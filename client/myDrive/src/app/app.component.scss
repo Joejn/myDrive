@@ -1,0 +1,23 @@
+.navbar {
+    justify-content: space-between;
+}
+
+span {
+    padding-right:  1rem;
+}
+
+.container {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+}
+
+.container .row.header {
+    flex: 0 1 auto;
+}
+
+.container .row.content {
+    flex: 1 1 auto;
+}
+
