@@ -28,14 +28,9 @@
                         </td>
                     </ng-container>
         
-                    <ng-container matColumnDef="owner">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Owner</th>
-                        <td mat-cell *matCellDef="let element">{{element.owner}}</td>
-                    </ng-container>
-        
                     <ng-container matColumnDef="last_modified">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>last_modified</th>
-                        <td mat-cell *matCellDef="let element">{{element.last_modified.getDate()}}.{{element.last_modified.getMonth() + 1}}.{{element.last_modified.getFullYear()}}</td>
+                        <td mat-cell *matCellDef="let element">{{element.last_modified}}</td>
                     </ng-container>
         
                     <ng-container matColumnDef="file_size">
