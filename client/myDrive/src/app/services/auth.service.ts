@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LoginData } from '../interfaces/login-data';
+import { RefreshTokenData } from '../interfaces/refresh-token-data';
 
 
 @Injectable({
@@ -27,7 +28,14 @@ export class AuthService {
   }
 
   refreshAccessToken() {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.getRefreshToken()}`
+      })
+    }
 
+    return this.http.post<RefreshTokenData>(`${this.authBaseUrl}/refresh`, "", httpOptions)
   }
 
   isLoggedIn() {
@@ -39,12 +47,20 @@ export class AuthService {
     return !this.tokenExpired(refreshToken)
   }
 
-  getAccessToken() {
-
+  getAccessToken(): string {
+    let access_token = ""
+    if (localStorage.getItem("access_token")) {
+      access_token = String(localStorage.getItem("access_token"))
+    }
+    return access_token
   }
 
-  getRefreshToken() {
-
+  getRefreshToken(): string {
+    let refresh_token = ""
+    if (localStorage.getItem("refresh_token")) {
+      refresh_token = String(localStorage.getItem("refresh_token"))
+    }
+    return refresh_token
   }
 
   tokenExpired(token: string) {

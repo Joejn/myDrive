@@ -13,6 +13,7 @@ jwt = JWTManager(app)
 
 # Config app ################################################################################
 
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 8
 app.config["JWT_SECRET_KEY"] = "passme" # Change the secret key before deployment
 
 # start app #################################################################################

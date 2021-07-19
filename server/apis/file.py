@@ -11,16 +11,18 @@ PATH = "D:\myDrive\data"
 @api.route("/myFiles")
 class MyFiles(Resource):
     @api.doc("my files")
-    # @jwt_required()
+    @jwt_required()
     def get(self):
-        dirContent = listdir(PATH)
+        identity = get_jwt_identity()
+        user_storage_path = join(PATH, identity)
+        # print(identity)
+        dirContent = listdir(user_storage_path)
         dirElements = {
             "directories": [],
             "files": []
         }
         for item in dirContent:
-            fullName = join(PATH, item)
-            print(fullName)
+            fullName = join(user_storage_path, item)
             if (isfile(fullName)):
                 dirElements["files"].append(
                     {"name": item, "path": fullName, "last_modified": getmtime(fullName), "file_size": getsize(fullName)}

@@ -1,3 +1,4 @@
+from core.utils import Database
 from flask import request, json
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
@@ -12,16 +13,14 @@ user = api.model("User", {
     "groups": fields.String(required=False, description="group where the user is a member of"),
 })
 
-USERS = [
-    {"id": 1, "username": "admin", "password": "passme", "groups": "administrators"}
-]
-
 @api.route("/login")
 class Login(Resource):
     @api.doc("sign in")
     @api.param("password")
     @api.param("username")
     def post(self):
+       
+        
         user_credential = json.loads(request.data)
         if not (user_credential["username"] and user_credential["password"]):
             return {
@@ -30,10 +29,13 @@ class Login(Resource):
                 "refresh_token": ""
             }
 
+        db = Database
+        statement = "SELECT username FROM users WHERE username = '" + user_credential["username"] + "' and password = '" + user_credential["password"] + "';"
+        selectResult = db.select(statement)
+
         is_user_existing = False
-        for item in USERS:
-            if (item.get("username") == user_credential["username"] and item.get("password") == user_credential["password"]):
-                is_user_existing = True
+        if selectResult[0][0] == user_credential["username"]:
+            is_user_existing = True
         
         if not is_user_existing:
             return {
@@ -43,7 +45,7 @@ class Login(Resource):
             }
 
         access_token = create_access_token(identity=user_credential["username"])
-        refresh_token = create_refresh_token(identity=user_credential["password"])
+        refresh_token = create_refresh_token(identity=user_credential["username"])
 
         return {
             "login": True,
@@ -60,6 +62,7 @@ class Refresh(Resource):
         user = get_jwt_identity()
         access_token = create_access_token(identity=user)
         return {
+            "refresh": True,
             "access_token": access_token
         }
 

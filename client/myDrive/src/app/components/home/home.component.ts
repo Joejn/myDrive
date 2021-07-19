@@ -57,7 +57,6 @@ export class HomeComponent implements AfterViewInit {
         )
       }
 
-      console.log(rows)
       this.dataSource = new MatTableDataSource(rows)
       this.dataSource.sort = this.sort
     })
