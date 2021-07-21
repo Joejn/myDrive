@@ -7,6 +7,7 @@ import { Dir } from 'src/app/interfaces/dir';
 export interface TableElement {
   type: string,
   name: string,
+  path: string
   last_modified: string,
   file_size: string
 }
@@ -30,14 +31,34 @@ export class HomeComponent implements AfterViewInit {
   dataSource = new MatTableDataSource(rows)
 
   constructor ( private file: FileService ) {
+    this.setTableData()
+  }
+
+  @ViewChild(MatSort, {static: false}) sort!: MatSort
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort
+  }
+
+  setTableData(directory: string = "/") {
     rows = []
-    this.file.getHomeDir().subscribe((data: Dir) => {
+    if (directory !== "/") {
+      rows = [{
+        "type": "directory",
+        "name": "..",
+        "path": "..",
+        "last_modified": "",
+        "file_size": ""
+      }]
+    }
+    
+    this.file.getDir(directory).subscribe((data: Dir) => {
       for (const item of data.directories) {
         const last_modified = new Date(item.last_modified * 1000)
         rows.push(
           {
             "type": "directory",
             "name": item.name,
+            "path": item.path,
             "last_modified": this.getModifiedStr(last_modified),
             "file_size": this.formatBytes(item.file_size)
           }
@@ -51,8 +72,9 @@ export class HomeComponent implements AfterViewInit {
           {
             "type": "file",
             "name": item.name,
+            "path": item.path,
             "last_modified": this.getModifiedStr(last_modified),
-            "file_size": this.formatBytes(item.file_size)
+            "file_size": this.formatBytes(item.file_size),
           }
         )
       }
@@ -60,11 +82,6 @@ export class HomeComponent implements AfterViewInit {
       this.dataSource = new MatTableDataSource(rows)
       this.dataSource.sort = this.sort
     })
-  }
-
-  @ViewChild(MatSort, {static: false}) sort!: MatSort
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort
   }
 
   // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
@@ -82,6 +99,8 @@ export class HomeComponent implements AfterViewInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   getModifiedStr( last_modified: Date): string {
     const last_modified_date = new Date(last_modified).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0)
@@ -97,4 +116,9 @@ export class HomeComponent implements AfterViewInit {
 
   // @ViewChild(MatSort) sort: MatSort
 
+  onClick(row: any) {
+    if (row["type"] === "directory") {
+      this.setTableData(row.path)
+    }
+  }
 }
