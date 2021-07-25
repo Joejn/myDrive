@@ -1,0 +1,79 @@
+<div>
+    <mat-card class="setting_card">
+        <div class="container">
+            <form (submit)="onSubmit($event)">
+                <div class="row row-line">
+                    <div class="col-sm-2">
+                        <span>Image</span>
+                    </div>
+                    <div class="col-sm">
+                        <button type="button" class="user_icon_button">
+                            <div class="text">Hinzufügen</div>
+                            <mat-icon class="user_icon">person</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row row-line">
+                    <div class="col-sm-2">
+                        <span>Firstname</span>
+                    </div>
+                    <div class="col-sm">
+                        <div>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Firstname</mat-label>
+                                <input matInput type="text" required>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row row-line">
+                    <div class="col-sm-2">
+                        <span>Lastname</span>
+                    </div>
+                    <div class="col-sm">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Lastname</mat-label>
+                            <input matInput type="text" required>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="row row-line">
+                    <div class="col-sm-2">
+                        <span>Birthday</span>
+                    </div>
+                    <div class="col-sm">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Birthday</mat-label>
+                            <input matInput [matDatepicker]="picker">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="row row-line">
+                    <div class="col-sm-2">
+                        <span>E-Mail</span>
+                    </div>
+                    <div class="col-sm">
+                        <mat-form-field appearance="outline">
+                            <mat-label>E-Mail</mat-label>
+                            <input matInput type="email">
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm" style="display: flex; justify-content: end;">
+                        <button mat-raised-button type="button">Reset</button>
+                        <button mat-raised-button color="primary" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </mat-card>
+</div>
+

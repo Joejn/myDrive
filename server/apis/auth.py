@@ -1,3 +1,4 @@
+from flask_jwt_extended.utils import get_jwt
 from core.utils import Database
 from flask import request, json
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -30,11 +31,17 @@ class Login(Resource):
             }
 
         db = Database
-        statement = "SELECT username FROM users WHERE username = '" + user_credential["username"] + "' and password = '" + user_credential["password"] + "';"
+        statement = "SELECT id, username FROM users WHERE username = '" + user_credential["username"] + "' and password = '" + user_credential["password"] + "';"
         selectResult = db.select(statement)
 
         is_user_existing = False
-        if selectResult[0][0] == user_credential["username"]:
+        if not selectResult:
+            return {
+                "login": False,
+                "access_token": "",
+                "refresh_token": ""
+            }
+        if selectResult[0][1] == user_credential["username"]:
             is_user_existing = True
         
         if not is_user_existing:
@@ -44,8 +51,9 @@ class Login(Resource):
                 "refresh_token": ""
             }
 
-        access_token = create_access_token(identity=user_credential["username"])
-        refresh_token = create_refresh_token(identity=user_credential["username"])
+        additional_claims = { "id": selectResult[0][0]}
+        access_token = create_access_token(identity=user_credential["username"], additional_claims=additional_claims)
+        refresh_token = create_refresh_token(identity=user_credential["username"], additional_claims=additional_claims)
 
         return {
             "login": True,
@@ -60,7 +68,9 @@ class Refresh(Resource):
     @jwt_required(refresh=True)
     def post(self):
         user = get_jwt_identity()
-        access_token = create_access_token(identity=user)
+        id = get_jwt()["id"]
+        additional_claims = { "id": id}
+        access_token = create_access_token(identity=user, additional_claims=additional_claims)
         return {
             "refresh": True,
             "access_token": access_token

@@ -6,10 +6,17 @@
     <mat-drawer-content style="padding: 1em;">
             <div class="recent">
                 <mat-grid-list cols="4" rowHeight="100%">
-                    <div *ngFor="let item of RecentFiles" class="recent_items">
-                        <mat-grid-tile>
+                    <div *ngFor="let item of recentFiles">
+                        <mat-grid-tile style="height: 100%;">
                             <mat-card class="recent_items">
-                                {{item}}
+                                <button style="height: 100%; width: 100%; background-color: transparent; border: none;" (click)="onRecentFileClicked(item.name, item.path)">
+                                    <h2>{{item.name}}</h2>
+                                    <br>
+                                    <div>
+                                        <mat-icon style="width: 100%; font-size: 4em;">description</mat-icon>
+                                    </div>
+                                </button>
+                                
                             </mat-card>
                         </mat-grid-tile>
                     </div>

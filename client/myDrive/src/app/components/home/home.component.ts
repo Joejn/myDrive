@@ -1,8 +1,12 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FileService } from 'src/app/services/file.service';
 import { Dir } from 'src/app/interfaces/dir';
+import { MatDialog } from '@angular/material/dialog';
+import { TextFileComponent } from 'src/app/dialogs/text-file/text-file.component';
+import { ImageFileComponent } from 'src/app/dialogs/image-file/image-file.component';
+import { RecentFiles } from 'src/app/interfaces/recent-files';
 
 export interface TableElement {
   type: string,
@@ -10,6 +14,12 @@ export interface TableElement {
   path: string
   last_modified: string,
   file_size: string
+}
+
+interface Row {
+  "type": string,
+  "name": string,
+  "path": string
 }
 
 let rows: TableElement[] = []
@@ -20,18 +30,14 @@ let rows: TableElement[] = []
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements AfterViewInit {
-  RecentFiles = [
-    "Datei 1",
-    "Datei 2",
-    "Datei 3",
-    "Datei 4"
-  ]
+  recentFiles: RecentFiles[] = []
 
   displayedColumns: string[] = ["name", "last_modified", "file_size"]
   dataSource = new MatTableDataSource(rows)
 
-  constructor ( private file: FileService ) {
+  constructor ( private file: FileService, private dialog: MatDialog ) {
     this.setTableData()
+    this.setRecentFiles()
   }
 
   @ViewChild(MatSort, {static: false}) sort!: MatSort
@@ -106,9 +112,16 @@ export class HomeComponent implements AfterViewInit {
     const today = new Date().setHours(0, 0, 0, 0)
     let display_last_modified = ""
     if (today !== last_modified_date) {
-      display_last_modified = `${last_modified.getDate()}.${last_modified.getMonth()}.${last_modified.getFullYear()}`
+      let day = last_modified.getDate() < 10 ? "0" + String(last_modified.getDate()) : last_modified.getDate()
+      let month = last_modified.getMonth() < 10 ? "0" + String(last_modified.getMonth()) : last_modified.getMonth()
+      let year = last_modified.getFullYear()
+
+      display_last_modified = `${day}.${month}.${year}`
     } else {
-      display_last_modified = `${last_modified.getHours()}:${last_modified.getMinutes()}`
+      let houre = last_modified.getHours() < 10 ? "0" + String(last_modified.getHours()) : last_modified.getHours()
+      let minutes = last_modified.getMinutes() < 10 ? "0" + String(last_modified.getMinutes()) : last_modified.getMinutes()
+
+      display_last_modified = `${houre}:${minutes}`
     }
 
     return display_last_modified
@@ -117,8 +130,73 @@ export class HomeComponent implements AfterViewInit {
   // @ViewChild(MatSort) sort: MatSort
 
   onClick(row: any) {
+    const currentRow: Row = {
+      type: row["type"],
+      name: row["name"],
+      path: row["path"]
+    }
+
+    this.setFileAction(currentRow)
+  }
+
+  openTextDialog( title: string, content: string, path: string) {
+    let dialog = this.dialog.open(TextFileComponent, { disableClose: true })
+    dialog.componentInstance.title = title
+    dialog.componentInstance.content = content
+    dialog.componentInstance.path = path
+  }
+
+  openImageDialog( title: string, content: string ) {
+    let dialog = this.dialog.open(ImageFileComponent, {disableClose: true})
+    dialog.componentInstance.title = title
+    dialog.componentInstance.content = content
+  }
+
+
+  setRecentFiles() {
+    this.file.getRecentFiles().subscribe((data: RecentFiles[]) => {
+        console.log(data)
+        this.recentFiles = data
+    })
+  }
+
+  onRecentFileClicked( name: string, path: string ) {
+    const currentRow: Row = {
+      type: "file",
+      name: name,
+      path: path
+    }
+    this.setFileAction(currentRow)
+  }
+
+  setFileAction(row: Row) {
     if (row["type"] === "directory") {
       this.setTableData(row.path)
+    } else {
+      const  file_extension: string = row.name.split(".").pop() + ""
+      this.file.getSpecificFile(row.path).subscribe(data => {
+        let blob = new Blob([atob(data)], { type: "octet/stream" })
+        const imgFormats = ["png", "jpg"]
+        
+        if (file_extension === "txt") {
+            this.openTextDialog(row.name, atob(data), row.path)
+        } else if (file_extension === "pdf") {
+
+        } else if (imgFormats.includes(file_extension)) {
+          this.openImageDialog(row.name, data)
+        } else {
+          // https://stackoverflow.com/questions/52182851/how-to-download-file-with-blob-function-using-angular-5
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement("a")
+          document.body.appendChild(a)
+          a.setAttribute("style", "display: none")
+          a.href = url
+          a.download = row.name
+          a.click()
+          window.URL.revokeObjectURL(url)
+          a.remove()
+        }
+      })
     }
   }
 }

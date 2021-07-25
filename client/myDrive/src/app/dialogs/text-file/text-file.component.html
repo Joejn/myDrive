@@ -1,0 +1,30 @@
+
+    <div mat-dialog-title style="display: flex; margin: 0em 1em 0.4em 1em">
+        <div style="flex-grow: 1; display: flex; align-items: center;">
+            <span>
+                {{this.title}}
+            </span>
+        </div>
+        <div>
+            <button mat-mini-fab mat-dialog-close color="warn">X</button>
+        </div>
+        
+    </div>
+    
+    <hr>
+    <div>
+        <mat-dialog-content>
+            <div class="main-content" contenteditable="true" #mainContent>
+                {{this.content}}
+            </div>
+        </mat-dialog-content>
+        <div style="display: flex; justify-content: end;">
+            <button mat-raised-button mat-dialog-close style="margin: 1em 0.4em 1em 1em;">Cancel</button>
+            <button mat-raised-button color="primary" [mat-dialog-close]="this.content" (click)="onSaveButtonClicked(mainContent.innerText)" style="margin: 1em 1em 1em 0.4em;">Save</button>
+        </div>
+        
+    </div>
+    
+    
+
+

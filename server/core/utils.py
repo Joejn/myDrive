@@ -1,4 +1,5 @@
 import psycopg2
+from os import path
 
 DB_HOST = "127.0.0.1"
 DB_NAME = "myDrive"
@@ -12,6 +13,10 @@ class Database():
     def select(statement):
         cur.execute(statement)
         return cur.fetchall()
+
+    def exec(statement):
+        cur.execute(statement)
+        conn.commit()
 
     def __exit__():
         cur.close()

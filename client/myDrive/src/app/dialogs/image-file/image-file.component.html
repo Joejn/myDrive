@@ -1,0 +1,26 @@
+
+    <div mat-dialog-title style="display: flex; margin: 0em 1em 0.4em 1em">
+        <div style="flex-grow: 1; display: flex; align-items: center;">
+            <span>
+                {{this.title}}
+            </span>
+        </div>
+        <div>
+            <button mat-mini-fab (click)="download()"><mat-icon>file_download</mat-icon></button>
+            <button mat-mini-fab mat-dialog-close color="warn">X</button>
+        </div>
+        
+    </div>
+    
+    <hr>
+    <div>
+        <mat-dialog-content>
+            <div class="main-content" contenteditable="true" id="mainContent">
+                <!-- {{this.content}} -->
+            </div>
+        </mat-dialog-content>
+    </div>
+    
+    
+
+
