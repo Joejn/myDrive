@@ -7,21 +7,18 @@
           <span routerLink="/login">login</span>
         </ng-template>
         <ng-template #links_logged_in>
-          <button class="user_icon" [matMenuTriggerFor]="menu">
-            <mat-icon style="color: black;">person</mat-icon>
-          </button>
+          <button class="user_icon" [matMenuTriggerFor]="menu" id="userProfilePictureDiv"></button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item routerLink="/home">Home</button>
             <button mat-menu-item routerLink="/user_settings">Settings</button>
             <hr style="margin: 0px 8px 0px 8px;">
             <button mat-menu-item routerLink="/login" (click)="auth.logout()">Logout</button>
           </mat-menu>
-          <!-- <span routerLink="/login" (click)="auth.logout()">logout</span> -->
         </ng-template>
     </mat-toolbar>
   </div>
   <div class="custom_row content">
-    <router-outlet></router-outlet>
+    <router-outlet (activate)="onActivated($event)"></router-outlet>
   </div>
 </div>
 

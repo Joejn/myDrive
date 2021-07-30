@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { LoginData } from 'src/app/interfaces/login-data';
@@ -11,6 +11,7 @@ import { LoginData } from 'src/app/interfaces/login-data';
 export class LoginComponent implements OnInit {
 
   constructor( private auth: AuthService, private router: Router ) { }
+  @Output() loggedIn = new EventEmitter()
 
   username: string = ""
   password: string = ""
@@ -28,8 +29,8 @@ export class LoginComponent implements OnInit {
 
       localStorage.setItem("access_token", data.access_token)
       localStorage.setItem("refresh_token", data.refresh_token)
+      this.loggedIn.emit()
       this.router.navigate(["home"])
     })
   }
-
 }

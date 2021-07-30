@@ -1,3 +1,4 @@
+import bcrypt
 from flask_jwt_extended.utils import get_jwt
 from core.utils import Database
 from flask import request, json
@@ -30,10 +31,12 @@ class Login(Resource):
                 "refresh_token": ""
             }
 
-        db = Database
-        statement = "SELECT id, username FROM users WHERE username = '" + user_credential["username"] + "' and password = '" + user_credential["password"] + "';"
-        selectResult = db.select(statement)
+        password = user_credential["password"]
 
+        db = Database
+        statement = "SELECT id, username, password FROM users WHERE username = '" + user_credential["username"] + "';"
+        selectResult = db.select(statement)
+        
         is_user_existing = False
         if not selectResult:
             return {
@@ -41,6 +44,14 @@ class Login(Resource):
                 "access_token": "",
                 "refresh_token": ""
             }
+
+        if not bcrypt.checkpw(str(password).encode("utf-8"), str(selectResult[0][2]).encode("utf-8")):
+            return {
+                "login": False,
+                "access_token": "",
+                "refresh_token": ""
+            }
+
         if selectResult[0][1] == user_credential["username"]:
             is_user_existing = True
         

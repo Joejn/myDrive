@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -30,18 +30,19 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatProgressBarModule} from '@angular/material/progress-bar'; 
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ChangePasswordComponent } from './dialogs/change-password/change-password.component';
 
 const materialModules = [
   MatToolbarModule,
   MatButtonModule,
   MatCardModule,
   MatFormFieldModule,
-  HttpClientModule,
-  FormsModule,
   MatInputModule,
   MatIconModule,
   MatSidenavModule,
@@ -53,7 +54,9 @@ const materialModules = [
   MatMenuModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatRippleModule
+  MatRippleModule,
+  MatSnackBarModule,
+  MatProgressBarModule
 ]
 
 @NgModule({
@@ -64,7 +67,8 @@ const materialModules = [
     SidenavComponent,
     ImageFileComponent,
     TextFileComponent,
-    UserSettingsComponent
+    UserSettingsComponent,
+    ChangePasswordComponent
   ],
   imports: [
     BrowserModule,
@@ -72,6 +76,9 @@ const materialModules = [
     BrowserAnimationsModule,
     materialModules,
     NgbModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [
     {

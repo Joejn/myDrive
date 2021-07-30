@@ -155,7 +155,6 @@ export class HomeComponent implements AfterViewInit {
 
   setRecentFiles() {
     this.file.getRecentFiles().subscribe((data: RecentFiles[]) => {
-        console.log(data)
         this.recentFiles = data
     })
   }

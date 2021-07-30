@@ -74,7 +74,6 @@ class GetFile(Resource):
 
         basename = current_file.split("/").pop()
         statement = "INSERT INTO user_history (user_id, file_name, file_path) VALUES (" + str(user_id) + ", '" + str(basename) + "', '" + str(current_file) + "');"
-        print(statement)
         db = Database
         db.exec(statement)
 
@@ -122,7 +121,6 @@ class GetRecentFiles(Resource):
                 (SELECT distinct on (file_path) id, file_name, file_path FROM public.user_history WHERE user_id = """ + str(id) + """ LIMIT 4) as subselect
             ORDER BY subselect.id DESC
         """
-        print(statement)
         recent_files = db.select(statement)
         data = []
         for item in recent_files:

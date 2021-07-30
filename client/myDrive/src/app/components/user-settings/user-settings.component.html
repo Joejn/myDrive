@@ -1,15 +1,15 @@
 <div>
-    <mat-card class="setting_card">
+    <mat-card id="mainContent" class="setting_card">
         <div class="container">
-            <form (submit)="onSubmit($event)">
+            <form (submit)="userForm.valid ? onSubmit($event) : 'return'" [formGroup]="userForm" >
                 <div class="row row-line">
                     <div class="col-sm-2">
                         <span>Image</span>
                     </div>
                     <div class="col-sm">
-                        <button type="button" class="user_icon_button">
+                        <input type="file" id="img_input" style="visibility: hidden;" (change)="onImgUploadChanged($event)">
+                        <button type="button" class="user_icon_button" (click)="onImgUploadClicked()" id="user_profile_picture">
                             <div class="text">Hinzufügen</div>
-                            <mat-icon class="user_icon">person</mat-icon>
                         </button>
                     </div>
                 </div>
@@ -22,7 +22,10 @@
                         <div>
                             <mat-form-field appearance="outline">
                                 <mat-label>Firstname</mat-label>
-                                <input matInput type="text" required>
+                                <input matInput type="text" name="firstname" formControlName="firstname" required>
+                                <mat-error *ngIf="this.userForm.controls['firstname'].hasError('required')">
+                                    {{ this.getErrorMessage("required", { "name": "Firstname" }) }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
                     </div>
@@ -35,7 +38,10 @@
                     <div class="col-sm">
                         <mat-form-field appearance="outline">
                             <mat-label>Lastname</mat-label>
-                            <input matInput type="text" required>
+                            <input matInput type="text" name="lastname" formControlName="lastname" required>
+                            <mat-error *ngIf="this.userForm.controls['lastname'].hasError('required')">
+                                {{ this.getErrorMessage("required", { "name": "Lastname" }) }}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -47,9 +53,12 @@
                     <div class="col-sm">
                         <mat-form-field appearance="outline">
                             <mat-label>Birthday</mat-label>
-                            <input matInput [matDatepicker]="picker">
+                            <input matInput [matDatepicker]="picker" name="birthday" formControlName="birthday">
                             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                             <mat-datepicker #picker></mat-datepicker>
+                            <mat-error *ngIf="this.userForm.controls['birthday'].hasError('required')">
+                                {{ this.getErrorMessage("required", { "name": "Birthday" }) }}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -61,18 +70,39 @@
                     <div class="col-sm">
                         <mat-form-field appearance="outline">
                             <mat-label>E-Mail</mat-label>
-                            <input matInput type="email">
+                            <input matInput type="email" name="email" formControlName="email" required>
+                            <mat-error *ngIf="this.userForm.controls['email'].hasError('required')">
+                                {{ this.getErrorMessage("required", { "name": "Email" }) }}
+                            </mat-error>
+                            <mat-error *ngIf="this.userForm.controls['email'].hasError('email') && !this.userForm.controls['email'].hasError('required')">
+                                {{ this.getErrorMessage("email") }}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-sm" style="display: flex; justify-content: end;">
-                        <button mat-raised-button type="button">Reset</button>
+                        <button mat-raised-button type="button" (click)="onResetButtonClicked()">Reset</button>
                         <button mat-raised-button color="primary" type="submit">Save</button>
                     </div>
                 </div>
             </form>
+        </div>
+    </mat-card>
+    <mat-card class="setting_card">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                    <span>Password</span>
+                </div>
+                <div class="col-sm" style="display: flex; align-items: center;">
+                    <span>********</span>
+                    <div style="width: 100%; display: flex; justify-content: end;">
+                        <button mat-raised-button type="button" color="warn" (click)="onChagePasswordClicked()">Change</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </mat-card>
 </div>

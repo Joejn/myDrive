@@ -5,9 +5,10 @@ import { LoginComponent } from './components/login/login.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 import { LoginGuardGuard } from './guards/login-guard.guard';
+import { LogoutGuard } from './guards/logout.guard';
 
 const routes: Routes = [
-  { path: "login", component: LoginComponent},
+  { path: "login", component: LoginComponent, canActivate: [LogoutGuard]},
   { path: "", component: HomeComponent, canActivate: [LoginGuardGuard]},
   { path: "home", component: HomeComponent, canActivate: [LoginGuardGuard]},
   { path: "user_settings", component: UserSettingsComponent, canActivate: [LoginGuardGuard]},
