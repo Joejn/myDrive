@@ -1,7 +1,7 @@
 <div class="custom_container">
   <div class="custom_row header">
     <mat-toolbar color="primary" class="navbar">
-      <div routerLink="/home">myDrive</div>
+      <div routerLink="/home" style="cursor: pointer;">myDrive</div>
       <div *ngIf="auth.isLoggedIn(); then links_logged_in else links_not_logged_in"></div>
         <ng-template #links_not_logged_in>
           <span routerLink="/login">login</span>
@@ -9,10 +9,20 @@
         <ng-template #links_logged_in>
           <button class="user_icon" [matMenuTriggerFor]="menu" id="userProfilePictureDiv"></button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item routerLink="/home">Home</button>
-            <button mat-menu-item routerLink="/user_settings">Settings</button>
+            <div *ngFor="let item of loggedInLinks">
+              <button mat-menu-item routerLink={{item.routerLink}}>{{item.name}}</button>
+            </div>
+            <div *ngIf="this.auth.memberOfGroup('administrators')">
+              <div *ngFor="let item of administratorsLinks">
+                <hr style="margin: 0px 8px 0px 8px;">
+                <button mat-menu-item routerLink={{item.routerLink}}>{{item.name}}</button>
+              </div>
+            </div>
+
             <hr style="margin: 0px 8px 0px 8px;">
-            <button mat-menu-item routerLink="/login" (click)="auth.logout()">Logout</button>
+            <div *ngFor="let item of logoutLinks">
+              <button mat-menu-item routerLink={{item.routerLink}} (click)="auth.logout()">{{item.name}}</button>
+            </div>
           </mat-menu>
         </ng-template>
     </mat-toolbar>

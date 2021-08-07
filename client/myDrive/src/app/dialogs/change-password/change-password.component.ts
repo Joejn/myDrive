@@ -78,7 +78,7 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   setPasswordStrength() {
-    const password: string = this.changePasswordForm.controls["currentPassword"].value
+    const password: string = this.changePasswordForm.controls["newPassword"].value
     const passwordLenght: number = password.length
     const security_01: number = 30
     const security_02: number = 60

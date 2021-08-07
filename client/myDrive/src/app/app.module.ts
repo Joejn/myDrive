@@ -37,6 +37,13 @@ import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/mate
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChangePasswordComponent } from './dialogs/change-password/change-password.component';
+import { DashboardComponent } from './components/admin/dashboard/dashboard.component';
+import { AdminBackendComponent } from './components/admin/admin-backend/admin-backend.component';
+import { LineChartCpuUsedComponent } from './components/charts/line-chart-cpu-used/line-chart-cpu-used.component';
+import { LineChartMemoryUsedComponent } from './components/charts/line-chart-memory-used/line-chart-memory-used.component';
+import { DoughnutChartSpaceUsedComponent } from './components/charts/doughnut-chart-space-used/doughnut-chart-space-used.component';
+import { LineChartCpuFreqComponent } from './components/charts/line-chart-cpu-freq/line-chart-cpu-freq.component';
+import { UsersComponent } from './components/admin/users/users.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -68,7 +75,14 @@ const materialModules = [
     ImageFileComponent,
     TextFileComponent,
     UserSettingsComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    DashboardComponent,
+    AdminBackendComponent,
+    LineChartCpuUsedComponent,
+    LineChartMemoryUsedComponent,
+    DoughnutChartSpaceUsedComponent,
+    LineChartCpuFreqComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,

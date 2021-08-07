@@ -34,7 +34,7 @@ class Login(Resource):
         password = user_credential["password"]
 
         db = Database
-        statement = "SELECT id, username, password FROM users WHERE username = '" + user_credential["username"] + "';"
+        statement = "SELECT id, username, password, groups FROM users WHERE username = '" + user_credential["username"] + "';"
         selectResult = db.select(statement)
         
         is_user_existing = False
@@ -62,7 +62,14 @@ class Login(Resource):
                 "refresh_token": ""
             }
 
-        additional_claims = { "id": selectResult[0][0]}
+        groups = selectResult[0][3]
+        if groups == None:
+            groups = []
+
+        additional_claims = {
+            "id": selectResult[0][0],
+            "groups": groups
+            }
         access_token = create_access_token(identity=user_credential["username"], additional_claims=additional_claims)
         refresh_token = create_refresh_token(identity=user_credential["username"], additional_claims=additional_claims)
 
@@ -80,7 +87,11 @@ class Refresh(Resource):
     def post(self):
         user = get_jwt_identity()
         id = get_jwt()["id"]
-        additional_claims = { "id": id}
+        groups = get_jwt()["groups"]
+        additional_claims = {
+            "id": id,
+            "groups": groups
+            }
         access_token = create_access_token(identity=user, additional_claims=additional_claims)
         return {
             "refresh": True,

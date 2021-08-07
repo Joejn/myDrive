@@ -1,4 +1,4 @@
-<div>
+<div class="content-div">
     <mat-card id="mainContent" class="setting_card">
         <div class="container">
             <form (submit)="userForm.valid ? onSubmit($event) : 'return'" [formGroup]="userForm" >
@@ -7,7 +7,7 @@
                         <span>Image</span>
                     </div>
                     <div class="col-sm">
-                        <input type="file" id="img_input" style="visibility: hidden;" (change)="onImgUploadChanged($event)">
+                        <input type="file" id="img_input" style="visibility: hidden;" accept="image/*" (change)="onImgUploadChanged($event)">
                         <button type="button" class="user_icon_button" (click)="onImgUploadClicked()" id="user_profile_picture">
                             <div class="text">Hinzufügen</div>
                         </button>

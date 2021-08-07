@@ -68,4 +68,17 @@ export class AuthService {
     return (Math.floor((new Date).getTime() / 1000)) >= expiry
   }
 
+  getGroups() {
+    const token = this.getAccessToken()
+    let base64Url = token.split(".")[1]
+    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+    const groups = JSON.parse(atob(base64))["groups"]
+    return groups
+  }
+
+  memberOfGroup(group: string) {
+    const userGroups = this.getGroups()
+    return userGroups.includes(group) ? true : false
+  }
+
 }
