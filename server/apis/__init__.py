@@ -4,6 +4,7 @@ from .auth import api as auth
 from .file import api as file
 from .user_profile import api as user_profile
 from .server_info import api as server_info
+from .users import api as users
 
 api = Api(
     title="myDrive",
@@ -15,3 +16,4 @@ api.add_namespace(auth)
 api.add_namespace(file)
 api.add_namespace(user_profile)
 api.add_namespace(server_info)
+api.add_namespace(users)

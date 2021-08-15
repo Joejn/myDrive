@@ -31,7 +31,8 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {MatProgressBarModule} from '@angular/material/progress-bar'; 
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatPaginatorModule} from '@angular/material/paginator'; 
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -44,6 +45,7 @@ import { LineChartMemoryUsedComponent } from './components/charts/line-chart-mem
 import { DoughnutChartSpaceUsedComponent } from './components/charts/doughnut-chart-space-used/doughnut-chart-space-used.component';
 import { LineChartCpuFreqComponent } from './components/charts/line-chart-cpu-freq/line-chart-cpu-freq.component';
 import { UsersComponent } from './components/admin/users/users.component';
+import { NewUserDialogComponent } from './components/admin/dialogs/new-user-dialog/new-user-dialog.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -63,7 +65,8 @@ const materialModules = [
   MatNativeDateModule,
   MatRippleModule,
   MatSnackBarModule,
-  MatProgressBarModule
+  MatProgressBarModule,
+  MatPaginatorModule
 ]
 
 @NgModule({
@@ -82,7 +85,8 @@ const materialModules = [
     LineChartMemoryUsedComponent,
     DoughnutChartSpaceUsedComponent,
     LineChartCpuFreqComponent,
-    UsersComponent
+    UsersComponent,
+    NewUserDialogComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,18 @@
+#userTable {
+    width: 100%;
+}
+
+:host ::ng-deep .no-wrapper .mat-form-field-wrapper {
+    margin: 0 !important;
+    padding: 0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    padding: 1em;
+}
+
+.header > * {
+    margin-right: 20px;
+}

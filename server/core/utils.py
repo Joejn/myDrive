@@ -1,5 +1,6 @@
 import psycopg2
-from os import path
+import bcrypt
+from core.consts import administrators_groups
 
 DB_HOST = "127.0.0.1"
 DB_NAME = "myDrive"
@@ -21,3 +22,13 @@ class Database():
     def __exit__():
         cur.close()
         conn.close
+
+class Password():
+    def hash( password ):
+        return bcrypt.hashpw(str.encode(password) , bcrypt.gensalt())
+
+class Admin():
+    def checkIfAdmin( id ):
+        db = Database
+        groups = db.select("SELECT groups FROM public.users WHERE id=" + str(id))[0][0]
+        return any(x in groups for x in administrators_groups)

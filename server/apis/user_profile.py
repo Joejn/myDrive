@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from core.utils import Database
 import base64
 import bcrypt
+from core.utils import Password
 
 api = Namespace("user_profile", description="userprofile related operations")
 
@@ -58,7 +59,7 @@ class UpdatePassword(Resource):
     @jwt_required()
     def post(self):
         current_password, new_password = json.loads(request.data).values()
-        hashed_new_password = bcrypt.hashpw(str.encode(new_password) , bcrypt.gensalt())
+        hashed_new_password = Password.hash(new_password)
         id = get_jwt()["id"]
         statement = "SELECT password FROM public.users WHERE id=" + str(id) + ";"
         db = Database
