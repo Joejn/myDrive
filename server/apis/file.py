@@ -1,11 +1,14 @@
+import os
 from flask import request, json
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource, fields
-from os import listdir, path
+from os import listdir
 from os.path import isfile, join, getsize, getmtime
 import base64
-from core.utils import Database, Config
+
+from werkzeug.utils import secure_filename
+from core.utils import Database, Config, Files
 
 api = Namespace("file", description="Files related operations")
 PATH = Config().get_data_dir()
@@ -18,35 +21,40 @@ class MyFiles(Resource):
         args = request.args
         identity = get_jwt_identity()
         user_storage_path = join(PATH, identity)
-        directory = str(args.get("directory")).replace("\\", "/")
-        if directory[0] == "/":
-            directory = directory[1:]
+        current_directory = args.get("directory")
+        if len(current_directory) > 0:
+            if current_directory[0] == "/" or current_directory[0] == "\\":
+                current_directory = current_directory[1:]
+        # directory = str(args.get("directory")).replace("\\", "/")
+        # if directory[0] == "/":
+        #     directory = directory[1:]
         
-        current_directory = user_storage_path
+        # current_directory = user_storage_path
         
-        if not directory == "/":
-            current_directory = join(user_storage_path, directory)
+        # if not directory == "/":
+        #     current_directory = join(user_storage_path, directory)
 
-        dirContent = listdir(current_directory)
-        dirElements = {
-            "directories": [],
-            "files": []
-        }
+        print(current_directory)
+        return Files().get_dir_content(user_storage_path, current_directory)
+        # dirContent = listdir(current_directory)
+        # dirElements = {
+        #     "directories": [],
+        #     "files": []
+        # }
 
-        for item in dirContent:
-            fullName = join(current_directory, item)
-            if (isfile(fullName)):
-                dirElements["files"].append(
-                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
-                )
-            else:
-                dirElements["directories"].append(
-                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
-                )
+        # for item in dirContent:
+        #     fullName = join(current_directory, item)
+        #     if (isfile(fullName)):
+        #         dirElements["files"].append(
+        #             {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
+        #         )
+        #     else:
+        #         dirElements["directories"].append(
+        #             {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
+        #         )
 
-        return dirElements
+        # return dirElements
         
-
 @api.route("/get_file")
 class GetFile(Resource):
     @api.param("file")
@@ -129,3 +137,22 @@ class GetRecentFiles(Resource):
             )
 
         return data
+
+@api.route("/upload_files")
+class UploadFiles(Resource):
+    @api.doc("upload files")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+        user_storage_path = join(PATH, identity)
+        current_dir = request.headers.get("current_dir")
+        if len(current_dir) > 0:
+            current_dir = current_dir[1:]
+        files = request.files
+        for file in files:
+            f = files.get(file)
+            file_path =  os.path.join(user_storage_path, current_dir, file)
+            f.save(file_path)
+
+        
+

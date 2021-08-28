@@ -34,6 +34,7 @@ export class HomeComponent implements AfterViewInit {
 
   displayedColumns: string[] = ["name", "last_modified", "file_size"]
   dataSource = new MatTableDataSource(rows)
+  currentDir = ""
 
   constructor ( private file: FileService, private dialog: MatDialog ) {
     this.setTableData()
@@ -136,6 +137,7 @@ export class HomeComponent implements AfterViewInit {
       path: row["path"]
     }
 
+    this.currentDir = row["path"]
     this.setFileAction(currentRow)
   }
 
@@ -151,7 +153,6 @@ export class HomeComponent implements AfterViewInit {
     dialog.componentInstance.title = title
     dialog.componentInstance.content = content
   }
-
 
   setRecentFiles() {
     this.file.getRecentFiles().subscribe((data: RecentFiles[]) => {
@@ -197,5 +198,12 @@ export class HomeComponent implements AfterViewInit {
         }
       })
     }
+  }
+
+  onFileUploadChanged(event: any) {
+    console.log(this.currentDir)
+    this.file.uploadFiles(event.target.files, this.currentDir).subscribe((data) => {
+      this.setTableData(this.currentDir)
+    })
   }
 }

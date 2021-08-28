@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Dir } from 'src/app/interfaces/dir';
 import { RecentFiles } from '../interfaces/recent-files';
@@ -57,5 +57,20 @@ export class FileService {
 
   getRecentFiles() {
     return this.http.get<RecentFiles[]>(`${this.fileApiUrl}/get_recent_files`)
+  }
+
+  uploadFiles( files: File[], currentDir: string) {
+    const fd = new FormData()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        "current_dir": currentDir
+      })
+    }
+    for (const file of files) {
+      if (typeof(file) === "object") {
+        fd.append(file.name, file, file.name)
+      }
+    }
+    return this.http.post(`${this.fileApiUrl}/upload_files`, fd, httpOptions)
   }
 }
