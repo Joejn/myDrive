@@ -46,6 +46,7 @@ import { DoughnutChartSpaceUsedComponent } from './components/charts/doughnut-ch
 import { LineChartCpuFreqComponent } from './components/charts/line-chart-cpu-freq/line-chart-cpu-freq.component';
 import { UsersComponent } from './components/admin/users/users.component';
 import { NewUserDialogComponent } from './components/admin/dialogs/new-user-dialog/new-user-dialog.component';
+import { CreateFolderComponent } from './dialogs/create-folder/create-folder.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -86,7 +87,8 @@ const materialModules = [
     DoughnutChartSpaceUsedComponent,
     LineChartCpuFreqComponent,
     UsersComponent,
-    NewUserDialogComponent
+    NewUserDialogComponent,
+    CreateFolderComponent
   ],
   imports: [
     BrowserModule,

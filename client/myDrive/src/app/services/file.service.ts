@@ -73,4 +73,13 @@ export class FileService {
     }
     return this.http.post(`${this.fileApiUrl}/upload_files`, fd, httpOptions)
   }
+
+  createFolder(currentDir: string, folderName: string) {
+    const body = {
+      "current_dir": currentDir,
+      "folder_name": folderName
+    }
+
+    return this.http.post(`${this.fileApiUrl}/create_folder`, body)
+  }
 }

@@ -1,4 +1,5 @@
 import os
+from core.utils import Path
 from flask import request, json
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
@@ -25,35 +26,9 @@ class MyFiles(Resource):
         if len(current_directory) > 0:
             if current_directory[0] == "/" or current_directory[0] == "\\":
                 current_directory = current_directory[1:]
-        # directory = str(args.get("directory")).replace("\\", "/")
-        # if directory[0] == "/":
-        #     directory = directory[1:]
-        
-        # current_directory = user_storage_path
-        
-        # if not directory == "/":
-        #     current_directory = join(user_storage_path, directory)
 
         print(current_directory)
         return Files().get_dir_content(user_storage_path, current_directory)
-        # dirContent = listdir(current_directory)
-        # dirElements = {
-        #     "directories": [],
-        #     "files": []
-        # }
-
-        # for item in dirContent:
-        #     fullName = join(current_directory, item)
-        #     if (isfile(fullName)):
-        #         dirElements["files"].append(
-        #             {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
-        #         )
-        #     else:
-        #         dirElements["directories"].append(
-        #             {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
-        #         )
-
-        # return dirElements
         
 @api.route("/get_file")
 class GetFile(Resource):
@@ -154,5 +129,18 @@ class UploadFiles(Resource):
             file_path =  os.path.join(user_storage_path, current_dir, file)
             f.save(file_path)
 
-        
+@api.route("/create_folder")
+class CreateFolder(Resource):
+    @api.doc("Create a new folder")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+        user_storage_path = join(PATH, identity)
+        request_data =  json.loads(request.data)
+        current_dir = Path().to_relative(request_data.get("current_dir"))
+        folder_name = request_data.get("folder_name")
 
+        absolute_folder_path = os.path.join(user_storage_path, current_dir, folder_name)
+        print(absolute_folder_path)
+        if not os.path.exists(absolute_folder_path):
+            os.makedirs(absolute_folder_path)

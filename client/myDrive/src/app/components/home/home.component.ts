@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TextFileComponent } from 'src/app/dialogs/text-file/text-file.component';
 import { ImageFileComponent } from 'src/app/dialogs/image-file/image-file.component';
 import { RecentFiles } from 'src/app/interfaces/recent-files';
+import { CreateFolderComponent } from 'src/app/dialogs/create-folder/create-folder.component';
 
 export interface TableElement {
   type: string,
@@ -204,6 +205,18 @@ export class HomeComponent implements AfterViewInit {
     console.log(this.currentDir)
     this.file.uploadFiles(event.target.files, this.currentDir).subscribe((data) => {
       this.setTableData(this.currentDir)
+    })
+  }
+
+  onCreateFolderClicked() {
+    const dialogRef = this.dialog.open(CreateFolderComponent)
+    dialogRef.afterClosed().subscribe((result: string) => {
+      if (result === "") {
+        return
+      }
+      this.file.createFolder(this.currentDir, result).subscribe(data => {
+        this.setTableData(this.currentDir)
+      })
     })
   }
 }

@@ -68,3 +68,12 @@ class Config():
 
     def get_data_dir(self):
         return self.config_parser.get("GENERAL", "HomeDir")
+
+class Path():
+    def to_relative(self, path):
+        if len(path) > 0:
+            path = "/".join(path.split("\\"))
+            if path[0] == "/":
+                path = path[1:]
+        
+        return path

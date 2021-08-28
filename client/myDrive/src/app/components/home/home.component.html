@@ -25,8 +25,9 @@
             <hr style="border-color:lightgray;">
             <div class="main-content">
                 <div class="main-content-header">
-                    <button mat-raised-button color="primary" type="file" (click)="fileUpload.click()" ><mat-icon>cloud_upload</mat-icon> Upload file</button>
+                    <button mat-raised-button color="primary" type="button" (click)="fileUpload.click()" ><mat-icon>cloud_upload</mat-icon> Upload file</button>
                     <input type="file" multiple hidden #fileUpload (change)="onFileUploadChanged($event)" >
+                    <button mat-raised-button color="primary" type="button" (click)="onCreateFolderClicked()" ><mat-icon>add</mat-icon> Create folder</button>
                 </div>
                 <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
                     <ng-container matColumnDef="name">
