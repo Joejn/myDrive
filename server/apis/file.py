@@ -5,10 +5,10 @@ from flask_restx import Namespace, Resource, fields
 from os import listdir, path
 from os.path import isfile, join, getsize, getmtime
 import base64
-from core.utils import Database
+from core.utils import Database, Config
 
 api = Namespace("file", description="Files related operations")
-PATH = "D:\myDrive\data"
+PATH = Config().get_data_dir()
 
 @api.route("/myFiles")
 class MyFiles(Resource):

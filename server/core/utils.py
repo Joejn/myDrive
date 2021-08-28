@@ -1,6 +1,8 @@
+import os
 import psycopg2
 import bcrypt
 from core.consts import administrators_groups
+from configparser import ConfigParser
 
 DB_HOST = "127.0.0.1"
 DB_NAME = "myDrive"
@@ -32,3 +34,13 @@ class Admin():
         db = Database
         groups = db.select("SELECT groups FROM public.users WHERE id=" + str(id))[0][0]
         return any(x in groups for x in administrators_groups)
+
+class Config():
+    def __init__(self):
+        self.config_parser = ConfigParser()
+        dirname = os.path.dirname(__file__)
+        self.config_file = os.path.join(dirname, "..", "config.ini")
+        self.config_parser.read(self.config_file)
+
+    def get_data_dir(self):
+        return self.config_parser.get("GENERAL", "HomeDir")
