@@ -6,13 +6,6 @@ import bcrypt
 from core.consts import administrators_groups
 from configparser import ConfigParser
 
-DB_HOST = "127.0.0.1"
-DB_NAME = "myDrive"
-DB_USER = "admin"
-DB_PASS = "passme"
-
-conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-cur = conn.cursor()
 
 class Files():
     def get_dir_content(self, user_storage_path, current_directory):
@@ -27,47 +20,73 @@ class Files():
             fullName = join(current_directory_absolute, item)
             if (isfile(fullName)):
                 dirElements["files"].append(
-                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
+                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(
+                        fullName), "file_size": getsize(fullName)}
                 )
             else:
                 dirElements["directories"].append(
-                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(fullName), "file_size": getsize(fullName)}
+                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(
+                        fullName), "file_size": getsize(fullName)}
                 )
 
         return dirElements
 
+
 class Database():
-    def select(statement):
-        cur.execute(statement)
-        return cur.fetchall()
+    def __init__(self):
+        conf = Config()
+        self.conn = psycopg2.connect(dbname=conf.get_db_name(), user=conf.get_db_user(
+        ), password=conf.get_db_pass(), host=conf.get_db_host())
+        self.cur = self.conn.cursor()
 
-    def exec(statement):
-        cur.execute(statement)
-        conn.commit()
+    def select(self, statement):
+        self.cur.execute(statement)
+        return self.cur.fetchall()
 
-    def __exit__():
-        cur.close()
-        conn.close
+    def exec(self, statement):
+        self.cur.execute(statement)
+        self.conn.commit()
+
+    def __exit__(self):
+        self.cur.close()
+        self.conn.close
+
 
 class Password():
-    def hash( password ):
-        return bcrypt.hashpw(str.encode(password) , bcrypt.gensalt())
+    def hash(password):
+        return bcrypt.hashpw(str.encode(password), bcrypt.gensalt())
+
 
 class Admin():
-    def checkIfAdmin( id ):
-        db = Database
-        groups = db.select("SELECT groups FROM public.users WHERE id=" + str(id))[0][0]
+    def checkIfAdmin(id):
+        db = Database()
+        groups = db.select(
+            "SELECT groups FROM public.users WHERE id=" + str(id))[0][0]
         return any(x in groups for x in administrators_groups)
+
 
 class Config():
     def __init__(self):
         self.config_parser = ConfigParser()
         dirname = os.path.dirname(__file__)
-        self.config_file = os.path.join(dirname, "..", "config.ini")
+        self.config_file = os.path.join(dirname, "..", "configs", "server.ini")
         self.config_parser.read(self.config_file)
 
     def get_data_dir(self):
         return self.config_parser.get("GENERAL", "HomeDir")
+
+    def get_db_name(self):
+        return self.config_parser.get("DATABASE", "Name")
+
+    def get_db_user(self):
+        return self.config_parser.get("DATABASE", "User")
+
+    def get_db_pass(self):
+        return self.config_parser.get("DATABASE", "Pass")
+
+    def get_db_host(self):
+        return self.config_parser.get("DATABASE", "Host")
+
 
 class Path():
     def to_relative(self, path):
@@ -75,5 +94,5 @@ class Path():
             path = "/".join(path.split("\\"))
             if path[0] == "/":
                 path = path[1:]
-        
+
         return path

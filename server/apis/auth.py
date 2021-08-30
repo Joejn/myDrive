@@ -33,7 +33,7 @@ class Login(Resource):
 
         password = user_credential["password"]
 
-        db = Database
+        db = Database()
         statement = "SELECT id, username, password, groups FROM users WHERE username = '" + user_credential["username"] + "';"
         selectResult = db.select(statement)
         

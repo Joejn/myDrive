@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Dir } from 'src/app/interfaces/dir';
 import { RecentFiles } from '../interfaces/recent-files';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +10,9 @@ import { RecentFiles } from '../interfaces/recent-files';
 export class FileService {
 
   currentDirectory: string = "root"
-  fileApiUrl = "http://127.0.0.1:5000/file"
+  apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/file`
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient, private conf: ConfigService ) { }
 
   getDir(directory: string = "/") {
 
@@ -33,7 +34,7 @@ export class FileService {
       this.currentDirectory = directory
     }
 
-    return this.http.get<Dir>(`${this.fileApiUrl}/myFiles?directory=${this.currentDirectory}`)
+    return this.http.get<Dir>(`${this.apiUrl}/myFiles?directory=${this.currentDirectory}`)
   }
 
   getCurrentDir () {
@@ -52,11 +53,11 @@ export class FileService {
       "filePath": filePath,
       "content": content
     }
-    return this.http.post(`${this.fileApiUrl}/set_file_content`, body)
+    return this.http.post(`${this.apiUrl}/set_file_content`, body)
   }
 
   getRecentFiles() {
-    return this.http.get<RecentFiles[]>(`${this.fileApiUrl}/get_recent_files`)
+    return this.http.get<RecentFiles[]>(`${this.apiUrl}/get_recent_files`)
   }
 
   uploadFiles( files: File[], currentDir: string) {
@@ -71,7 +72,7 @@ export class FileService {
         fd.append(file.name, file, file.name)
       }
     }
-    return this.http.post(`${this.fileApiUrl}/upload_files`, fd, httpOptions)
+    return this.http.post(`${this.apiUrl}/upload_files`, fd, httpOptions)
   }
 
   createFolder(currentDir: string, folderName: string) {
@@ -80,6 +81,6 @@ export class FileService {
       "folder_name": folderName
     }
 
-    return this.http.post(`${this.fileApiUrl}/create_folder`, body)
+    return this.http.post(`${this.apiUrl}/create_folder`, body)
   }
 }

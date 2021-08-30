@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LoginData } from '../interfaces/login-data';
 import { RefreshTokenData } from '../interfaces/refresh-token-data';
-
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor( private http: HttpClient) { }
+  constructor( private http: HttpClient, private conf: ConfigService ) { }
 
-  authBaseUrl = "http://127.0.0.1:5000/auth"
+  apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/auth`
 
   login(username: string, password: string) {
     const user_credentials = {
@@ -19,7 +19,7 @@ export class AuthService {
       "password": password
     }
 
-    return this.http.post<LoginData>(`${this.authBaseUrl}/login`, user_credentials)
+    return this.http.post<LoginData>(`${this.apiUrl}/login`, user_credentials)
   }
 
   logout() {
@@ -35,7 +35,7 @@ export class AuthService {
       })
     }
 
-    return this.http.post<RefreshTokenData>(`${this.authBaseUrl}/refresh`, "", httpOptions)
+    return this.http.post<RefreshTokenData>(`${this.apiUrl}/refresh`, "", httpOptions)
   }
 
   isLoggedIn() {

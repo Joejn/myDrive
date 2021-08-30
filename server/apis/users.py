@@ -22,7 +22,7 @@ class UploadProfilePicture(Resource):
         if not isAdmin:
             return "Unauthorized", 401
 
-        db = Database
+        db = Database()
 
         data = []
         users = db.select(
@@ -54,7 +54,7 @@ class AddUser(Resource):
         data = json.loads(request.data)
         username, firstname, lastname, birthday, email, password = data.values()
         hashed_password = Password.hash(password).decode("utf-8")
-        db = Database
+        db = Database()
         statement = """
             INSERT INTO public.users(
                 username, firstname, lastname, birthday, email, password)
@@ -94,7 +94,7 @@ class AddUser(Resource):
         data = json.loads(request.data)
         user_id = data.get("id")
         print(user_id)
-        db = Database
+        db = Database()
         statement = "DELETE FROM public.users WHERE id={id};".format(id=user_id)
         db.exec(statement)
         

@@ -57,7 +57,7 @@ class GetFile(Resource):
 
         basename = current_file.split("/").pop()
         statement = "INSERT INTO user_history (user_id, file_name, file_path) VALUES (" + str(user_id) + ", '" + str(basename) + "', '" + str(current_file) + "');"
-        db = Database
+        db = Database()
         db.exec(statement)
 
         return file_content
@@ -95,7 +95,7 @@ class GetRecentFiles(Resource):
     @api.doc("get the latest used files")
     @jwt_required()
     def get(self):
-        db = Database
+        db = Database()
         id = get_jwt()["id"]
         statement = """
             SELECT

@@ -13,7 +13,6 @@ interface links {
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-
   title = 'myDrive';
   loggedInLinks: links[] = [
     {

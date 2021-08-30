@@ -1,14 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserProfileService {
 
-  apiUrl = "http://127.0.0.1:5000/user_profile"
+  apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/user_profile`
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient, private conf: ConfigService ) { }
 
   uploadProfilePicture( file: File ) {
     const fd = new FormData()

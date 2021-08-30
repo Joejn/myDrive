@@ -1,15 +1,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { User } from '../interfaces/user';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
 
-  private apiUrl = "http://127.0.0.1:5000/users"
+  apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/users`
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient, private conf: ConfigService ) { }
 
   getAllUsers() {
     return this.http.get<User[]>(`${this.apiUrl}/get_all_users`)

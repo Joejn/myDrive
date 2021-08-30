@@ -1,14 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServerLoadService {
 
-  private apiUrl = "http://127.0.0.1:5000/server_info"
+  apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/server_info`
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient, private conf: ConfigService ) { }
 
   get_server_load() {
     interface ServerLoad {

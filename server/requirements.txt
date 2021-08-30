@@ -1,0 +1,9 @@
+Flask
+flask-jwt-extended
+flask-cors
+flask-restx
+bcrypt
+psutil
+psycopg2
+configparser
+

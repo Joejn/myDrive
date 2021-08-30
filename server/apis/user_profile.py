@@ -27,7 +27,7 @@ class UploadProfilePicture(Resource):
         data = base64.b64encode(binary_data)
 
         data_str = str(data)[1:]
-        db = Database
+        db = Database()
         statement = "UPDATE public.users SET profile_img=" + data_str + " WHERE id =" + str(id)
         db.exec(statement)
 
@@ -41,7 +41,7 @@ class UpdateGeneralData(Resource):
     def post(self):
         firstname, lastname, birthday, email = json.loads(request.data).values()
         id = get_jwt().get("id")
-        db = Database
+        db = Database()
         statement = """
             UPDATE public.users
                 SET firstname='""" + str(firstname) + "' , lastname='" + str(lastname) + "', birthday=to_date('" + str(birthday) + "', " + "'mm/dd/yyyy'" + "), email='" + str(email) + """'
@@ -62,7 +62,7 @@ class UpdatePassword(Resource):
         hashed_new_password = Password.hash(new_password)
         id = get_jwt()["id"]
         statement = "SELECT password FROM public.users WHERE id=" + str(id) + ";"
-        db = Database
+        db = Database()
         result = db.select(statement)
         if not bcrypt.checkpw(str(current_password).encode("utf-8"), str(result[0][0]).encode("utf-8")):
             return {
@@ -84,7 +84,7 @@ class GetProfilePicture(Resource):
     @jwt_required()
     def get(self):
         id = get_jwt()["id"]
-        db = Database
+        db = Database()
 
         statement = "SELECT encode(profile_img, 'escape') FROM public.users WHERE id=" + str(id)
         img_byte = str(db.select(statement)[0][0])
@@ -96,7 +96,7 @@ class GetProfilePicture(Resource):
 class GetGeneralData(Resource):
     @jwt_required()
     def get(self):
-        db = Database
+        db = Database()
         id = get_jwt()["id"]
         statement = "SELECT firstname, lastname, birthday, email FROM public.users WHERE id=" + str(id) + ";"
         firstname, lastname, birthday, email = db.select(statement)[0]
