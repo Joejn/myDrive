@@ -10,9 +10,9 @@ import psutil
 
 api = Namespace("server_info", description="server related operations")
 
-cpu_usage_history = []
-cpu_freq_history = []
-memory_usage_history = []
+# cpu_usage_history = []
+# cpu_freq_history = []
+# memory_usage_history = []
 
 @api.route("/usage")
 class Usage(Resource):
@@ -28,30 +28,40 @@ class Usage(Resource):
 
         current_time = datetime.now().strftime("%H:%M")
         
-        cpu_usage_history.append({
-            "time": current_time,
-            "value": cpu_usage
-        })
+        # cpu_usage_history.append({
+        #     "time": current_time,
+        #     "value": cpu_usage
+        # })
 
-        cpu_freq_history.append({
-            "time": current_time,
-            "value": cpu_freq_current
-        })
+        # cpu_freq_history.append({
+        #     "time": current_time,
+        #     "value": cpu_freq_current
+        # })
 
-        memory_usage_history.append({
-            "time": current_time,
-            "value": memory_usage
-        })
+        # memory_usage_history.append({
+        #     "time": current_time,
+        #     "value": memory_usage
+        # })
+
 
         data = {
-            "cpu_usage": cpu_usage_history,
-            "cpu_freq_current": cpu_freq_history,
-            "memory_usage": memory_usage_history,
+            "cpu_usage": {
+                "value": cpu_usage,
+                "time": current_time
+            },
+            "cpu_freq_current": {
+                "value": cpu_freq_current,
+                "time": current_time
+            },
+            "memory_usage": {
+                "value": memory_usage,
+                "time": current_time
+            },
             "disk_space_free": disk_space_free,
             "disk_space_used": disk_space_used
         }
         
-        if len(cpu_usage_history) > 8:
-            cpu_usage_history.pop(0)
+        # if len(cpu_usage_history) > 8:
+        #     cpu_usage_history.pop(0)
             
         return data

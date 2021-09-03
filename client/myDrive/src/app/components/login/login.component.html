@@ -2,15 +2,24 @@
     <mat-card class="card">
         <h1 style="text-align: center;">Login</h1>
         <br>
-        <form (submit)="onSubmit($event)">
+        <form (submit)="this.loginForm.valid ? onSubmit($event) : 'return'" [formGroup]="loginForm">
             <mat-form-field appearance="outline" style="width: 100%;">
                 <mat-label>username</mat-label>
-                <input matInput type="text" placeholder="username" [(ngModel)]="username" name="username" required>
+                <input matInput type="text" placeholder="username" [(ngModel)]="username" name="username" formControlName="username">
+                <mat-error *ngIf="this.loginForm.controls['username'].hasError('required')">
+                    {{ this.getErrorMessage("required", { "name": "Username" }) }}
+                </mat-error>
             </mat-form-field>
             <br>
             <mat-form-field appearance="outline" style="width: 100%;">
                 <mat-label>password</mat-label>
-                <input matInput type="password" placeholder="password" [(ngModel)]="password" name="password" required>
+                <input matInput type="password" placeholder="password" [(ngModel)]="password" name="password" formControlName="password">
+                <mat-error *ngIf="this.loginForm.controls['password'].hasError('required') && this.loginCorrect">
+                    {{ this.getErrorMessage("required", { "name": "Password" }) }}
+                </mat-error>
+                <mat-error *ngIf="!this.loginCorrect">
+                    {{ this.getErrorMessage("wrongOr", { "fields": ['username', 'password'] }) }}
+                </mat-error>
             </mat-form-field>
             <br>
             <button mat-button type="button" style="float: left;">forgot password</button>

@@ -9,6 +9,16 @@ export function getErrorMessage( error: string, params: any = {} ) {
         return `Enter a valid email address`
     } else if ( error === "wrongValue" ) {
         return `${params["name"]} is wrong`
+    } else if ( error === "wrongOr" ) {
+        let msg = ""
+        const len = params["fields"].length
+        for (const i in params["fields"]) {
+            msg += params["fields"][i]
+            if (!(len - 1 === Number(i))) {
+                msg += " or "
+            }
+        }
+        return `${msg} is wrong`
     }
 
     return ""

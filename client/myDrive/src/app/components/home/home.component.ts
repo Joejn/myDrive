@@ -49,7 +49,7 @@ export class HomeComponent implements AfterViewInit {
 
   setTableData(directory: string = "/") {
     rows = []
-    if (directory !== "/") {
+    if (directory !== "/" && directory !== "..") {
       rows = [{
         "type": "directory",
         "name": "..",

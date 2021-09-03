@@ -57,10 +57,8 @@ export class DashboardComponent implements AfterViewInit {
       this.cpuUsage.y.shift()
     }
 
-    if (data.cpu_usage.length > 0) {
-      this.cpuUsage.x.push(data.cpu_usage.pop().time)
-      this.cpuUsage.y.push(data.cpu_usage.pop().value)
-    }
+    this.cpuUsage.x.push(data.cpu_usage.time)
+    this.cpuUsage.y.push(data.cpu_usage.value)
 
     //////////////////////////////////////////////////////////////////
 
@@ -69,10 +67,8 @@ export class DashboardComponent implements AfterViewInit {
       this.cpuFreq.y.shift()
     }
 
-    if (data.cpu_freq_current.length > 0) {
-      this.cpuFreq.x.push(data.cpu_freq_current.pop().time)
-      this.cpuFreq.y.push(data.cpu_freq_current.pop().value)
-    }
+    this.cpuFreq.x.push(data.cpu_freq_current.time)
+    this.cpuFreq.y.push(data.cpu_freq_current.value)
 
     //////////////////////////////////////////////////////////////////
 
@@ -81,10 +77,8 @@ export class DashboardComponent implements AfterViewInit {
       this.memoryUsage.y.shift()
     }
 
-    if (data.memory_usage.length > 0) {
-      this.memoryUsage.x.push(data.memory_usage.pop().time)
-      this.memoryUsage.y.push(data.memory_usage.pop().value)
-    }
+    this.memoryUsage.x.push(data.memory_usage.time)
+    this.memoryUsage.y.push(data.memory_usage.value)
     
     //////////////////////////////////////////////////////////////////
 
