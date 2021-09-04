@@ -23,7 +23,6 @@ import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTreeModule} from '@angular/material/tree';
-import {SidenavComponent} from './components/sidenav/sidenav.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatTableModule} from '@angular/material/table';
 import {MatSortModule} from '@angular/material/sort';
@@ -75,7 +74,6 @@ const materialModules = [
     AppComponent,
     LoginComponent,
     HomeComponent,
-    SidenavComponent,
     ImageFileComponent,
     TextFileComponent,
     UserSettingsComponent,
