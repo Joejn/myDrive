@@ -8,8 +8,8 @@ from configparser import ConfigParser
 
 
 class Files():
-    def get_dir_content(self, user_storage_path, current_directory):
-        current_directory_absolute = join(user_storage_path, current_directory)
+    def get_dir_content(self, path, current_directory = ""):
+        current_directory_absolute = join(path, current_directory)
         dirContent = listdir(current_directory_absolute)
         dirElements = {
             "directories": [],
@@ -20,12 +20,12 @@ class Files():
             fullName = join(current_directory_absolute, item)
             if (isfile(fullName)):
                 dirElements["files"].append(
-                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(
+                    {"name": item, "path": fullName.replace(path, ""), "last_modified": getmtime(
                         fullName), "file_size": getsize(fullName)}
                 )
             else:
                 dirElements["directories"].append(
-                    {"name": item, "path": fullName.replace(user_storage_path, ""), "last_modified": getmtime(
+                    {"name": item, "path": fullName.replace(path, ""), "last_modified": getmtime(
                         fullName), "file_size": getsize(fullName)}
                 )
 

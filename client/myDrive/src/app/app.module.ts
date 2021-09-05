@@ -13,25 +13,25 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 import { ImageFileComponent } from './dialogs/image-file/image-file.component';
 import { TextFileComponent } from './dialogs/text-file/text-file.component';
 
-import {TokenInterceptorService } from './services/token-interceptor.service';
+import { TokenInterceptorService } from './services/token-interceptor.service';
 
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
-import {MatIconModule} from '@angular/material/icon';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatTreeModule} from '@angular/material/tree';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatTableModule} from '@angular/material/table';
-import {MatSortModule} from '@angular/material/sort';
-import {MatDialogModule} from '@angular/material/dialog';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatPaginatorModule} from '@angular/material/paginator'; 
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -47,6 +47,7 @@ import { UsersComponent } from './components/admin/users/users.component';
 import { NewUserDialogComponent } from './components/admin/dialogs/new-user-dialog/new-user-dialog.component';
 import { CreateFolderComponent } from './dialogs/create-folder/create-folder.component';
 import { MainComponent } from './components/main/main.component';
+import { TrashComponent } from './components/trash/trash.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -88,7 +89,8 @@ const materialModules = [
     UsersComponent,
     NewUserDialogComponent,
     CreateFolderComponent,
-    MainComponent
+    MainComponent,
+    TrashComponent,
   ],
   imports: [
     BrowserModule,

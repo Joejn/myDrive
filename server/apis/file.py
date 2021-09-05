@@ -1,18 +1,21 @@
+import base64
+from genericpath import isfile
 import os
-from core.utils import Path
-from flask import request, json
+from os.path import join
+
+from core.utils import Config, Database, Files, Path
+from flask import json, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
-from flask_restx import Namespace, Resource, fields
-from os import listdir
-from os.path import isfile, join, getsize, getmtime
-import base64
+from flask_restx import Namespace, Resource
 
-from werkzeug.utils import secure_filename
-from core.utils import Database, Config, Files
+from shutil import rmtree
 
 api = Namespace("file", description="Files related operations")
 PATH = Config().get_data_dir()
+DATA_DIR = "home"
+TRASH_DIR = "trash"
+
 
 @api.route("/myFiles")
 class MyFiles(Resource):
@@ -21,15 +24,15 @@ class MyFiles(Resource):
     def get(self):
         args = request.args
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity)
+        user_storage_path = join(PATH, identity, DATA_DIR)
         current_directory = args.get("directory")
         if len(current_directory) > 0:
             if current_directory[0] == "/" or current_directory[0] == "\\":
                 current_directory = current_directory[1:]
 
-        print(current_directory)
         return Files().get_dir_content(user_storage_path, current_directory)
-        
+
+
 @api.route("/get_file")
 class GetFile(Resource):
     @api.param("file")
@@ -40,11 +43,11 @@ class GetFile(Resource):
 
         file_path = str(request.args.get("file"))
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity)
+        user_storage_path = join(PATH, identity, DATA_DIR)
         file = file_path.replace("\\", "/")
         if file[0] == "/":
             file = file[1:]
-        
+
         current_file = user_storage_path
 
         if not file == "/":
@@ -56,11 +59,13 @@ class GetFile(Resource):
             file_content = base64.b64encode(file.read()).decode("utf-8")
 
         basename = current_file.split("/").pop()
-        statement = "INSERT INTO user_history (user_id, file_name, file_path) VALUES (" + str(user_id) + ", '" + str(basename) + "', '" + str(current_file) + "');"
+        statement = "INSERT INTO user_history (user_id, file_name, file_path) VALUES (" + str(
+            user_id) + ", '" + str(basename) + "', '" + str(current_file) + "');"
         db = Database()
         db.exec(statement)
 
         return file_content
+
 
 @api.route("/set_file_content")
 class SetFileContent(Resource):
@@ -75,13 +80,13 @@ class SetFileContent(Resource):
         content = response["content"]
 
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity)
+        user_storage_path = join(PATH, identity, DATA_DIR)
         file = file_path.replace("\\", "/")
         if file[0] == "/":
             file = file[1:]
-        
+
         current_file = user_storage_path
-        
+
         if not file == "/":
             current_file = join(user_storage_path, file)
 
@@ -113,21 +118,23 @@ class GetRecentFiles(Resource):
 
         return data
 
+
 @api.route("/upload_files")
 class UploadFiles(Resource):
     @api.doc("upload files")
     @jwt_required()
     def post(self):
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity)
+        user_storage_path = join(PATH, identity, DATA_DIR)
         current_dir = request.headers.get("current_dir")
         if len(current_dir) > 0:
             current_dir = current_dir[1:]
         files = request.files
         for file in files:
             f = files.get(file)
-            file_path =  os.path.join(user_storage_path, current_dir, file)
+            file_path = os.path.join(user_storage_path, current_dir, file)
             f.save(file_path)
+
 
 @api.route("/create_folder")
 class CreateFolder(Resource):
@@ -135,12 +142,56 @@ class CreateFolder(Resource):
     @jwt_required()
     def post(self):
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity)
-        request_data =  json.loads(request.data)
+        user_storage_path = join(PATH, identity, DATA_DIR)
+        request_data = json.loads(request.data)
         current_dir = Path().to_relative(request_data.get("current_dir"))
         folder_name = request_data.get("folder_name")
 
-        absolute_folder_path = os.path.join(user_storage_path, current_dir, folder_name)
-        print(absolute_folder_path)
+        absolute_folder_path = os.path.join(
+            user_storage_path, current_dir, folder_name)
         if not os.path.exists(absolute_folder_path):
             os.makedirs(absolute_folder_path)
+
+
+@api.route("/move_to_trash")
+class MoveToTrash(Resource):
+    @api.doc("move a object to trash directory")
+    @jwt_required()
+    def post(self):
+        body = json.loads(request.data)
+        identity = get_jwt_identity()
+        relative_path = Path().to_relative(body.get("path"))
+        path = os.path.join(PATH, identity, DATA_DIR, relative_path)
+        object_name = relative_path.split("/").pop()
+        trash_path = os.path.join(PATH, identity, TRASH_DIR, object_name)
+        os.rename(path, trash_path)
+        return "ok", 200
+
+
+@api.route("/get_objects_from_trash")
+class GetObjectsFromTrash(Resource):
+    @api.doc("delete a object from trash")
+    @jwt_required()
+    def get(self):
+        identity = get_jwt_identity()
+        path = os.path.join(PATH, identity, TRASH_DIR)
+
+        return Files().get_dir_content(path)
+
+
+
+@api.route("/delete_object_from_trash")
+class DeleteObjectFromTrash(Resource):
+    @api.doc("delete a object from trash")
+    @jwt_required()
+    def post(self):
+        body = json.loads(request.data)
+        identity = get_jwt_identity()
+        relative_path = Path().to_relative(body.get("path"))
+        path = os.path.join(PATH, identity, TRASH_DIR, relative_path)
+        if os.path.isfile(path):
+            os.remove(path)
+        else:
+            rmtree(path)
+
+        return "ok", 200

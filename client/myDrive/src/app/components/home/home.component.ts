@@ -8,22 +8,9 @@ import { TextFileComponent } from 'src/app/dialogs/text-file/text-file.component
 import { ImageFileComponent } from 'src/app/dialogs/image-file/image-file.component';
 import { RecentFiles } from 'src/app/interfaces/recent-files';
 import { CreateFolderComponent } from 'src/app/dialogs/create-folder/create-folder.component';
+import { FileTableRow } from 'src/app/interfaces/file-table-row';
 
-export interface TableElement {
-  type: string,
-  name: string,
-  path: string
-  last_modified: string,
-  file_size: string
-}
-
-interface Row {
-  "type": string,
-  "name": string,
-  "path": string
-}
-
-let rows: TableElement[] = []
+let rows: FileTableRow[] = []
 
 @Component({
   selector: 'app-home',
@@ -33,7 +20,7 @@ let rows: TableElement[] = []
 export class HomeComponent implements AfterViewInit {
   recentFiles: RecentFiles[] = []
 
-  displayedColumns: string[] = ["name", "last_modified", "file_size"]
+  displayedColumns: string[] = ["name", "last_modified", "file_size", "delete"]
   dataSource = new MatTableDataSource(rows)
   currentDir = ""
 
@@ -60,33 +47,10 @@ export class HomeComponent implements AfterViewInit {
     }
     
     this.file.getDir(directory).subscribe((data: Dir) => {
-      for (const item of data.directories) {
-        const last_modified = new Date(item.last_modified * 1000)
-        rows.push(
-          {
-            "type": "directory",
-            "name": item.name,
-            "path": item.path,
-            "last_modified": this.getModifiedStr(last_modified),
-            "file_size": this.formatBytes(item.file_size)
-          }
-        )
+      const items = this.file.formatFileRowContent(data)
+      for (const item of items) {
+        rows.push(item)
       }
-
-      for (const item of data.files) {
-        const last_modified = new Date(item.last_modified * 1000)
-        
-        rows.push(
-          {
-            "type": "file",
-            "name": item.name,
-            "path": item.path,
-            "last_modified": this.getModifiedStr(last_modified),
-            "file_size": this.formatBytes(item.file_size),
-          }
-        )
-      }
-
       this.dataSource = new MatTableDataSource(rows)
       this.dataSource.sort = this.sort
     })
@@ -131,11 +95,14 @@ export class HomeComponent implements AfterViewInit {
 
   // @ViewChild(MatSort) sort: MatSort
 
-  onClick(row: any) {
-    const currentRow: Row = {
+  onClick(row: FileTableRow) {
+    const currentRow: FileTableRow = {
       type: row["type"],
       name: row["name"],
-      path: row["path"]
+      path: row["path"],
+      last_modified: row["last_modified"],
+      file_size: row["file_size"],
+
     }
 
     this.currentDir = row["path"]
@@ -162,15 +129,17 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onRecentFileClicked( name: string, path: string ) {
-    const currentRow: Row = {
+    const currentRow: FileTableRow = {
       type: "file",
       name: name,
-      path: path
+      path: path,
+      last_modified: "",
+      file_size: "",
     }
     this.setFileAction(currentRow)
   }
 
-  setFileAction(row: Row) {
+  setFileAction(row: FileTableRow) {
     if (row["type"] === "directory") {
       this.setTableData(row.path)
     } else {
@@ -202,7 +171,6 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onFileUploadChanged(event: any) {
-    console.log(this.currentDir)
     this.file.uploadFiles(event.target.files, this.currentDir).subscribe((data) => {
       this.setTableData(this.currentDir)
     })
@@ -217,6 +185,14 @@ export class HomeComponent implements AfterViewInit {
       this.file.createFolder(this.currentDir, result).subscribe(data => {
         this.setTableData(this.currentDir)
       })
+    })
+  }
+
+  onDeleteClicked( row : FileTableRow ) {
+    this.file.moveObjectToTrash(row.path).subscribe(data => {
+      if (data === "ok") {
+        this.setTableData(this.currentDir)
+      }
     })
   }
 }
