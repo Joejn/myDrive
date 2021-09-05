@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
       localStorage.setItem("access_token", data.access_token)
       localStorage.setItem("refresh_token", data.refresh_token)
       this.loggedIn.emit()
-      this.router.navigate(["home"])
+      this.router.navigate(["main"])
     })
   }
 }

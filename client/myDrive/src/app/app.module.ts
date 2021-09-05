@@ -46,6 +46,7 @@ import { LineChartCpuFreqComponent } from './components/charts/line-chart-cpu-fr
 import { UsersComponent } from './components/admin/users/users.component';
 import { NewUserDialogComponent } from './components/admin/dialogs/new-user-dialog/new-user-dialog.component';
 import { CreateFolderComponent } from './dialogs/create-folder/create-folder.component';
+import { MainComponent } from './components/main/main.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -86,7 +87,8 @@ const materialModules = [
     LineChartCpuFreqComponent,
     UsersComponent,
     NewUserDialogComponent,
-    CreateFolderComponent
+    CreateFolderComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,

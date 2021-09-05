@@ -1,0 +1,27 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav class="sidenav" mode="side" opened>
+        <div class="sidenav-item"  [ngClass]="{'active-sidenav-item': currentTab == 'home'}" (click)="currentTab = 'home'">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
+        </div>
+        <div class="sidenav-item" [ngClass]="{'active-sidenav-item': currentTab == 'recent'}" (click)="currentTab = 'recent'">
+            <mat-icon>history</mat-icon>
+            <span>Recent</span>
+        </div>
+        <div class="sidenav-item" [ngClass]="{'active-sidenav-item': currentTab == 'trash'}" (click)="currentTab = 'trash'">
+            <mat-icon>delete</mat-icon>
+            <span>Trash</span>
+        </div>
+    </mat-sidenav>
+    <mat-sidenav-content class="sidenav-content">
+        <div *ngIf="currentTab=='home'">
+            <app-home></app-home>
+        </div>
+        <div *ngIf="currentTab=='recent'">
+            recent
+        </div>
+        <div *ngIf="currentTab=='trash'">
+            trash
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

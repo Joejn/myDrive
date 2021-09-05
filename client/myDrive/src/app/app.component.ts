@@ -16,8 +16,8 @@ export class AppComponent {
   title = 'myDrive';
   loggedInLinks: links[] = [
     {
-      name: "Home",
-      routerLink: "/home"
+      name: "myDrive",
+      routerLink: "/main"
     },
     {
       name: "Settings",

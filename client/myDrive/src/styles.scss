@@ -14,5 +14,60 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     padding: 1em;
 }
 
+// sidenav /////////////////////////////////////////////////////
+
+.sidenav-container {
+    height: 100%;
+    width: 100%;
+}
+
+.sidenav {
+    min-width: 200px;
+}
+
+.sidenav-content {
+    padding: 1em;
+}
+
+.sidenav-header {
+    display: flex;
+    margin: 2em 2em 1em;
+    color: lightgray;
+}
+
+.sidenav-item {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    margin: 0.4em;
+    padding: 1em;
+    cursor: pointer;
+}
+
+.sidenav-item > mat-icon {
+    margin-right: 10px;
+}
+
+.active-sidenav-item {
+    font-weight: bold;
+}
+
+.active-sidenav-item::before {
+    position: absolute;
+    left: -10px;
+    content: "";
+    height: 20px;
+    width: 10px;
+    background-color: #3f51b5;
+    animation: item .2s linear both;
+}
+
+@keyframes item {
+    0% { transform: translateX(0px)}
+    100% { transform: translateX(10px)}
+}
+
+////////////////////////////////////////////////////////
+
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';

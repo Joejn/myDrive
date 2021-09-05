@@ -1,7 +1,7 @@
 <div class="custom_container">
   <div class="custom_row header">
     <mat-toolbar color="primary" class="navbar">
-      <div routerLink="/home" style="cursor: pointer;">myDrive</div>
+      <div routerLink="/main" style="cursor: pointer;">myDrive</div>
       <div *ngIf="auth.isLoggedIn(); then links_logged_in else links_not_logged_in"></div>
         <ng-template #links_not_logged_in>
           <span routerLink="/login">login</span>
