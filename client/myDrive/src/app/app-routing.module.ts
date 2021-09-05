@@ -12,7 +12,7 @@ import { LogoutGuard } from './guards/logout.guard';
 
 const routes: Routes = [
   { path: "login", component: LoginComponent, canActivate: [LogoutGuard]},
-  { path: "", component: HomeComponent, canActivate: [LoginGuardGuard]},
+  { path: "", component: MainComponent, canActivate: [LoginGuardGuard]},
   { path: "main", component: MainComponent, canActivate: [LoginGuardGuard]},
   { path: "home", component: HomeComponent, canActivate: [LoginGuardGuard]},
   { path: "user_settings", component: UserSettingsComponent, canActivate: [LoginGuardGuard]},
