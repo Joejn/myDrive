@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { interval, merge, Observable, Subject, Subscription } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
 import { ServerLoadService } from 'src/app/services/server-load.service';
+import { UsersService } from 'src/app/services/users.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,6 +11,8 @@ import { ServerLoadService } from 'src/app/services/server-load.service';
 })
 export class DashboardComponent implements AfterViewInit {
   
+  isFirstGet: boolean = true
+
   public cpuFreq = {
     x: [""],
     y: [0]
@@ -25,17 +28,7 @@ export class DashboardComponent implements AfterViewInit {
     y: [0]
   }
 
-  public spaceUsage = {
-    free: 0,
-    used: 0
-  }
-
-
-  constructor( private serverLoad: ServerLoadService ) {
-    this.serverLoad.get_server_load().subscribe(data => {
-      this.setChartData(data)
-    })
-  }
+  public userCount: string = ""
 
   sub: Subscription = new Subscription()
 
@@ -43,22 +36,51 @@ export class DashboardComponent implements AfterViewInit {
   @ViewChild("cpuUsageChart") cpuUsageChart : any;
   @ViewChild("memoryUsageChart") memoryUsageChart : any;
   @ViewChild("spaceUsageChart") spaceUsageChart : any;
-  ngAfterViewInit(): void {
 
-    interval(2000).pipe(
-      mergeMap(() => this.serverLoad.get_server_load())
-    ).subscribe(data => this.setChartData(data))
+  constructor( private serverLoad: ServerLoadService, private elementRef: ElementRef, private users: UsersService ) {
+    users.getUserCount().subscribe((data: any) => {
+      if (data) {
+        this.userCount = String(data["user_count"])
+      } else {
+        this.userCount = "faild to load"
+      }
+    })
   }
 
-  
+  ngAfterViewInit(): void {
+    this.serverLoad.get_server_load().subscribe(data => {
+      this.setChartData(data)
+    })
+
+    const element = this.elementRef.nativeElement
+
+    interval(2000).pipe(
+      switchMap(() => {
+        if (element.offsetParent !== null) {
+          return this.serverLoad.get_server_load()
+        }
+        return new Observable()
+      })
+    ).subscribe(data => {
+      if (data) {
+        this.setChartData(data)
+      }
+    })
+  }
+
   setChartData(data: any) {
     if (this.cpuUsage.x.length > 8) {
       this.cpuUsage.x.shift()
       this.cpuUsage.y.shift()
     }
 
-    this.cpuUsage.x.push(data.cpu_usage.time)
-    this.cpuUsage.y.push(data.cpu_usage.value)
+    if (this.isFirstGet) {
+      this.cpuUsage.x[0] = data.cpu_usage.time
+      this.cpuUsage.y[0] = data.cpu_usage.value
+    } else {
+      this.cpuUsage.x.push(data.cpu_usage.time)
+      this.cpuUsage.y.push(data.cpu_usage.value)
+    }
 
     //////////////////////////////////////////////////////////////////
 
@@ -67,8 +89,13 @@ export class DashboardComponent implements AfterViewInit {
       this.cpuFreq.y.shift()
     }
 
-    this.cpuFreq.x.push(data.cpu_freq_current.time)
-    this.cpuFreq.y.push(data.cpu_freq_current.value)
+    if (this.isFirstGet) {
+      this.cpuFreq.x[0] = data.cpu_freq_current.time
+      this.cpuFreq.y[0] = data.cpu_freq_current.value
+    } else {
+      this.cpuFreq.x.push(data.cpu_freq_current.time)
+      this.cpuFreq.y.push(data.cpu_freq_current.value)
+    }
 
     //////////////////////////////////////////////////////////////////
 
@@ -77,13 +104,19 @@ export class DashboardComponent implements AfterViewInit {
       this.memoryUsage.y.shift()
     }
 
-    this.memoryUsage.x.push(data.memory_usage.time)
-    this.memoryUsage.y.push(data.memory_usage.value)
+    if (this.isFirstGet) {
+      this.memoryUsage.x[0] = data.memory_usage.time
+      this.memoryUsage.y[0] = data.memory_usage.value
+      this.isFirstGet = false
+    } else {
+      this.memoryUsage.x.push(data.memory_usage.time)
+      this.memoryUsage.y.push(data.memory_usage.value)
+    }
     
     //////////////////////////////////////////////////////////////////
 
-    this.spaceUsage.free = data.disk_space_free
-    this.spaceUsage.used = data.disk_space_used
+    this.spaceUsageChart.freeSpace = data.disk_space_free
+    this.spaceUsageChart.usedSpace = data.disk_space_used
     
     this.diskFreqChart.updateChart()
     this.cpuUsageChart.updateChart()

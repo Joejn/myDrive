@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-sm-8">
             <mat-card>
-                <app-doughnut-chart-space-used #spaceUsageChart label="space usage" [freeSpace]="this.spaceUsage.free" [usedSpace]="this.spaceUsage.used"></app-doughnut-chart-space-used>
+                <app-doughnut-chart-space-used #spaceUsageChart label="space usage" [freeSpace]="0" [usedSpace]="0"></app-doughnut-chart-space-used>
             </mat-card>
         </div>
         <div class="col-sm-4">
@@ -36,7 +36,7 @@
                         </div>
                     </div>
                     <h1 style="display: flex; justify-content: center;">
-                        6392
+                        {{this.userCount}}
                     </h1>
                 </div>
             </mat-card>

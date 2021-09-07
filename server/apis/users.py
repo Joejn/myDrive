@@ -11,7 +11,7 @@ api = Namespace("users", description="user related operations")
 
 
 @api.route("/get_all_users")
-class UploadProfilePicture(Resource):
+class GetAllUsers(Resource):
     @api.doc("return all users")
     @jwt_required()
     def get(self):
@@ -81,7 +81,7 @@ class AddUser(Resource):
         return json.jsonify(data)
 
 @api.route("/delete_user")
-class AddUser(Resource):
+class DeleteUser(Resource):
     @api.doc("Delete a user")
     @jwt_required()
     def delete(self):
@@ -117,3 +117,21 @@ class AddUser(Resource):
 
         return json.jsonify(data)
 
+@api.route("/get_registerd_users_count")
+class GetRegisterdUsersCount(Resource):
+    @api.doc("Get the count of the registered users")
+    @jwt_required()
+    def get(self):
+        id = get_jwt()["id"]
+        isAdmin = Admin.checkIfAdmin(id)
+
+        if not isAdmin:
+            return "Unauthorized", 401
+
+        db = Database()
+        user_count = db.select("SELECT COUNT(id) FROM public.users;")[0][0]
+        body = {
+            "user_count": user_count
+        }
+
+        return json.jsonify(body)

@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AdminBackendComponent implements OnInit {
 
-  public currentTab: string = "users"
+  public currentTab: string = "dashboard"
 
   constructor() { }
 

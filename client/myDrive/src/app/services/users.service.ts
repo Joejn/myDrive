@@ -36,4 +36,8 @@ export class UsersService {
     }
     return this.http.delete(`${this.apiUrl}/delete_user`, httpOptions)
   }
+
+  getUserCount() {
+    return this.http.get(`${this.apiUrl}/get_registerd_users_count`)
+  }
 }
