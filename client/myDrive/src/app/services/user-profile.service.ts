@@ -51,6 +51,7 @@ export class UserProfileService {
 
   getGeneralData() {
     interface GeneralData {
+      username: string,
       firstname: string,
       lastname: string,
       birthday: string,

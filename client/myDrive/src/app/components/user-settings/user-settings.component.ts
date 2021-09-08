@@ -13,25 +13,22 @@ import { getErrorMessage } from 'src/app/shared/error-messages';
 })
 export class UserSettingsComponent implements OnInit {
   @Output() profilePictureChanged = new EventEmitter()
-  
-  firstname: string = ""
-  lastname: string = ""
-  birthday: Date = new Date()
-  email: string = ""
 
   imgFile: File = new File([""], "profileImg")
+  username = ""
 
   userForm = this.fb.group({
-    firstname: new FormControl(this.firstname, [
+    username: new FormControl("", []),
+    firstname: new FormControl("", [
       Validators.required
     ]),
-    lastname: new FormControl(this.lastname, [
+    lastname: new FormControl("", [
       Validators.required
     ]),
-    birthday: new FormControl(this.birthday, [
+    birthday: new FormControl("", [
       Validators.required
     ]),
-    email: new FormControl(this.email, [
+    email: new FormControl("", [
       Validators.required,
       Validators.email
     ])
@@ -105,6 +102,7 @@ export class UserSettingsComponent implements OnInit {
       this.userProfile.getGeneralData().subscribe(data => {
         const birthday = new Date(data.birthday)
   
+        this.username = data.username
         this.userForm.controls["firstname"].setValue(data.firstname)
         this.userForm.controls["lastname"].setValue(data.lastname)
         this.userForm.controls["birthday"].setValue(birthday)

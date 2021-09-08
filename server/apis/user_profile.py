@@ -98,9 +98,10 @@ class GetGeneralData(Resource):
     def get(self):
         db = Database()
         id = get_jwt()["id"]
-        statement = "SELECT firstname, lastname, birthday, email FROM public.users WHERE id=" + str(id) + ";"
-        firstname, lastname, birthday, email = db.select(statement)[0]
+        statement = "SELECT username, firstname, lastname, birthday, email FROM public.users WHERE id=" + str(id) + ";"
+        username, firstname, lastname, birthday, email = db.select(statement)[0]
         data = {
+            "username": username,
             "firstname": firstname,
             "lastname": lastname,
             "birthday": birthday,

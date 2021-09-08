@@ -1,10 +1,12 @@
 from datetime import datetime
+import os
+import shutil
+from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR
 from flask import request, json
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended.utils import get_jwt
+from flask_jwt_extended.utils import get_jwt, get_jwt_identity
 from flask_restx import Namespace, Resource
 from core.utils import Database
-from core.consts import administrators_groups
 from core.utils import Password, Admin
 
 api = Namespace("users", description="user related operations")
@@ -62,8 +64,16 @@ class AddUser(Resource):
                 ('{username}' , '{firstname}', '{lastname}', to_date('{birthday}', 'mm/dd/yyyy'), '{email}', '{password}');
         """.format(username=username, firstname=firstname, lastname=lastname, birthday=datetime.utcfromtimestamp(birthday).strftime("%m/%d/%y"), email=email, password=hashed_password)
         db.exec(statement.strip())
-        
-        
+
+        # Create home directory for new User ##################
+
+        data_dir_of_user = os.path.join(DATA_PATH, username)
+        os.mkdir(data_dir_of_user)
+        os.mkdir(os.path.join(data_dir_of_user, HOME_DIR))
+        os.mkdir(os.path.join(data_dir_of_user, TRASH_DIR))
+
+        #######################################################
+
         data = []
         users = db.select(
             "SELECT id, username, firstname, lastname, birthday, email FROM public.users ORDER BY id;")
@@ -93,13 +103,20 @@ class DeleteUser(Resource):
 
         data = json.loads(request.data)
         user_id = data.get("id")
-        print(user_id)
+        username = data.get("username")
         db = Database()
         statement = "DELETE FROM public.user_history WHERE id={id};".format(id=user_id)
         db.exec(statement)
         
         statement = "DELETE FROM public.users WHERE id={id};".format(id=user_id)
         db.exec(statement)
+
+        # Delete home directory from User ##################
+
+        data_dir_of_user = os.path.join(DATA_PATH, username)
+        shutil.rmtree(data_dir_of_user)
+
+        #######################################################
         
         data = []
         users = db.select(

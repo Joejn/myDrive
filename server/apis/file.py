@@ -1,9 +1,9 @@
 import base64
-from genericpath import isfile
 import os
 from os.path import join
 
-from core.utils import Config, Database, Files, Path
+from core.utils import Database, Files, Path
+from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR
 from flask import json, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
@@ -12,10 +12,6 @@ from flask_restx import Namespace, Resource
 from shutil import rmtree
 
 api = Namespace("file", description="Files related operations")
-PATH = Config().get_data_dir()
-DATA_DIR = "home"
-TRASH_DIR = "trash"
-
 
 @api.route("/myFiles")
 class MyFiles(Resource):
@@ -24,7 +20,7 @@ class MyFiles(Resource):
     def get(self):
         args = request.args
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity, DATA_DIR)
+        user_storage_path = join(DATA_PATH, identity, HOME_DIR)
         current_directory = args.get("directory")
         if len(current_directory) > 0:
             if current_directory[0] == "/" or current_directory[0] == "\\":
@@ -43,7 +39,7 @@ class GetFile(Resource):
 
         file_path = str(request.args.get("file"))
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity, DATA_DIR)
+        user_storage_path = join(DATA_PATH, identity, HOME_DIR)
         file = file_path.replace("\\", "/")
         if file[0] == "/":
             file = file[1:]
@@ -80,7 +76,7 @@ class SetFileContent(Resource):
         content = response["content"]
 
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity, DATA_DIR)
+        user_storage_path = join(DATA_PATH, identity, HOME_DIR)
         file = file_path.replace("\\", "/")
         if file[0] == "/":
             file = file[1:]
@@ -125,7 +121,7 @@ class UploadFiles(Resource):
     @jwt_required()
     def post(self):
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity, DATA_DIR)
+        user_storage_path = join(DATA_PATH, identity, HOME_DIR)
         current_dir = request.headers.get("current_dir")
         if len(current_dir) > 0:
             current_dir = current_dir[1:]
@@ -142,7 +138,7 @@ class CreateFolder(Resource):
     @jwt_required()
     def post(self):
         identity = get_jwt_identity()
-        user_storage_path = join(PATH, identity, DATA_DIR)
+        user_storage_path = join(DATA_PATH, identity, HOME_DIR)
         request_data = json.loads(request.data)
         current_dir = Path().to_relative(request_data.get("current_dir"))
         folder_name = request_data.get("folder_name")
@@ -161,9 +157,9 @@ class MoveToTrash(Resource):
         body = json.loads(request.data)
         identity = get_jwt_identity()
         relative_path = Path().to_relative(body.get("path"))
-        path = os.path.join(PATH, identity, DATA_DIR, relative_path)
+        path = os.path.join(DATA_PATH, identity, HOME_DIR, relative_path)
         object_name = relative_path.split("/").pop()
-        trash_path = os.path.join(PATH, identity, TRASH_DIR, object_name)
+        trash_path = os.path.join(DATA_PATH, identity, TRASH_DIR, object_name)
         os.rename(path, trash_path)
         return "ok", 200
 
@@ -174,10 +170,9 @@ class GetObjectsFromTrash(Resource):
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
-        path = os.path.join(PATH, identity, TRASH_DIR)
+        path = os.path.join(DATA_PATH, identity, TRASH_DIR)
 
         return Files().get_dir_content(path)
-
 
 
 @api.route("/delete_object_from_trash")
@@ -188,7 +183,7 @@ class DeleteObjectFromTrash(Resource):
         body = json.loads(request.data)
         identity = get_jwt_identity()
         relative_path = Path().to_relative(body.get("path"))
-        path = os.path.join(PATH, identity, TRASH_DIR, relative_path)
+        path = os.path.join(DATA_PATH, identity, TRASH_DIR, relative_path)
         if os.path.isfile(path):
             os.remove(path)
         else:

@@ -1,9 +1,11 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { User } from 'src/app/interfaces/user';
 import { UsersService } from 'src/app/services/users.service';
+import { ConfirmUserDeleteComponent } from '../dialogs/confirm-user-delete/confirm-user-delete.component';
 import { NewUserDialogComponent } from '../dialogs/new-user-dialog/new-user-dialog.component';
 
 const USERDATA: User[] = [
@@ -25,7 +27,7 @@ export class UsersComponent implements AfterViewInit {
   displayColumns: string[] = ["id", "username", "firstname", "lastname", "birthday", "email", "delete"]
   dataSource = new MatTableDataSource(this.allUsers)
 
-  constructor( private users: UsersService, private dialog: MatDialog ) {
+  constructor( private users: UsersService, private dialog: MatDialog, private _snackBar: MatSnackBar ) {
     this.setTableData()
   }
 
@@ -53,15 +55,27 @@ export class UsersComponent implements AfterViewInit {
   }
 
   onDeleteClicked( user: User ) {
-    this.users.deleteUser(user.id).subscribe((data: any) => {
-      let user_data = data
-      for ( let item of user_data ) {
-        const birthday_date = new Date(item.birthday)
-        item.birthday = `${birthday_date.getMonth() + 1}/${birthday_date.getDate()}/${birthday_date.getFullYear()}`
+    const dialogRef = this.dialog.open(ConfirmUserDeleteComponent, {
+      disableClose: true,
+      data: {
+        "username": user.username
       }
+    })
 
-      this.dataSource = new MatTableDataSource(user_data)
-      this.dataSource.paginator = this.paginator
+    dialogRef.afterClosed().subscribe(isConfirmed => {
+      if (isConfirmed) {
+        this.users.deleteUser(user.id, user.username).subscribe((data: any) => {
+          let user_data = data
+          for ( let item of user_data ) {
+            const birthday_date = new Date(item.birthday)
+            item.birthday = `${birthday_date.getMonth() + 1}/${birthday_date.getDate()}/${birthday_date.getFullYear()}`
+          }
+
+          this.openSnackBar(`successfully deleted user "${user.username}"`, "Close")
+          this.dataSource = new MatTableDataSource(user_data)
+          this.dataSource.paginator = this.paginator
+        })
+      }
     })
   }
 
@@ -74,6 +88,13 @@ export class UsersComponent implements AfterViewInit {
       if (status) {
         this.setTableData()
       }
+    })
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      horizontalPosition: "right",
+      duration: 3000
     })
   }
 }

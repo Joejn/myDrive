@@ -48,6 +48,7 @@ import { NewUserDialogComponent } from './components/admin/dialogs/new-user-dial
 import { CreateFolderComponent } from './dialogs/create-folder/create-folder.component';
 import { MainComponent } from './components/main/main.component';
 import { TrashComponent } from './components/trash/trash.component';
+import { ConfirmUserDeleteComponent } from './components/admin/dialogs/confirm-user-delete/confirm-user-delete.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -91,6 +92,7 @@ const materialModules = [
     CreateFolderComponent,
     MainComponent,
     TrashComponent,
+    ConfirmUserDeleteComponent,
   ],
   imports: [
     BrowserModule,

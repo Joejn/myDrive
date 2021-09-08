@@ -16,7 +16,7 @@ export class NewUserDialogComponent implements OnInit {
   addUserForm = this.fb.group ({
     username: ["", [Validators.required]],
     firstname: ["", [Validators.required]],
-    lastname: ["Neuhauser", [Validators.required]],
+    lastname: ["", [Validators.required]],
     birthday: [new Date(), [Validators.required]],
     email: ["", [Validators.required, Validators.email]],
     password: ["", [Validators.required, Validators.minLength(8)]]

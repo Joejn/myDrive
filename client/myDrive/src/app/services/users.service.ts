@@ -28,10 +28,11 @@ export class UsersService {
     return this.http.post<User[]>(`${this.apiUrl}/add_user`, body)
   }
 
-  deleteUser( id: number ) {
+  deleteUser( id: number, username: string ) {
     const httpOptions = {
       body: {
-        "id": id
+        "id": id,
+        "username": username
       }
     }
     return this.http.delete(`${this.apiUrl}/delete_user`, httpOptions)
