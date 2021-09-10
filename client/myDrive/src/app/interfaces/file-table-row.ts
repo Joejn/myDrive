@@ -1,4 +1,5 @@
 export interface FileTableRow {
+    position: number,
     type: string,
     name: string,
     path: string

@@ -9,6 +9,7 @@ import { ImageFileComponent } from 'src/app/dialogs/image-file/image-file.compon
 import { RecentFiles } from 'src/app/interfaces/recent-files';
 import { CreateFolderComponent } from 'src/app/dialogs/create-folder/create-folder.component';
 import { FileTableRow } from 'src/app/interfaces/file-table-row';
+import { SelectionModel } from '@angular/cdk/collections';
 
 let rows: FileTableRow[] = []
 
@@ -20,11 +21,12 @@ let rows: FileTableRow[] = []
 export class HomeComponent implements AfterViewInit {
   recentFiles: RecentFiles[] = []
 
-  displayedColumns: string[] = ["name", "last_modified", "file_size", "delete"]
+  displayedColumns: string[] = ["select", "name", "last_modified", "file_size", "delete"]
   dataSource = new MatTableDataSource(rows)
+  selection = new SelectionModel<FileTableRow>(true, [])
   currentDir = ""
 
-  constructor ( private file: FileService, private dialog: MatDialog ) {
+  constructor ( private file: FileService, private dialog: MatDialog) {
     this.setTableData()
     this.setRecentFiles()
   }
@@ -34,10 +36,36 @@ export class HomeComponent implements AfterViewInit {
     this.dataSource.sort = this.sort
   }
 
+  // Source: https://material.angular.io/components/table/examples also used code from the same source in HTML file /////////////////////////////////////
+  isAllSelected() {
+    const numSelected = this.selection.selected.length
+    const numRows = this.dataSource.data.length
+    return numSelected == numRows
+  }
+
+  masterToggle() {
+    if (this.isAllSelected()) {
+      this.selection.clear()
+      return
+    }
+
+    this.selection.select(...this.dataSource.data)
+  }
+
+  checkboxLabel(row? : FileTableRow) : string {
+    if (!row) {
+      return `${this.isAllSelected() ? "deselect" : "select" } all`
+    }
+    return `${this.selection.isSelected(row) ? "deselect" : "select"} row ${row.position + 1}`
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+
   setTableData(directory: string = "/") {
     rows = []
     if (directory !== "/" && directory !== "..") {
       rows = [{
+        "position": -1,
         "type": "directory",
         "name": "..",
         "path": "..",
@@ -97,11 +125,12 @@ export class HomeComponent implements AfterViewInit {
 
   onClick(row: FileTableRow) {
     const currentRow: FileTableRow = {
+      position: row.position,
       type: row["type"],
-      name: row["name"],
-      path: row["path"],
-      last_modified: row["last_modified"],
-      file_size: row["file_size"],
+      name: row.name,
+      path: row.path,
+      last_modified: row.last_modified,
+      file_size: row.file_size
 
     }
 
@@ -130,6 +159,7 @@ export class HomeComponent implements AfterViewInit {
 
   onRecentFileClicked( name: string, path: string ) {
     const currentRow: FileTableRow = {
+      position: -1,
       type: "file",
       name: name,
       path: path,

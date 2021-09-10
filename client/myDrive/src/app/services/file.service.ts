@@ -105,10 +105,12 @@ export class FileService {
 
   formatFileRowContent( data : Dir ) : FileTableRow[] {
     const rows : FileTableRow[] = []
+    let pos = 0
     for (const item of data.directories) {
       const last_modified = new Date(item.last_modified * 1000)
       rows.push(
         {
+          "position": pos++,
           "type": "directory",
           "name": item.name,
           "path": item.path,
@@ -123,6 +125,7 @@ export class FileService {
       
       rows.push(
         {
+          "position": pos++,
           "type": "file",
           "name": item.name,
           "path": item.path,

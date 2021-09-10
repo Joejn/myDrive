@@ -32,6 +32,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -69,7 +70,8 @@ const materialModules = [
   MatRippleModule,
   MatSnackBarModule,
   MatProgressBarModule,
-  MatPaginatorModule
+  MatPaginatorModule,
+  MatCheckboxModule
 ]
 
 @NgModule({
