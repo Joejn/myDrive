@@ -1,4 +1,5 @@
 import base64
+import io
 import os
 from os.path import join
 
@@ -10,8 +11,10 @@ from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource
 
 from shutil import rmtree
+import zipfile
 
 api = Namespace("file", description="Files related operations")
+
 
 @api.route("/myFiles")
 class MyFiles(Resource):
@@ -151,7 +154,7 @@ class CreateFolder(Resource):
 
 @api.route("/move_to_trash")
 class MoveToTrash(Resource):
-    @api.doc("move a object to trash directory")
+    @api.doc("move a element to trash directory")
     @jwt_required()
     def post(self):
         body = json.loads(request.data)
@@ -166,7 +169,7 @@ class MoveToTrash(Resource):
 
 @api.route("/get_objects_from_trash")
 class GetObjectsFromTrash(Resource):
-    @api.doc("delete a object from trash")
+    @api.doc("delete a element from trash")
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
@@ -177,7 +180,7 @@ class GetObjectsFromTrash(Resource):
 
 @api.route("/delete_object_from_trash")
 class DeleteObjectFromTrash(Resource):
-    @api.doc("delete a object from trash")
+    @api.doc("delete a element from trash")
     @jwt_required()
     def post(self):
         body = json.loads(request.data)
@@ -190,3 +193,84 @@ class DeleteObjectFromTrash(Resource):
             rmtree(path)
 
         return "ok", 200
+
+
+@api.route("/download")
+class GetObjectsFromTrash(Resource):
+    @api.doc("download one or mulitple elements")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+        request_data = json.loads(request.data)
+        current_dir = Path().to_relative(request_data.get("currentDir"))
+        elements = request_data.get("data")
+        home_path = os.path.join(DATA_PATH, identity, HOME_DIR)
+        isOneFile = False
+        if len(elements) == 1:
+            if elements[0].get("type") == "file":
+                isOneFile = True
+
+        if (isOneFile):
+            element = elements[0]
+            relative_path = Path().to_relative(element.get("path"))
+            if (relative_path == ".."):
+                    return ""
+            absolute_path = os.path.join(
+                    DATA_PATH, identity, HOME_DIR, relative_path)
+
+            with open(absolute_path, "rb") as f:
+                bin_data = f.read()
+
+            base64_data = (base64.b64encode(bin_data)).decode("utf-8")
+            data = {
+                "title": os.path.basename(absolute_path),
+                "body": base64_data
+            }
+            return data
+
+        empty_dirs = []
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for element in elements:
+                relative_path = Path().to_relative(element.get("path"))
+                if (relative_path == ".."):
+                    continue
+                absolute_path = os.path.join(
+                    DATA_PATH, identity, HOME_DIR, relative_path)
+                if element.get("type") == "file":
+                    zip_file.write(
+                        absolute_path, os.path.basename(absolute_path))
+                else:
+                    pass
+                    if len(os.listdir(absolute_path)) == 0:
+                        empty_dirs.append(absolute_path)
+
+                    for dirname, subdirs, files in os.walk(absolute_path):
+                        empty_dirs.extend([os.path.join(
+                            dirname, dir) for dir in subdirs if os.listdir(join(dirname, dir)) == []])
+
+                        for filename in files:
+                            absname = os.path.abspath(
+                                os.path.join(dirname, filename))
+                            archname = absname[len(os.path.join(
+                                home_path, current_dir)) + 1:]
+                            zip_file.write(absname, archname)
+
+                        for dir in empty_dirs:
+                            path = os.path.join(dir, "")[len(
+                                os.path.join(home_path, current_dir)) + 1:]
+                            zif = zipfile.ZipInfo(path)
+                            zip_file.writestr(zif, "")
+
+        buffer.seek(0)
+
+        bin_data = ""
+        with buffer as f:
+            bin_data = f.read()
+
+        base64_data = (base64.b64encode(bin_data)).decode("utf-8")
+        data = {
+            "title": "myDrive.zip",
+            "body": base64_data
+        }
+        return data

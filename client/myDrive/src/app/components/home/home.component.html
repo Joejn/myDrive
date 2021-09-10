@@ -21,6 +21,9 @@
     <hr style="border-color:lightgray;">
     <div class="main-content">
         <div class="main-content-header">
+            <button mat-raised-button color="primary" type="button" (click)="onDownloadClicked()">
+                <mat-icon>cloud_download</mat-icon> Download file
+            </button>
             <button mat-raised-button color="primary" type="button" (click)="fileUpload.click()">
                 <mat-icon>cloud_upload</mat-icon> Upload file
             </button>
@@ -41,6 +44,7 @@
                 <td mat-cell *matCellDef="let row">
                     <mat-checkbox (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null"
+                        [disabled]="row.name == '..'"
                         [checked]="selection.isSelected(row)"
                         [aria-label]="checkboxLabel(row)">
                     </mat-checkbox>

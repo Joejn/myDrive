@@ -26,12 +26,12 @@ export class HomeComponent implements AfterViewInit {
   selection = new SelectionModel<FileTableRow>(true, [])
   currentDir = ""
 
-  constructor ( private file: FileService, private dialog: MatDialog) {
+  constructor(private file: FileService, private dialog: MatDialog) {
     this.setTableData()
     this.setRecentFiles()
   }
 
-  @ViewChild(MatSort, {static: false}) sort!: MatSort
+  @ViewChild(MatSort, { static: false }) sort!: MatSort
   ngAfterViewInit() {
     this.dataSource.sort = this.sort
   }
@@ -52,9 +52,9 @@ export class HomeComponent implements AfterViewInit {
     this.selection.select(...this.dataSource.data)
   }
 
-  checkboxLabel(row? : FileTableRow) : string {
+  checkboxLabel(row?: FileTableRow): string {
     if (!row) {
-      return `${this.isAllSelected() ? "deselect" : "select" } all`
+      return `${this.isAllSelected() ? "deselect" : "select"} all`
     }
     return `${this.selection.isSelected(row) ? "deselect" : "select"} row ${row.position + 1}`
   }
@@ -73,7 +73,7 @@ export class HomeComponent implements AfterViewInit {
         "file_size": ""
       }]
     }
-    
+
     this.file.getDir(directory).subscribe((data: Dir) => {
       const items = this.file.formatFileRowContent(data)
       for (const item of items) {
@@ -85,7 +85,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
-  formatBytes( bytes: number, decimals: number = 2 ): string {
+  formatBytes(bytes: number, decimals: number = 2): string {
     if (bytes === 0) {
       return "0 Bytes"
     }
@@ -101,7 +101,7 @@ export class HomeComponent implements AfterViewInit {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  getModifiedStr( last_modified: Date): string {
+  getModifiedStr(last_modified: Date): string {
     const last_modified_date = new Date(last_modified).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0)
     let display_last_modified = ""
@@ -121,8 +121,6 @@ export class HomeComponent implements AfterViewInit {
     return display_last_modified
   }
 
-  // @ViewChild(MatSort) sort: MatSort
-
   onClick(row: FileTableRow) {
     const currentRow: FileTableRow = {
       position: row.position,
@@ -138,26 +136,26 @@ export class HomeComponent implements AfterViewInit {
     this.setFileAction(currentRow)
   }
 
-  openTextDialog( title: string, content: string, path: string) {
+  openTextDialog(title: string, content: string, path: string) {
     let dialog = this.dialog.open(TextFileComponent, { disableClose: true })
     dialog.componentInstance.title = title
     dialog.componentInstance.content = content
     dialog.componentInstance.path = path
   }
 
-  openImageDialog( title: string, content: string ) {
-    let dialog = this.dialog.open(ImageFileComponent, {disableClose: true})
+  openImageDialog(title: string, content: string) {
+    let dialog = this.dialog.open(ImageFileComponent, { disableClose: true })
     dialog.componentInstance.title = title
     dialog.componentInstance.content = content
   }
 
   setRecentFiles() {
     this.file.getRecentFiles().subscribe((data: RecentFiles[]) => {
-        this.recentFiles = data
+      this.recentFiles = data
     })
   }
 
-  onRecentFileClicked( name: string, path: string ) {
+  onRecentFileClicked(name: string, path: string) {
     const currentRow: FileTableRow = {
       position: -1,
       type: "file",
@@ -173,13 +171,13 @@ export class HomeComponent implements AfterViewInit {
     if (row["type"] === "directory") {
       this.setTableData(row.path)
     } else {
-      const  file_extension: string = row.name.split(".").pop() + ""
+      const file_extension: string = row.name.split(".").pop() + ""
       this.file.getSpecificFile(row.path).subscribe(data => {
         let blob = new Blob([atob(data)], { type: "octet/stream" })
         const imgFormats = ["png", "jpg"]
-        
+
         if (file_extension === "txt") {
-            this.openTextDialog(row.name, atob(data), row.path)
+          this.openTextDialog(row.name, atob(data), row.path)
         } else if (file_extension === "pdf") {
 
         } else if (imgFormats.includes(file_extension)) {
@@ -200,6 +198,32 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
+  onDownloadClicked() {
+    const selectedItems = this.selection.selected
+    console.log(selectedItems)
+    this.file.downloadFiles(selectedItems, this.currentDir).subscribe(data => {
+      var element = document.createElement("a")
+      const tmpTitle = data.title
+      let extension = tmpTitle.split(".").pop()?.toLowerCase()
+      if (extension == undefined) {
+        extension = ""
+      }
+      const imgFormats = ["jpg", "jpeg", "png"]       // make global const !!!
+      if (imgFormats.includes(extension)) {
+        element.setAttribute("href", "data:image/jpeg;base64," + data.body)
+      } else {
+        element.setAttribute("href", "data:text/plain;base64," + data.body)
+      }
+      
+      element.setAttribute("download", data.title)
+
+      element.style.display = "none"
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
+    })
+  }
+
   onFileUploadChanged(event: any) {
     this.file.uploadFiles(event.target.files, this.currentDir).subscribe((data) => {
       this.setTableData(this.currentDir)
@@ -218,7 +242,7 @@ export class HomeComponent implements AfterViewInit {
     })
   }
 
-  onDeleteClicked( row : FileTableRow ) {
+  onDeleteClicked(row: FileTableRow) {
     this.file.moveObjectToTrash(row.path).subscribe(data => {
       if (data === "ok") {
         this.setTableData(this.currentDir)

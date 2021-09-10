@@ -5,6 +5,21 @@ import { FileTableRow } from '../interfaces/file-table-row';
 import { RecentFiles } from '../interfaces/recent-files';
 import { ConfigService } from './config.service';
 
+export interface DownloadFilesStructureInformations {
+  currentDir: string,
+  data: 
+    {
+      type: string,
+      path: string
+    }[]
+  
+}
+
+export interface DownloadFilesStructure {
+  title: string,
+  body: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -173,5 +188,29 @@ export class FileService {
     }
 
     return display_last_modified
+  }
+
+  /**
+   * 
+   * @param files releative path to object
+   */
+  downloadFiles( rows: FileTableRow[], currentDir: string ) {
+    const bodyData = []
+    for (const row of rows) {
+      const dataElement = {
+        "type": row.type,
+        "path": row.path
+      }
+
+      bodyData.push(dataElement)
+    }
+
+    const body: DownloadFilesStructureInformations = {
+      "currentDir": currentDir,
+      data: bodyData
+    }
+
+
+    return this.http.post<DownloadFilesStructure>(`${this.apiUrl}/download`, body)
   }
 }
