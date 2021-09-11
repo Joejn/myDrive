@@ -10,6 +10,7 @@ import { RecentFiles } from 'src/app/interfaces/recent-files';
 import { CreateFolderComponent } from 'src/app/dialogs/create-folder/create-folder.component';
 import { FileTableRow } from 'src/app/interfaces/file-table-row';
 import { SelectionModel } from '@angular/cdk/collections';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 let rows: FileTableRow[] = []
 
@@ -198,9 +199,12 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  onDownloadClicked() {
-    const selectedItems = this.selection.selected
+  onDownloadClicked(selectedItems: FileTableRow[]) {
+    console.log(typeof selectedItems)
     console.log(selectedItems)
+    if (selectedItems.length === 0) {
+      return
+    }
     this.file.downloadFiles(selectedItems, this.currentDir).subscribe(data => {
       var element = document.createElement("a")
       const tmpTitle = data.title
@@ -248,5 +252,31 @@ export class HomeComponent implements AfterViewInit {
         this.setTableData(this.currentDir)
       }
     })
+  }
+
+  @ViewChild(MatMenuTrigger)
+  public contextMenu!: MatMenuTrigger
+  
+  contextMenuPosition = { x: "0px", y: "0px"}
+
+  // https://stackblitz.com/edit/angular-material-context-menu?file=app%2Fcontext-menu-example.ts
+  onContextMenu( event: MouseEvent, element: FileTableRow ) {
+    event.preventDefault()
+    this.contextMenuPosition.x = event.clientX + "px"
+    this.contextMenuPosition.y = event.clientY + "px"
+    this.contextMenu.menuData = element
+    this.contextMenu.menu.focusFirstItem("mouse")
+    this.contextMenu.openMenu()
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+
+  onSingleItemDownloadClicked() {
+    const data: FileTableRow[] = [this.contextMenu.menuData]
+    this.onDownloadClicked(data)
+  }
+  
+  onSingleItemDeleteClicked() {
+    this.onDeleteClicked(this.contextMenu.menuData)
   }
 }
