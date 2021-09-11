@@ -11,6 +11,12 @@ import { CreateFolderComponent } from 'src/app/dialogs/create-folder/create-fold
 import { FileTableRow } from 'src/app/interfaces/file-table-row';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { RenameComponent } from 'src/app/dialogs/rename/rename.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+export interface DialogDataRename {
+  name: string
+}
 
 let rows: FileTableRow[] = []
 
@@ -27,7 +33,7 @@ export class HomeComponent implements AfterViewInit {
   selection = new SelectionModel<FileTableRow>(true, [])
   currentDir = ""
 
-  constructor(private file: FileService, private dialog: MatDialog) {
+  constructor(private file: FileService, private dialog: MatDialog, private _snackbar: MatSnackBar) {
     this.setTableData()
     this.setRecentFiles()
   }
@@ -278,5 +284,38 @@ export class HomeComponent implements AfterViewInit {
   
   onSingleItemDeleteClicked() {
     this.onDeleteClicked(this.contextMenu.menuData)
+  }
+
+  onRenameClicked() {
+    const dialogRef = this.dialog.open(RenameComponent, {
+      disableClose: true,
+      data: {
+        "name": this.contextMenu.menuData["name"]
+      }
+    })
+
+    dialogRef.afterClosed().subscribe(data => {
+      if (data) {
+        console.log(data)
+        let path: String[] = this.contextMenu.menuData["path"].split("\\")
+        path.pop()
+        path.push(data)
+        const oldPath = this.contextMenu.menuData["path"]
+        const newPath = path.join("\\")
+        this.file.rename(oldPath, newPath).subscribe(status => {
+          if (status) {
+            this.setTableData()
+            this.openSnackBar("Successfully renamed", "Close")
+          }
+        })
+      }
+    })
+  }
+
+  openSnackBar( message: string, action: string) {
+    this._snackbar.open(message, action, {
+      horizontalPosition: 'end',
+      duration: 3000
+    })
   }
 }

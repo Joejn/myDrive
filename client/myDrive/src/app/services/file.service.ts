@@ -213,4 +213,12 @@ export class FileService {
 
     return this.http.post<DownloadFilesStructure>(`${this.apiUrl}/download`, body)
   }
+
+  rename( oldPath: string, newPath: string ) {
+    const body = {
+      "oldPath": oldPath,
+      "newPath": newPath
+    }
+    return this.http.post(`${this.apiUrl}/rename`, body)
+  }
 }

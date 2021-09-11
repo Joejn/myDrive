@@ -69,5 +69,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 ////////////////////////////////////////////////////////
 
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+////////////////////////////////////////////////////////
+
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';

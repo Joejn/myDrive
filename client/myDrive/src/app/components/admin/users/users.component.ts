@@ -8,11 +8,6 @@ import { UsersService } from 'src/app/services/users.service';
 import { ConfirmUserDeleteComponent } from '../dialogs/confirm-user-delete/confirm-user-delete.component';
 import { NewUserDialogComponent } from '../dialogs/new-user-dialog/new-user-dialog.component';
 
-const USERDATA: User[] = [
-  {id: 1, username: "admin", firstname: "admin", lastname: "admin", birthday:"11/08/2002", email: "admin@myDrive.at"},
-  {id: 2, username: "jonas", firstname: "Jonas", lastname: "Neuhauser", birthday:"11/08/2002", email: "jonas.neuhauser@gmx.at"},
-]
-
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',

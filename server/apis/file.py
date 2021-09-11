@@ -196,7 +196,7 @@ class DeleteObjectFromTrash(Resource):
 
 
 @api.route("/download")
-class GetObjectsFromTrash(Resource):
+class Download(Resource):
     @api.doc("download one or mulitple elements")
     @jwt_required()
     def post(self):
@@ -274,3 +274,15 @@ class GetObjectsFromTrash(Resource):
             "body": base64_data
         }
         return data
+
+@api.route("/rename")
+class Rename(Resource):
+    @api.doc("rename a object")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+        oldPath, newPath = json.loads(request.data).values()
+        old_path_abs = os.path.join(DATA_PATH, identity, HOME_DIR, Path().to_relative(oldPath))
+        new_path_abs = os.path.join(DATA_PATH, identity, HOME_DIR, Path().to_relative(newPath))
+        os.rename(old_path_abs, new_path_abs)
+        return True

@@ -51,6 +51,7 @@ import { CreateFolderComponent } from './dialogs/create-folder/create-folder.com
 import { MainComponent } from './components/main/main.component';
 import { TrashComponent } from './components/trash/trash.component';
 import { ConfirmUserDeleteComponent } from './components/admin/dialogs/confirm-user-delete/confirm-user-delete.component';
+import { RenameComponent } from './dialogs/rename/rename.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -97,6 +98,7 @@ const materialModules = [
     MainComponent,
     TrashComponent,
     ConfirmUserDeleteComponent,
+    RenameComponent,
   ],
   imports: [
     BrowserModule,
