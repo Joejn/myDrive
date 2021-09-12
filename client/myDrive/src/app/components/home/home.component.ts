@@ -206,26 +206,14 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onDownloadClicked(selectedItems: FileTableRow[]) {
-    console.log(typeof selectedItems)
-    console.log(selectedItems)
     if (selectedItems.length === 0) {
       return
     }
-    this.file.downloadFiles(selectedItems, this.currentDir).subscribe(data => {
+    this.file.downloadFiles(selectedItems, this.currentDir).subscribe(file => {
       var element = document.createElement("a")
-      const tmpTitle = data.title
-      let extension = tmpTitle.split(".").pop()?.toLowerCase()
-      if (extension == undefined) {
-        extension = ""
-      }
-      const imgFormats = ["jpg", "jpeg", "png"]       // make global const !!!
-      if (imgFormats.includes(extension)) {
-        element.setAttribute("href", "data:image/jpeg;base64," + data.body)
-      } else {
-        element.setAttribute("href", "data:text/plain;base64," + data.body)
-      }
-      
-      element.setAttribute("download", data.title)
+      element.setAttribute("href", "data:" + file.mimeType + ";base64," + file.data.body)
+
+      element.setAttribute("download", file.data.title)
 
       element.style.display = "none"
       document.body.appendChild(element)
@@ -262,11 +250,11 @@ export class HomeComponent implements AfterViewInit {
 
   @ViewChild(MatMenuTrigger)
   public contextMenu!: MatMenuTrigger
-  
-  contextMenuPosition = { x: "0px", y: "0px"}
+
+  contextMenuPosition = { x: "0px", y: "0px" }
 
   // https://stackblitz.com/edit/angular-material-context-menu?file=app%2Fcontext-menu-example.ts
-  onContextMenu( event: MouseEvent, element: FileTableRow ) {
+  onContextMenu(event: MouseEvent, element: FileTableRow) {
     event.preventDefault()
     this.contextMenuPosition.x = event.clientX + "px"
     this.contextMenuPosition.y = event.clientY + "px"
@@ -281,7 +269,7 @@ export class HomeComponent implements AfterViewInit {
     const data: FileTableRow[] = [this.contextMenu.menuData]
     this.onDownloadClicked(data)
   }
-  
+
   onSingleItemDeleteClicked() {
     this.onDeleteClicked(this.contextMenu.menuData)
   }
@@ -296,7 +284,6 @@ export class HomeComponent implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe(data => {
       if (data) {
-        console.log(data)
         let path: String[] = this.contextMenu.menuData["path"].split("\\")
         path.pop()
         path.push(data)
@@ -312,7 +299,7 @@ export class HomeComponent implements AfterViewInit {
     })
   }
 
-  openSnackBar( message: string, action: string) {
+  openSnackBar(message: string, action: string) {
     this._snackbar.open(message, action, {
       horizontalPosition: 'end',
       duration: 3000

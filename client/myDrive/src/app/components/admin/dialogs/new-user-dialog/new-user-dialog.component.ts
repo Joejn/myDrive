@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatDialogRef } from '@angular/material/dialog';
 import { User } from 'src/app/interfaces/user';
 import { UsersService } from 'src/app/services/users.service';
+import { getErrorMessage } from 'src/app/shared/error-messages';
 
 @Component({
   selector: 'app-new-user-dialog',
@@ -10,6 +11,8 @@ import { UsersService } from 'src/app/services/users.service';
   styleUrls: ['./new-user-dialog.component.scss']
 })
 export class NewUserDialogComponent implements OnInit {
+
+  getErrorMessage = getErrorMessage
 
   tableData: User[] = []
 

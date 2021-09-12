@@ -16,8 +16,11 @@ export interface DownloadFilesStructureInformations {
 }
 
 export interface DownloadFilesStructure {
-  title: string,
-  body: string
+  mimeType: string
+  data: {
+    title: string,
+    body: string
+  }
 }
 
 @Injectable({

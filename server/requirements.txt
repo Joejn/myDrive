@@ -6,4 +6,5 @@ bcrypt
 psutil
 psycopg2
 configparser
+python-magic
 
