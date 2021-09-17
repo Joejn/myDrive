@@ -12,7 +12,6 @@
                                 <mat-icon style="width: 100%; font-size: 4em;">description</mat-icon>
                             </div>
                         </button>
-    
                     </mat-card>
                 </mat-grid-tile>
             </div>
@@ -21,7 +20,7 @@
     <hr style="border-color:lightgray;">
     <div class="main-content">
         <div class="main-content-header">
-            <button mat-raised-button color="primary" type="button" (click)="onDownloadClicked(selection.selected)">
+            <button mat-raised-button color="primary" type="button" (click)="onDownloadClicked(selection.selected)" [disabled]="selection.selected.length === 0">
                 <mat-icon>cloud_download</mat-icon> Download file
             </button>
             <button mat-raised-button color="primary" type="button" (click)="fileUpload.click()">
@@ -97,7 +96,7 @@
         [style.left]="contextMenuPosition.x"
             [matMenuTriggerFor]="contextMenu"></div>
         <mat-menu #contextMenu="matMenu">
-            <button mat-menu-item (click)="onSingleItemDownloadClicked()" >
+            <button mat-menu-item (click)="onSingleItemDownloadClicked()">
                 <mat-icon>cloud_download</mat-icon>
                 <span>Download</span>
             </button>
