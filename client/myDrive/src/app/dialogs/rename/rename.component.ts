@@ -1,8 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogDataRename } from 'src/app/components/home/home.component';
 import { getErrorMessage } from 'src/app/shared/error-messages';
+import { forbiddenNameValidator } from 'src/app/shared/forbidden-filename.directive';
 
 @Component({
   selector: 'app-rename',
@@ -12,7 +13,11 @@ import { getErrorMessage } from 'src/app/shared/error-messages';
 export class RenameComponent implements OnInit {
 
   getErrorMessage = getErrorMessage
-  name = new FormControl(this.data.name, [Validators.required])
+  rename = new FormGroup({
+    name: new FormControl(this.data.name, [
+      forbiddenNameValidator()
+    ])
+  })
 
   constructor(
     private dialogRef: MatDialogRef<RenameComponent>,
@@ -24,8 +29,8 @@ export class RenameComponent implements OnInit {
   }
 
   onRenameClicked() {
-    if (this.name.valid) {
-      this.dialogRef.close(this.name.value)
+    if (this.rename.valid) {
+      this.dialogRef.close(this.rename.controls.name.value)
     }
   }
 

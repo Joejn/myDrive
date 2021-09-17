@@ -19,6 +19,8 @@ export function getErrorMessage( error: string, params: any = {} ) {
             }
         }
         return `${msg} is wrong`
+    } else if ( error === "invalidName") {
+        return `${params["name"]} is invalid`
     }
 
     return ""

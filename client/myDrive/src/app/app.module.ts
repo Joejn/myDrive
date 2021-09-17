@@ -33,7 +33,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatDividerModule} from '@angular/material/divider'; 
+import { MatDividerModule } from '@angular/material/divider';
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -52,6 +52,7 @@ import { MainComponent } from './components/main/main.component';
 import { TrashComponent } from './components/trash/trash.component';
 import { ConfirmUserDeleteComponent } from './components/admin/dialogs/confirm-user-delete/confirm-user-delete.component';
 import { RenameComponent } from './dialogs/rename/rename.component';
+import { ForbiddenFilenameDirective } from './shared/forbidden-filename.directive';
 
 const materialModules = [
   MatToolbarModule,
@@ -99,6 +100,7 @@ const materialModules = [
     TrashComponent,
     ConfirmUserDeleteComponent,
     RenameComponent,
+    ForbiddenFilenameDirective,
   ],
   imports: [
     BrowserModule,

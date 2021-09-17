@@ -1,10 +1,14 @@
 <h1 mat-dialog-title>Rename</h1>
 <div mat-dialog-content>
-    <mat-form-field appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput [formControl]="name" required>
-        <mat-error *ngIf="name.invalid">{{getErrorMessage("required", {"name": "Name"})}} </mat-error>
-    </mat-form-field>
+    <form [formGroup]="rename">
+        <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name">
+            <mat-error *ngIf="this.rename.controls['name'].hasError('forbiddenName')">
+                {{ this.getErrorMessage("invalidName", { "name": "name" }) }}
+            </mat-error>
+        </mat-form-field>
+    </form>
 </div>
 <div mat-dialog-actions class="dialog-actions">
     <div>

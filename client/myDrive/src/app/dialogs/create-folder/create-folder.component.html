@@ -1,11 +1,17 @@
 <h1 mat-dialog-title>Create folder</h1>
-<div mat-dialog-content>
-    <mat-form-field appearance="outline">
-        <mat-label>Folder name</mat-label>
-        <input matInput [(ngModel)]="folderName">
-    </mat-form-field>
-</div>
-<div mat-dialog-actions class="button_container">
-    <button mat-raised-button mat-dialog-close>Cancel</button>
-    <button mat-raised-button color="primary" [mat-dialog-close]="folderName" >Create</button>
-</div>
+<form [formGroup]="createFolder">
+    <div mat-dialog-content>
+        <mat-form-field appearance="outline">
+            <mat-label>Folder name</mat-label>
+            <input matInput formControlName="name">
+            <mat-error *ngIf="this.createFolder.controls['name'].hasError('forbiddenName')">
+                {{ this.getErrorMessage("invalidName", { "name": "folder name" }) }}
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions class="button_container">
+        <button mat-raised-button mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" (click)="this.onCreateClicked()">Create</button>
+    </div>
+</form>
+
