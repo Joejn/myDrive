@@ -11,6 +11,7 @@ span {
     flex-flow: column;
     height: 100%;
     width: 100%;
+    overflow: auto;
 }
 
 .custom_container .custom_row.header {

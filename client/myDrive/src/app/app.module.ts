@@ -53,6 +53,7 @@ import { TrashComponent } from './components/trash/trash.component';
 import { ConfirmUserDeleteComponent } from './components/admin/dialogs/confirm-user-delete/confirm-user-delete.component';
 import { RenameComponent } from './dialogs/rename/rename.component';
 import { ForbiddenFilenameDirective } from './shared/forbidden-filename.directive';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 const materialModules = [
   MatToolbarModule,
@@ -75,7 +76,8 @@ const materialModules = [
   MatProgressBarModule,
   MatPaginatorModule,
   MatCheckboxModule,
-  MatDividerModule
+  MatDividerModule,
+  MatSlideToggleModule
 ]
 
 @NgModule({

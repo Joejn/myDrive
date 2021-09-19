@@ -1,4 +1,4 @@
-<div class="custom_container">
+<div class="custom_container" [ngClass]="this.colorTheme.getTheme()">
   <div class="custom_row header">
     <mat-toolbar color="primary" class="navbar">
       <div routerLink="/main" style="cursor: pointer;">myDrive</div>

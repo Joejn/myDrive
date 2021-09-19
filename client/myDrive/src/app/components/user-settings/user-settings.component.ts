@@ -1,10 +1,14 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import {  FormBuilder, FormControl,  Validators } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChangePasswordComponent } from 'src/app/dialogs/change-password/change-password.component';
+import { ColorThemesService } from 'src/app/services/color-themes.service';
 import { UserProfileService } from 'src/app/services/user-profile.service';
 import { getErrorMessage } from 'src/app/shared/error-messages';
+
+const DARK_THEME = "my-theme-dark"
 
 @Component({
   selector: 'app-user-settings',
@@ -13,9 +17,11 @@ import { getErrorMessage } from 'src/app/shared/error-messages';
 })
 export class UserSettingsComponent implements OnInit {
   @Output() profilePictureChanged = new EventEmitter()
+  @Output() colorThemeChanged = new EventEmitter()
 
   imgFile: File = new File([""], "profileImg")
   username = ""
+  isDarkMode: boolean = false
 
   userForm = this.fb.group({
     username: new FormControl("", []),
@@ -36,9 +42,16 @@ export class UserSettingsComponent implements OnInit {
 
   getErrorMessage = getErrorMessage
 
-  constructor( private fb: FormBuilder, private userProfile: UserProfileService, private dialog: MatDialog, private snackbar: MatSnackBar) { }
+  constructor(
+    private fb: FormBuilder,
+    private userProfile: UserProfileService,
+    private dialog: MatDialog,
+    private snackbar: MatSnackBar,
+    private colorTheme: ColorThemesService
+  ) { }
 
   ngOnInit(): void {
+    this.setThemeTogglePosition(this.colorTheme.getTheme())
     this.resetForm()
   }
 
@@ -47,7 +60,7 @@ export class UserSettingsComponent implements OnInit {
     fileUploadElement?.click()
   }
 
-  onImgUploadChanged( event: any ) {
+  onImgUploadChanged(event: any) {
     const fileUploadElement = document.getElementById("img_input")
     if (fileUploadElement === null) {
       return
@@ -60,10 +73,10 @@ export class UserSettingsComponent implements OnInit {
   }
 
   onChagePasswordClicked() {
-    let dialog = this.dialog.open( ChangePasswordComponent )
+    let dialog = this.dialog.open(ChangePasswordComponent)
   }
 
-  onSubmit( event: Event ) {
+  onSubmit(event: Event) {
     event.preventDefault()
     const firstname = this.userForm.controls['firstname'].value
     const lastname = this.userForm.controls['lastname'].value
@@ -85,7 +98,7 @@ export class UserSettingsComponent implements OnInit {
     }
   }
 
-  openSnackbar( message: string, action: string ) {
+  openSnackbar(message: string, action: string) {
     this.snackbar.open(message, action, {
       horizontalPosition: "end",
       duration: 3000,
@@ -101,7 +114,7 @@ export class UserSettingsComponent implements OnInit {
     setTimeout(() => {
       this.userProfile.getGeneralData().subscribe(data => {
         const birthday = new Date(data.birthday)
-  
+
         this.username = data.username
         this.userForm.controls["firstname"].setValue(data.firstname)
         this.userForm.controls["lastname"].setValue(data.lastname)
@@ -113,5 +126,26 @@ export class UserSettingsComponent implements OnInit {
 
   onResetButtonClicked(): void {
     this.resetForm()
+  }
+
+  onColorThemeChanged(event: MatSlideToggleChange): void {
+    const checked = event.checked
+    let theme = "my-theme-light"
+    if (checked) {
+      theme = "my-theme-dark"
+    }
+
+    this.colorTheme.setTheme(theme)
+    this.userProfile.setColorThemeOnServer(theme).subscribe()
+    this.colorThemeChanged.emit(theme)
+  }
+
+  setThemeTogglePosition(theme: string) {
+    let pos = false
+    if(theme === DARK_THEME) {
+      pos = true
+    }
+
+    this.isDarkMode = pos
   }
 }

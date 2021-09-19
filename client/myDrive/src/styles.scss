@@ -14,6 +14,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     padding: 1em;
 }
 
+// overlay-container /////////////////////////////////////////////////////
+
+.cdk-overlay-container{
+    background-color: transparent;
+  }
+
 // sidenav /////////////////////////////////////////////////////
 
 .sidenav-container {

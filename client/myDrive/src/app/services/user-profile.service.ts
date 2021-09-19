@@ -2,6 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from './config.service';
 
+export interface ThemeBody {
+  theme: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -9,15 +13,15 @@ export class UserProfileService {
 
   apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/user_profile`
 
-  constructor( private http: HttpClient, private conf: ConfigService ) { }
+  constructor(private http: HttpClient, private conf: ConfigService) { }
 
-  uploadProfilePicture( file: File ) {
+  uploadProfilePicture(file: File) {
     const fd = new FormData()
     fd.append("image", file, file.name)
     return this.http.post(`${this.apiUrl}/upload_profile_picture`, fd)
   }
 
-  updateGeneralData( firstname: string, lastname: string, birthday: Date, email: string) {
+  updateGeneralData(firstname: string, lastname: string, birthday: Date, email: string) {
     const date = birthday.getDate() < 10 ? `0${birthday.getDate()}` : birthday.getDate()
     const month = (birthday.getMonth() + 1) < 10 ? `0${birthday.getMonth() + 1}` : birthday.getMonth() + 1
     const year = birthday.getFullYear()
@@ -32,7 +36,7 @@ export class UserProfileService {
     return this.http.post(`${this.apiUrl}/update_general_data`, data)
   }
 
-  updatePassword( currentPassword: string, newPassword: string) {
+  updatePassword(currentPassword: string, newPassword: string) {
     interface UpdatePassword {
       "successful": string,
       "error": string
@@ -58,6 +62,18 @@ export class UserProfileService {
       email: string
     }
     return this.http.get<GeneralData>(`${this.apiUrl}/get_general_data`)
+  }
+
+  setColorThemeOnServer(theme: string) {
+    const body = {
+      "theme": theme
+    }
+
+    return this.http.post(`${this.apiUrl}/set_color_theme`, body)
+  }
+
+  getColorThemeFromServer() {
+    return this.http.get<ThemeBody>(`${this.apiUrl}/get_color_theme`)
   }
 
 }

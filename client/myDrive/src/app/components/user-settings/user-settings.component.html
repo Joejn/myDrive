@@ -108,6 +108,20 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-2">
+                    <span></span>
+                </div>
+                <div class="col-sm" style="display: flex; align-items: center;">
+                    <div style="width: 100%; display: flex; justify-content: end;">
+                        <mat-slide-toggle (change)="onColorThemeChanged($event)" [checked]="isDarkMode" >Dark Mode</mat-slide-toggle>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card>
+    <mat-card class="setting_card">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
                     <span>Password</span>
                 </div>
                 <div class="col-sm" style="display: flex; align-items: center;">

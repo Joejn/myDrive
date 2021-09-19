@@ -13,6 +13,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { RenameComponent } from 'src/app/dialogs/rename/rename.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ColorThemesService } from 'src/app/services/color-themes.service';
 
 export interface DialogDataRename {
   name: string
@@ -33,7 +34,7 @@ export class HomeComponent implements AfterViewInit {
   selection = new SelectionModel<FileTableRow>(true, [])
   currentDir = ""
 
-  constructor(private file: FileService, private dialog: MatDialog, private _snackbar: MatSnackBar) {
+  constructor(private file: FileService, private dialog: MatDialog, private _snackbar: MatSnackBar, public colorTheme: ColorThemesService) {
     this.setTableData()
     this.setRecentFiles()
   }

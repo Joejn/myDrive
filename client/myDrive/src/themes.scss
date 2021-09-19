@@ -1,0 +1,70 @@
+@import "../node_modules/@angular/material/theming";
+@include mat-core();
+
+$my-primary-light: mat-palette($mat-indigo-palette);
+$my-accent-light: mat-palette($mat-pink);
+$my-warn-light: mat-palette($mat-red);
+$my-theme-light: mat-light-theme($my-primary-light, $my-accent-light, $my-warn-light);
+@include angular-material-theme($my-theme-light);
+
+$dark-gray-pallete: (
+    50: #f7f7f7,
+    100: #eeeeee,
+    200: #e2e2e2,
+    300: #d0d0d0,
+    400: #ababab,
+    500: #8a8a8a,
+    600: #636363,
+    700: #505050,
+    800: #323232,
+    900: #121212,
+    contrast: (
+        50: white,
+        100: white,
+        200: white,
+        300: white,
+        400: white,
+        500: white,
+        600: white,
+        700: white,
+        800: white,
+        900: white,
+    )
+);
+
+$dark-purble-pallete: (
+    50: #f4ebfe,
+    100: #e2cdfd,
+    200: #cfabfd,
+    300: #bb86fc,
+    400: #aa67f9,
+    500: #994af1,
+    600: #8e44ea,
+    700: #803be0,
+    800: #7335d8,
+    900: #5f27ca,
+    contrast: (
+        50: white,
+        100: white,
+        200: white,
+        300: white,
+        400: white,
+        500: white,
+        600: white,
+        700: white,
+        800: white,
+        900: white,
+    )
+);
+
+// dark theme
+.my-theme-dark {
+    $my-primary-dark: mat-palette($dark-gray-pallete, 900);
+    $my-accent-dark: mat-palette($dark-purble-pallete, 600);
+    $my-warn-dark: mat-palette($mat-red);
+
+    $my-theme-dark: mat-dark-theme($my-primary-dark, $my-accent-dark, $my-warn-dark);
+    background-color: #2b2a33;
+
+    @include angular-material-theme($my-theme-dark)
+}

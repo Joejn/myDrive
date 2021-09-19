@@ -9,6 +9,8 @@ import base64
 import bcrypt
 from core.utils import Password
 
+DEFAULT_THEME = "my-theme-light"
+
 api = Namespace("user_profile", description="userprofile related operations")
 
 
@@ -109,3 +111,38 @@ class GetGeneralData(Resource):
         }
 
         return json.jsonify(data)
+
+@api.route("/set_color_theme")
+class SetColorTheme(Resource):
+    @jwt_required()
+    def post(self):
+        id = get_jwt()["id"]
+        theme = json.loads(request.data).get("theme")
+        statement = "UPDATE public.users SET color_theme='{color_theme}' WHERE id={id};".format(color_theme=theme, id=id)
+        db = Database()
+
+        db.exec(statement)
+
+        body = {
+            "successful": True
+        }
+
+        body = json.jsonify(body)
+
+@api.route("/get_color_theme")
+class GetColorTheme(Resource):
+    @jwt_required()
+    def get(self):
+        id = get_jwt()["id"]
+        db = Database()
+
+        statement = "SELECT color_theme FROM public.users WHERE id={id}".format(id=id)
+        theme = db.select(statement)[0][0]
+        if theme == None:
+            theme = DEFAULT_THEME
+
+        body = {
+            "theme": theme
+        }
+
+        return json.jsonify(body)
