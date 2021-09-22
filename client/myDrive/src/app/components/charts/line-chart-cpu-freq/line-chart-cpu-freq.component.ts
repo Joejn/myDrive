@@ -39,12 +39,21 @@ export class LineChartCpuFreqComponent implements OnInit {
         plugins: {
           legend: {
             display: false
+          },
+          tooltip: {
+            enabled: true,
+            callbacks: {
+              label: function (context) {
+                const label = context.raw + "Hz"
+                return label;
+              }
+            }
           }
         },
         scales: {
           y: {
             ticks: {
-              callback: function(value, index, values) {
+              callback: function (value, index, values) {
                 return value + "Hz"
               }
             },

@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Dir } from 'src/app/interfaces/dir';
@@ -47,12 +48,30 @@ export class TrashComponent implements AfterViewInit {
   }
 
   onDeleteClicked( row : FileTableRow ) {
-    console.log("Row:", row)
     this.file.deleteObjectFromTrash(row.path).subscribe(data => {
       if (data === "ok") {
         this.setTableData()
       }
     })
+  }
+
+  @ViewChild(MatMenuTrigger)
+  public contextMenu!: MatMenuTrigger
+
+  contextMenuPosition = { x: "0px", y: "0px" }
+
+  // https://stackblitz.com/edit/angular-material-context-menu?file=app%2Fcontext-menu-example.ts
+  onContextMenu(event: MouseEvent, element: FileTableRow) {
+    event.preventDefault()
+    this.contextMenuPosition.x = event.clientX + "px"
+    this.contextMenuPosition.y = event.clientY + "px"
+    this.contextMenu.menuData = element
+    this.contextMenu.menu.focusFirstItem("mouse")
+    this.contextMenu.openMenu()
+  }
+
+  onSingleItemDeleteClicked() {
+    this.onDeleteClicked(this.contextMenu.menuData)
   }
 
 }

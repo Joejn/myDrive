@@ -39,6 +39,15 @@ export class LineChartMemoryUsedComponent implements OnInit {
         plugins: {
           legend: {
             display: false
+          },
+          tooltip: {
+            enabled: true,
+            callbacks: {
+              label: function (context) {
+                const label = context.raw + "%"
+                return label;
+              }
+            }
           }
         },
         scales: {

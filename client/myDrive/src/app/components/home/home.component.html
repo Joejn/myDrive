@@ -5,7 +5,7 @@
                 <mat-grid-tile style="height: 100%;">
                     <mat-card class="recent-item">
                         <div class="recent-item-content" (click)="onRecentFileClicked(item.name, item.path)">
-                            <h2>{{item.name}}</h2>
+                            <h2 class="text-overflow-ellipsis">{{item.name}}</h2>
                             <div>
                                 <mat-icon style="width: 100%; font-size: 4em;">description</mat-icon>
                             </div>
@@ -88,8 +88,8 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-        <div style="visibility: hidden; position: fixed;" [style.top]="contextMenuPosition.y"
-            [style.left]="contextMenuPosition.x" [matMenuTriggerFor]="contextMenu"></div>
+        <div class="context-menu" [style.top]="contextMenuPosition.y" [style.left]="contextMenuPosition.x"
+            [matMenuTriggerFor]="contextMenu"></div>
         <mat-menu #contextMenu="matMenu">
             <button mat-menu-item (click)="onSingleItemDownloadClicked()">
                 <mat-icon>cloud_download</mat-icon>

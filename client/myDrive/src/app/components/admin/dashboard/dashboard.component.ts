@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { interval, merge, Observable, Subject, Subscription } from 'rxjs';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
+import { FileService } from 'src/app/services/file.service';
 import { ServerLoadService } from 'src/app/services/server-load.service';
 import { UsersService } from 'src/app/services/users.service';
 
@@ -37,8 +38,8 @@ export class DashboardComponent implements AfterViewInit {
   @ViewChild("memoryUsageChart") memoryUsageChart : any;
   @ViewChild("spaceUsageChart") spaceUsageChart : any;
 
-  constructor( private serverLoad: ServerLoadService, private elementRef: ElementRef, private users: UsersService ) {
-    users.getUserCount().subscribe((data: any) => {
+  constructor( private serverLoad: ServerLoadService, private elementRef: ElementRef, private users: UsersService, file: FileService ) {
+    this.users.getUserCount().subscribe((data: any) => {
       if (data) {
         this.userCount = String(data["user_count"])
       } else {

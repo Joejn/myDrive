@@ -80,6 +80,26 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     justify-content: flex-end;
 }
 
+// context meue ////////////////////////////////////////
+
+.context-menu {
+    visibility: hidden;
+    position: fixed;
+}
+
+// text ////////////////////////////////////////////////
+
+.warn_text *{
+    color: #f44336 !important
+}
+
+.text-overflow-ellipsis {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 ////////////////////////////////////////////////////////
 
 /* Importing Bootstrap SCSS file. */

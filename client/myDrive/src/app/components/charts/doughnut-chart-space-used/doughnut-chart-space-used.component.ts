@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { FileService } from 'src/app/services/file.service';
 import { HighlightSpanKind } from 'typescript';
 
 @Component({
@@ -15,13 +16,15 @@ export class DoughnutChartSpaceUsedComponent implements OnInit {
 
   chart: any = ""
 
-  constructor() { }
+  constructor( private file: FileService) {
 
-  ngOnInit(): void {
-    this.setChartData()
   }
 
-  setChartData() {
+  ngOnInit(): void {
+    this.setChartData(this.file)
+  }
+
+  setChartData(file: FileService) {
     Chart.register(...registerables)
 
     this.chart = new Chart("space_used_chart", {
@@ -39,8 +42,19 @@ export class DoughnutChartSpaceUsedComponent implements OnInit {
         maintainAspectRatio: false,
         animation: {
           duration: 0
+        },
+        plugins: {
+          tooltip: {
+            enabled: true,
+            callbacks: {
+              label: function(context) {
+                const label = file.formatBytes(Number(context.raw))
+                return label;
+            }
+            }
+          }
         }
-      }
+      },
     })
   }
 
