@@ -34,6 +34,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -53,7 +55,6 @@ import { TrashComponent } from './components/trash/trash.component';
 import { ConfirmUserDeleteComponent } from './components/admin/dialogs/confirm-user-delete/confirm-user-delete.component';
 import { RenameComponent } from './dialogs/rename/rename.component';
 import { ForbiddenFilenameDirective } from './shared/forbidden-filename.directive';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 const materialModules = [
   MatToolbarModule,
@@ -77,7 +78,8 @@ const materialModules = [
   MatPaginatorModule,
   MatCheckboxModule,
   MatDividerModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatProgressSpinnerModule
 ]
 
 @NgModule({

@@ -16,11 +16,16 @@ let rows: FileTableRow[] = []
 export class TrashComponent implements AfterViewInit {
 
   isTableHidden : boolean = false
+  isLoading: boolean = false
+  timeout: any = () => {}
 
   displayedColumns: string[] = ["name", "last_modified", "file_size", "delete"]
   dataSource = new MatTableDataSource(rows)
 
   constructor( private file: FileService ) {
+    this.timeout = setTimeout(() => {
+        this.isLoading = true
+    }, 200)
     this.setTableData()
   }
 
@@ -30,8 +35,9 @@ export class TrashComponent implements AfterViewInit {
   }
 
   setTableData() {
-
     this.file.getObjectsFromTrash().subscribe((data: Dir) => {
+      clearTimeout(this.timeout)
+      this.isLoading = false
       const numbersOfDirectories = data.directories.length
       const numbersOfFiles = data.files.length
 

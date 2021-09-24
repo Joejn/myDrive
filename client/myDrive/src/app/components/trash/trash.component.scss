@@ -1,8 +1,11 @@
 .main-content {
+    position: absolute;
     display: flex;
     justify-content: center;
-    height: 100%;
-    width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
 
 table {
@@ -18,8 +21,47 @@ table {
     width: 400px;
 }
 
+.center-card {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .search-icon {
     font-size: 160px;
     height: 160px;
     width: 160px;
+}
+
+.site-content {
+    width: 100%;
+    margin: 1em;
+}
+
+.overlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.33);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.overlay * {
+    margin: 1em;
+}
+
+.loading-text::before {
+    content: "";
+    animation: loading-text 2s infinite both
+}
+
+@keyframes loading-text {
+    0% { content: "loading ."}
+    33% { content: "loading .."}
+    66% { content: "loading ..."}
+    100% { content: "loading ."}
 }
