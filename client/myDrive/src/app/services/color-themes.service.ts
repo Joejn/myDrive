@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class ColorThemesService {
 
+  private DARK_THEME: string = "my-theme-dark"
+
   constructor() { }
 
   setTheme(theme: string): void {
@@ -13,5 +15,9 @@ export class ColorThemesService {
 
   getTheme(): string {
     return String(localStorage.getItem("theme"))
+  }
+
+  isDarkTheme(): boolean {
+    return this.getTheme() === this.DARK_THEME
   }
 }
