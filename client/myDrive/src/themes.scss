@@ -32,35 +32,10 @@ $dark-gray-pallete: (
     )
 );
 
-$dark-green-pallete: (
-    50: #f2fde4,
-    100: #defabb,
-    200: #c6f68d,
-    300: #aaf255,
-    400: #90ee02,
-    500: #75e900,
-    600: #61d800,
-    700: #41c300,
-    800: #09af00,
-    900: #008b00,
-    contrast: (
-        50: black,
-        100: black,
-        200: black,
-        300: white,
-        400: white,
-        500: white,
-        600: white,
-        700: white,
-        800: white,
-        900: white,
-    )
-);
-
 // dark theme
 .my-theme-dark {
     $my-primary-dark: mat-palette($mat-purple, 300);
-    $my-accent-dark: mat-palette($dark-green-pallete, 400);
+    $my-accent-dark: mat-palette($mat-light-blue, 400);
     $my-warn-dark: mat-palette($mat-red);
 
     $my-theme-dark: mat-dark-theme($my-primary-dark, $my-accent-dark, $my-warn-dark);
