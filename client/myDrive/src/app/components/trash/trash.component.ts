@@ -15,21 +15,22 @@ let rows: FileTableRow[] = []
 })
 export class TrashComponent implements AfterViewInit {
 
-  isTableHidden : boolean = false
+  isTableHidden: boolean = false
   isLoading: boolean = false
-  timeout: any = () => {}
+  isShowingContent: boolean = false
+  timeout: any = () => { }
 
   displayedColumns: string[] = ["name", "last_modified", "file_size", "delete"]
   dataSource = new MatTableDataSource(rows)
 
-  constructor( private file: FileService ) {
+  constructor(private file: FileService) {
     this.timeout = setTimeout(() => {
-        this.isLoading = true
+      this.isLoading = true
     }, 200)
     this.setTableData()
   }
 
-  @ViewChild(MatSort, {static: false}) sort!: MatSort
+  @ViewChild(MatSort, { static: false }) sort!: MatSort
   ngAfterViewInit() {
     this.dataSource.sort = this.sort
   }
@@ -38,6 +39,7 @@ export class TrashComponent implements AfterViewInit {
     this.file.getObjectsFromTrash().subscribe((data: Dir) => {
       clearTimeout(this.timeout)
       this.isLoading = false
+      this.isShowingContent = true
       const numbersOfDirectories = data.directories.length
       const numbersOfFiles = data.files.length
 
@@ -53,7 +55,7 @@ export class TrashComponent implements AfterViewInit {
     })
   }
 
-  onDeleteClicked( row : FileTableRow ) {
+  onDeleteClicked(row: FileTableRow) {
     this.file.deleteObjectFromTrash(row.path).subscribe(data => {
       if (data === "ok") {
         this.setTableData()

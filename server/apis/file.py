@@ -106,17 +106,35 @@ class GetRecentFiles(Resource):
             SELECT
                 subselect.file_name, subselect.file_path
             FROM
-                (SELECT distinct on (file_path) id, file_name, file_path FROM public.user_history WHERE user_id = """ + str(id) + """ LIMIT 4) as subselect
+                (SELECT distinct on (file_path) id, file_name, file_path FROM public.user_history WHERE user_id = """ + str(id) + """ LIMIT 20) as subselect
             ORDER BY subselect.id DESC
         """
         recent_files = db.select(statement)
-        data = []
-        for item in recent_files:
-            data.append(
-                {"name": item[0], "path": item[1]}
-            )
+        # for item in recent_files:
+        #     data.append(
+        #         {"name": item[0], "path": item[1]}
+        #     )
 
-        return data
+        """
+        {"name": item, "path": fullName.replace(path, ""), "last_modified": getmtime(
+                        fullName), "file_size": getsize(fullName)}
+        """
+
+        body = {
+            "directories": [],
+            "files": []
+        }
+
+        for name, path in recent_files:
+            if os.path.isfile(path):
+                body["files"].append({
+                    "name": name,
+                    "path": path,
+                    "last_modified": os.path.getmtime(path),
+                    "file_size": os.path.getsize(path)
+                })
+
+        return json.jsonify(body)
 
 
 @api.route("/upload_files")
@@ -175,7 +193,6 @@ class GetObjectsFromTrash(Resource):
     def get(self):
         identity = get_jwt_identity()
         path = os.path.join(DATA_PATH, identity, TRASH_DIR)
-
         return Files().get_dir_content(path)
 
 
@@ -218,8 +235,9 @@ class Download(Resource):
             element = elements[0]
             relative_path = Path().to_relative(element.get("path"))
             if (relative_path == ".."):
-                    return ""
-            absolute_path = os.path.join(DATA_PATH, identity, HOME_DIR, relative_path)
+                return ""
+            absolute_path = os.path.join(
+                DATA_PATH, identity, HOME_DIR, relative_path)
 
             with open(absolute_path, "rb") as f:
                 bin_data = f.read()
@@ -283,6 +301,7 @@ class Download(Resource):
         }
         return body
 
+
 @api.route("/rename")
 class Rename(Resource):
     @api.doc("rename a object")
@@ -290,7 +309,9 @@ class Rename(Resource):
     def post(self):
         identity = get_jwt_identity()
         oldPath, newPath = json.loads(request.data).values()
-        old_path_abs = os.path.join(DATA_PATH, identity, HOME_DIR, Path().to_relative(oldPath))
-        new_path_abs = os.path.join(DATA_PATH, identity, HOME_DIR, Path().to_relative(newPath))
+        old_path_abs = os.path.join(
+            DATA_PATH, identity, HOME_DIR, Path().to_relative(oldPath))
+        new_path_abs = os.path.join(
+            DATA_PATH, identity, HOME_DIR, Path().to_relative(newPath))
         os.rename(old_path_abs, new_path_abs)
         return True

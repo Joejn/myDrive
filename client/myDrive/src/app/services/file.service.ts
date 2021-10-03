@@ -76,7 +76,7 @@ export class FileService {
   }
 
   getRecentFiles() {
-    return this.http.get<RecentFiles[]>(`${this.apiUrl}/get_recent_files`)
+    return this.http.get<Dir>(`${this.apiUrl}/get_recent_files`)
   }
 
   uploadFiles( files: File[], currentDir: string) {

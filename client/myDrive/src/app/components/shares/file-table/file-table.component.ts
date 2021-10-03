@@ -1,46 +1,73 @@
-import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { FileService } from 'src/app/services/file.service';
-import { Dir } from 'src/app/interfaces/dir';
-import { MatDialog } from '@angular/material/dialog';
-import { TextFileComponent } from 'src/app/dialogs/text-file/text-file.component';
-import { ImageFileComponent } from 'src/app/dialogs/image-file/image-file.component';
-import { RecentFiles } from 'src/app/interfaces/recent-files';
 import { CreateFolderComponent } from 'src/app/dialogs/create-folder/create-folder.component';
-import { FileTableRow } from 'src/app/interfaces/file-table-row';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatMenuTrigger } from '@angular/material/menu';
+import { ImageFileComponent } from 'src/app/dialogs/image-file/image-file.component';
 import { RenameComponent } from 'src/app/dialogs/rename/rename.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { TextFileComponent } from 'src/app/dialogs/text-file/text-file.component';
+import { Dir } from 'src/app/interfaces/dir';
+import { FileTableRow } from 'src/app/interfaces/file-table-row';
 import { ColorThemesService } from 'src/app/services/color-themes.service';
+import { FileService } from 'src/app/services/file.service';
 
-export interface DialogDataRename {
-  name: string
+export interface headerElement {
+  text: string,
+  color: string
 }
 
-let rows: FileTableRow[] = []
-
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  selector: 'app-file-table',
+  templateUrl: './file-table.component.html',
+  styleUrls: ['./file-table.component.scss']
 })
-export class HomeComponent implements AfterViewInit {
-  recentFiles: RecentFiles[] = []
+export class FileTableComponent implements AfterViewInit {
 
-  displayedColumns: string[] = ["select", "name", "last_modified", "file_size", "delete"]
-  dataSource = new MatTableDataSource(rows)
+  @Input() height: string = "100%";
+  @Input() width: string = "100%";
+
+  /**
+   * columns
+   * - select
+   * - name
+   * - last_modified
+   * - file_size
+   * - delete
+   */
+  @Input() displayedColumns: string[] = ["select", "name", "last_modified", "file_size", "delete"]
+
+  /**
+   * elements
+   * - download
+   * - rename
+   * - delete
+   */
+  @Input() contextMenuElements: string[] = []
+
+  /**
+   * elements
+   * - download
+   * - upload
+   * - createFolder
+   */
+  @Input() headerElements: string[] = []
+  @Input() dataApi: string = ""
+
+  rows: FileTableRow[] = []
+  dataSource = new MatTableDataSource(this.rows)
   selection = new SelectionModel<FileTableRow>(true, [])
   currentDir = ""
 
   constructor(private file: FileService, private dialog: MatDialog, private _snackbar: MatSnackBar, public colorTheme: ColorThemesService) {
-    this.setTableData()
-    // this.setRecentFiles()
+
   }
 
   @ViewChild(MatSort, { static: false }) sort!: MatSort
   ngAfterViewInit() {
+    this.setTableData()
     this.dataSource.sort = this.sort
   }
 
@@ -70,9 +97,16 @@ export class HomeComponent implements AfterViewInit {
   //////////////////////////////////////////////////////////////////////////////////////////////////////
 
   setTableData(directory: string = "/") {
-    rows = []
+    console.log(this.dataApi)
+    if (this.dataApi === "recent") {
+      this.file.getRecentFiles().subscribe((data: Dir) => {
+        this.appendRows(data)
+      })
+      return
+    }
+    this.rows = []
     if (directory !== "/" && directory !== "..") {
-      rows = [{
+      this.rows = [{
         "position": -1,
         "type": "directory",
         "name": "..",
@@ -83,13 +117,17 @@ export class HomeComponent implements AfterViewInit {
     }
 
     this.file.getDir(directory).subscribe((data: Dir) => {
-      const items = this.file.formatFileRowContent(data)
-      for (const item of items) {
-        rows.push(item)
-      }
-      this.dataSource = new MatTableDataSource(rows)
-      this.dataSource.sort = this.sort
+      this.appendRows(data)
     })
+  }
+
+  appendRows(tableContent: Dir): void {
+    const items = this.file.formatFileRowContent(tableContent)
+    for (const item of items) {
+      this.rows.push(item)
+    }
+    this.dataSource = new MatTableDataSource(this.rows)
+    this.dataSource.sort = this.sort
   }
 
   // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
@@ -156,24 +194,6 @@ export class HomeComponent implements AfterViewInit {
     dialog.componentInstance.title = title
     dialog.componentInstance.content = content
   }
-
-  // setRecentFiles() {
-  //   this.file.getRecentFiles().subscribe((data: RecentFiles[]) => {
-  //     this.recentFiles = data
-  //   })
-  // }
-
-  // onRecentFileClicked(name: string, path: string) {
-  //   const currentRow: FileTableRow = {
-  //     position: -1,
-  //     type: "file",
-  //     name: name,
-  //     path: path,
-  //     last_modified: "",
-  //     file_size: "",
-  //   }
-  //   this.setFileAction(currentRow)
-  // }
 
   setFileAction(row: FileTableRow) {
     if (row["type"] === "directory") {
@@ -256,6 +276,10 @@ export class HomeComponent implements AfterViewInit {
 
   // https://stackblitz.com/edit/angular-material-context-menu?file=app%2Fcontext-menu-example.ts
   onContextMenu(event: MouseEvent, element: FileTableRow) {
+    if (this.contextMenuElements.length === 0) {
+      return
+    }
+
     event.preventDefault()
     this.contextMenuPosition.x = event.clientX + "px"
     this.contextMenuPosition.y = event.clientY + "px"
@@ -306,4 +330,5 @@ export class HomeComponent implements AfterViewInit {
       duration: 3000
     })
   }
+
 }

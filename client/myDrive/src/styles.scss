@@ -1,6 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box
+}
+
+html, body { height: 100%; font-size: 62.5%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .main-div-center {
@@ -100,7 +106,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     text-overflow: ellipsis;
 }
 
-////////////////////////////////////////////////////////
+// content /////////////////////////////////////////////
+
+.content__header {
+    padding: 1em;
+    margin: 1em 0;
+}
+
+.content__header-item {
+    margin-right: 10px !important;
+}
 
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';

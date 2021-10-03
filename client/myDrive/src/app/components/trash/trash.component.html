@@ -6,7 +6,7 @@
     </div>
 
 
-    <div class="site-content" [style.visibility]="!isLoading ? 'visible' : 'hidden'">
+    <div class="site-content" [style.visibility]="isShowingContent ? 'visible' : 'hidden'">
         <div class="center-card">
             <mat-card class="card" [hidden]="!isTableHidden">
                 <div class="card-row">
