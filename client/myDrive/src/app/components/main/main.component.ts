@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MainComponent implements OnInit {
 
-  public currentTab: string = "recent"
+  public currentTab: string = "home"
 
   constructor() { }
 
