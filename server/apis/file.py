@@ -206,6 +206,10 @@ class DeleteObjectFromTrash(Resource):
         relative_path = Path().to_relative(body.get("path"))
         path = os.path.join(DATA_PATH, identity, TRASH_DIR, relative_path)
         if os.path.isfile(path):
+            statement = """
+                DELETE FROM public.user_history
+                    WHERE file_path={};
+            """.format(path)
             os.remove(path)
         else:
             rmtree(path)
