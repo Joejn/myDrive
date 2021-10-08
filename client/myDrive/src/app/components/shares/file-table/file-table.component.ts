@@ -45,7 +45,7 @@ export class FileTableComponent implements AfterViewInit {
    * - rename
    * - delete
    */
-  @Input() contextMenuElements: string[] = []
+  @Input() contextMenuElements: string[] = ["download", "rename", "delete"]
 
   /**
    * elements
@@ -53,8 +53,8 @@ export class FileTableComponent implements AfterViewInit {
    * - upload
    * - createFolder
    */
-  @Input() headerElements: string[] = []
-  @Input() dataApi: string = ""
+  @Input() headerElements: string[] = ["download", "upload", "createFolder"]
+  @Input() dataApi: string = "home"
 
   rows: FileTableRow[] = []
   dataSource = new MatTableDataSource(this.rows)

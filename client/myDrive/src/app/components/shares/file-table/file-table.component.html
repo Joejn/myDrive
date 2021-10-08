@@ -1,15 +1,15 @@
 <div>
     <div [hidden]="this.headerElements.length === 0" class="table__header">
-        <button [hidden]="!this.headerElements.includes('download')" mat-raised-button color="primary" (click)="onDownloadClicked(selection.selected)" [disabled]="selection.selected.length === 0">
+        <button class="table__header-item" [hidden]="!this.headerElements.includes('download')" mat-raised-button color="primary" (click)="onDownloadClicked(selection.selected)" [disabled]="selection.selected.length === 0">
             <mat-icon>cloud_download</mat-icon>
             <span>Download file</span>
         </button>
         <input type="file" multiple hidden #fileUpload (change)="onFileUploadChanged($event)">
-        <button [hidden]="!this.headerElements.includes('upload')" mat-raised-button color="primary" (click)="fileUpload.click()">
+        <button class="table__header-item" [hidden]="!this.headerElements.includes('upload')" mat-raised-button color="primary" (click)="fileUpload.click()">
             <mat-icon>cloud_download</mat-icon>
             <span>Upload file</span>
         </button>
-        <button [hidden]="!this.headerElements.includes('createFolder')" mat-raised-button color="primary" (click)="onCreateFolderClicked()">
+        <button class="table__header-item" [hidden]="!this.headerElements.includes('createFolder')" mat-raised-button color="primary" (click)="onCreateFolderClicked()">
             <mat-icon>cloud_download</mat-icon>
             <span>Create Folder</span>
         </button>
