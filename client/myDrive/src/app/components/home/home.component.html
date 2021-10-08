@@ -4,12 +4,12 @@
             <div *ngFor="let item of recentFiles">
                 <mat-grid-tile style="height: 100%;">
                     <mat-card class="recent-item">
-                        <!-- <div class="recent-item-content" (click)="onRecentFileClicked(item.name, item.path)">
+                        <div class="recent-item-content" (click)="onRecentFileClicked(item.name, item.path)">
                             <h2 class="text-overflow-ellipsis">{{item.name}}</h2>
                             <div>
                                 <mat-icon style="width: 100%; font-size: 4em;">description</mat-icon>
                             </div>
-                        </div> -->
+                        </div>
                     </mat-card>
                 </mat-grid-tile>
             </div>

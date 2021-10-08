@@ -36,7 +36,7 @@ export class HomeComponent implements AfterViewInit {
 
   constructor(private file: FileService, private dialog: MatDialog, private _snackbar: MatSnackBar, public colorTheme: ColorThemesService) {
     this.setTableData()
-    // this.setRecentFiles()
+    this.setRecentFiles()
   }
 
   @ViewChild(MatSort, { static: false }) sort!: MatSort
@@ -157,23 +157,32 @@ export class HomeComponent implements AfterViewInit {
     dialog.componentInstance.content = content
   }
 
-  // setRecentFiles() {
-  //   this.file.getRecentFiles().subscribe((data: RecentFiles[]) => {
-  //     this.recentFiles = data
-  //   })
-  // }
+  setRecentFiles() {
+    this.file.getRecentFiles().subscribe((data: Dir) => {
+      this.recentFiles = []
+      for (const file of data.files) {
+        if (this.recentFiles.length >= 4) {
+          break
+        }
+        this.recentFiles.push({
+          "name": file.name,
+          "path": file.path
+        })
+      }
+    })
+  }
 
-  // onRecentFileClicked(name: string, path: string) {
-  //   const currentRow: FileTableRow = {
-  //     position: -1,
-  //     type: "file",
-  //     name: name,
-  //     path: path,
-  //     last_modified: "",
-  //     file_size: "",
-  //   }
-  //   this.setFileAction(currentRow)
-  // }
+  onRecentFileClicked(name: string, path: string) {
+    const currentRow: FileTableRow = {
+      position: -1,
+      type: "file",
+      name: name,
+      path: path,
+      last_modified: "",
+      file_size: "",
+    }
+    this.setFileAction(currentRow)
+  }
 
   setFileAction(row: FileTableRow) {
     if (row["type"] === "directory") {
