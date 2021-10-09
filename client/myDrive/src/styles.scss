@@ -128,5 +128,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     margin-right: 1rem !important;
 }
 
+// button //////////////////////////////////////////////
+
+.button__icon-left {
+    margin-right: 1rem;
+}
+
+.button__icon-right {
+    margin-left: 1rem
+}
+
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';

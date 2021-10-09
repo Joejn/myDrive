@@ -4,11 +4,11 @@
         <input matInput (keyup)="applyFilter($event)" #input>
     </mat-form-field>
     <button mat-raised-button class="table__header-item" type="button" color="primary" (click)="openDialog()">
-        <mat-icon>add</mat-icon>
+        <mat-icon class="button__icon-left">add</mat-icon>
         <span>Add new user</span>
     </button>
     <button mat-raised-button class="table__header-item" type="button" color="primary" (click)="onAddGroupClicked()" [disabled]="this.selection.selected.length === 0" >
-        <mat-icon>group_add</mat-icon>
+        <mat-icon class="button__icon-left">group_add</mat-icon>
         <span>Add to group</span>
     </button>
 </div>
