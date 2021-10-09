@@ -36,6 +36,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatListModule } from '@angular/material/list';
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -57,6 +59,8 @@ import { RenameComponent } from './dialogs/rename/rename.component';
 import { ForbiddenFilenameDirective } from './shared/forbidden-filename.directive';
 import { RecentComponent } from './components/recent/recent.component';
 import { FileTableComponent } from './components/shares/file-table/file-table.component';
+import { SharedWithMeComponent } from './components/shared-with-me/shared-with-me.component';
+import { AddToGroupComponent } from './components/admin/dialogs/add-to-group/add-to-group.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -81,7 +85,9 @@ const materialModules = [
   MatCheckboxModule,
   MatDividerModule,
   MatSlideToggleModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MatAutocompleteModule,
+  MatListModule
 ]
 
 @NgModule({
@@ -109,6 +115,8 @@ const materialModules = [
     ForbiddenFilenameDirective,
     RecentComponent,
     FileTableComponent,
+    SharedWithMeComponent,
+    AddToGroupComponent,
   ],
   imports: [
     BrowserModule,

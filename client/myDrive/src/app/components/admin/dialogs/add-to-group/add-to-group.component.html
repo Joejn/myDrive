@@ -1,0 +1,33 @@
+<div>
+    <h1 mat-dialog-title>Add to Group</h1>
+    <div mat-dialog-content>
+        <form>
+            <mat-form-field appearance="outline">
+                <mat-label>Group</mat-label>
+                <input type="text" placeholder="administrators" matInput [formControl]="myControl"
+                    [matAutocomplete]="auto">
+                <button matSuffix mat-icon-button aria-label="Add" (click)="onAddClicked()">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                        {{option}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <div *ngIf="groups.length > 0">
+                <mat-divider></mat-divider>
+                <mat-list role="list">
+                    <div mat-subheader>Groups</div>
+                    <ng-container *ngFor="let group of groups">
+                        <mat-list-item role="listitem">{{group}}</mat-list-item>
+                    </ng-container>
+                </mat-list>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions class="dialog-actions">
+        <button mat-raised-button color="warn" mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" (click)="onApplyClicked()">Apply</button>
+    </div>
+</div>

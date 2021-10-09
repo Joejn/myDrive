@@ -1,3 +1,4 @@
+import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -5,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { User } from 'src/app/interfaces/user';
 import { UsersService } from 'src/app/services/users.service';
+import { AddToGroupComponent } from '../dialogs/add-to-group/add-to-group.component';
 import { ConfirmUserDeleteComponent } from '../dialogs/confirm-user-delete/confirm-user-delete.component';
 import { NewUserDialogComponent } from '../dialogs/new-user-dialog/new-user-dialog.component';
 
@@ -19,10 +21,11 @@ export class UsersComponent implements AfterViewInit {
 
   @ViewChild(MatPaginator) paginator: any = ""
 
-  displayColumns: string[] = ["id", "username", "firstname", "lastname", "birthday", "email", "delete"]
+  displayColumns: string[] = ["select", "id", "username", "firstname", "lastname", "birthday", "email", "delete"]
   dataSource = new MatTableDataSource(this.allUsers)
+  selection = new SelectionModel<User>(true, []);
 
-  constructor( private users: UsersService, private dialog: MatDialog, private _snackBar: MatSnackBar ) {
+  constructor(private users: UsersService, private dialog: MatDialog, private _snackBar: MatSnackBar) {
     this.setTableData()
   }
 
@@ -33,7 +36,7 @@ export class UsersComponent implements AfterViewInit {
   setTableData() {
     this.users.getAllUsers().subscribe((data: User[]) => {
       let user_data = data
-      for ( let item of user_data ) {
+      for (let item of user_data) {
         const birthday_date = new Date(item.birthday)
         item.birthday = `${birthday_date.getMonth() + 1}/${birthday_date.getDate()}/${birthday_date.getFullYear()}`
       }
@@ -43,13 +46,13 @@ export class UsersComponent implements AfterViewInit {
     })
   }
 
-  applyFilter( event: Event ) {
+  applyFilter(event: Event) {
+    this.selection.clear()
     const filterValue = (event.target as HTMLInputElement).value
     this.dataSource.filter = filterValue.trim().toLowerCase()
-    console.log(this.dataSource)
   }
 
-  onDeleteClicked( user: User ) {
+  onDeleteClicked(user: User) {
     const dialogRef = this.dialog.open(ConfirmUserDeleteComponent, {
       disableClose: true,
       data: {
@@ -61,7 +64,7 @@ export class UsersComponent implements AfterViewInit {
       if (isConfirmed) {
         this.users.deleteUser(user.id, user.username).subscribe((data: any) => {
           let user_data = data
-          for ( let item of user_data ) {
+          for (let item of user_data) {
             const birthday_date = new Date(item.birthday)
             item.birthday = `${birthday_date.getMonth() + 1}/${birthday_date.getDate()}/${birthday_date.getFullYear()}`
           }
@@ -86,10 +89,42 @@ export class UsersComponent implements AfterViewInit {
     })
   }
 
+  onAddGroupClicked() {
+    const dialogRef = this.dialog.open(AddToGroupComponent, {
+      disableClose: true,
+      data: this.selection.selected.map(x => x.username)
+    })
+  }
+
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       horizontalPosition: "right",
       duration: 3000
     })
   }
+
+  // Source: https://material.angular.io/components/table/examples also used code from the same source in HTML file /////////////////////////////////////
+  isAllSelected() {
+    const numSelected = this.selection.selected.length
+    const numRows = this.dataSource.data.length
+    return numSelected == numRows
+  }
+
+  masterToggle() {
+    if (this.isAllSelected()) {
+      this.selection.clear()
+      return
+    }
+
+    this.selection.select(...this.dataSource.data)
+  }
+
+  checkboxLabel(row?: User): string {
+    if (!row) {
+      return `${this.isAllSelected() ? "deselect" : "select"} all`
+    }
+    return `${this.selection.isSelected(row) ? "deselect" : "select"} row ${row.id + 1}`
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -12,6 +12,10 @@
             <mat-icon>delete</mat-icon>
             <span>Trash</span>
         </div>
+        <div class="sidenav-item" [ngClass]="{'active-sidenav-item': currentTab == 'shared-with-me'}" (click)="currentTab = 'shared-with-me'">
+            <mat-icon>folder_shared</mat-icon>
+            <span>Shared with me</span>
+        </div>
     </mat-sidenav>
     <mat-sidenav-content class="sidenav-content">
         <div *ngIf="currentTab=='home'">
@@ -22,6 +26,9 @@
         </div>
         <div *ngIf="currentTab=='trash'">
             <app-trash></app-trash>
+        </div>
+        <div *ngIf="currentTab=='shared-with-me'">
+            <app-shared-with-me></app-shared-with-me>
         </div>
     </mat-sidenav-content>
 </mat-sidenav-container>
