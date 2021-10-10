@@ -39,6 +39,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatListModule } from '@angular/material/list';
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -61,6 +63,7 @@ import { RecentComponent } from './components/recent/recent.component';
 import { FileTableComponent } from './components/shares/file-table/file-table.component';
 import { SharedWithMeComponent } from './components/shared-with-me/shared-with-me.component';
 import { AddToGroupComponent } from './components/admin/dialogs/add-to-group/add-to-group.component';
+import { EditGroupsFromUserComponent } from './components/admin/dialogs/edit-groups-from-user/edit-groups-from-user.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -90,6 +93,10 @@ const materialModules = [
   MatListModule
 ]
 
+const matCdk = [
+  DragDropModule
+]
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -117,12 +124,14 @@ const materialModules = [
     FileTableComponent,
     SharedWithMeComponent,
     AddToGroupComponent,
+    EditGroupsFromUserComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     materialModules,
+    matCdk,
     NgbModule,
     HttpClientModule,
     FormsModule,

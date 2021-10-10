@@ -1,0 +1,24 @@
+<!-- Source: https://material.angular.io/cdk/drag-drop/overview -->
+<div>
+    <h1 mat-dialog-title>group edit</h1>
+    <div class="main-content" cdkDropListGroup matDialogContent>
+        <div class="drag-container">
+            <h2>Available groups</h2>
+            <div class="drag-list" cdkDropList [cdkDropListData]="availableGroups" cdkDropListSortingDisabled
+                (cdkDropListDropped)="drop($event)">
+                <div class="drag-list-item" *ngFor="let item of availableGroups" cdkDrag>{{item}}</div>
+            </div>
+        </div>
+
+        <div class="drag-container">
+            <h2>memberships</h2>
+            <div class="drag-list" cdkDropList [cdkDropListData]="memberOfGroups" (cdkDropListDropped)="drop($event)">
+                <div class="drag-list-item" *ngFor="let item of memberOfGroups" cdkDrag>{{item}}</div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions class="dialog-actions">
+        <button mat-raised-button color="warn" mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" (click)="onApplyClicked()">Apply</button>
+    </div>
+</div>

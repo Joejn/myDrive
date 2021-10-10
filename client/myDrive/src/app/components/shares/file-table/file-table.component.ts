@@ -61,6 +61,11 @@ export class FileTableComponent implements AfterViewInit {
   selection = new SelectionModel<FileTableRow>(true, [])
   currentDir = ""
 
+  @ViewChild(MatMenuTrigger)
+  public contextMenu!: MatMenuTrigger
+
+  contextMenuPosition = { x: "0px", y: "0px" }
+
   constructor(private file: FileService, private dialog: MatDialog, private _snackbar: MatSnackBar, public colorTheme: ColorThemesService) {
 
   }
@@ -268,11 +273,6 @@ export class FileTableComponent implements AfterViewInit {
       }
     })
   }
-
-  @ViewChild(MatMenuTrigger)
-  public contextMenu!: MatMenuTrigger
-
-  contextMenuPosition = { x: "0px", y: "0px" }
 
   // https://stackblitz.com/edit/angular-material-context-menu?file=app%2Fcontext-menu-example.ts
   onContextMenu(event: MouseEvent, element: FileTableRow) {

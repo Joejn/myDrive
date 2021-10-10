@@ -1,6 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
@@ -8,6 +9,7 @@ import { User } from 'src/app/interfaces/user';
 import { UsersService } from 'src/app/services/users.service';
 import { AddToGroupComponent } from '../dialogs/add-to-group/add-to-group.component';
 import { ConfirmUserDeleteComponent } from '../dialogs/confirm-user-delete/confirm-user-delete.component';
+import { EditGroupsFromUserComponent } from '../dialogs/edit-groups-from-user/edit-groups-from-user.component';
 import { NewUserDialogComponent } from '../dialogs/new-user-dialog/new-user-dialog.component';
 
 @Component({
@@ -25,6 +27,8 @@ export class UsersComponent implements AfterViewInit {
   dataSource = new MatTableDataSource(this.allUsers)
   selection = new SelectionModel<User>(true, []);
 
+  
+
   constructor(private users: UsersService, private dialog: MatDialog, private _snackBar: MatSnackBar) {
     this.setTableData()
   }
@@ -32,6 +36,11 @@ export class UsersComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator
   }
+
+  @ViewChild(MatMenuTrigger)
+  public contextMenu!: MatMenuTrigger
+
+  contextMenuPosition = { x: "0px", y: "0px" }
 
   setTableData() {
     this.users.getAllUsers().subscribe((data: User[]) => {
@@ -127,4 +136,25 @@ export class UsersComponent implements AfterViewInit {
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // https://stackblitz.com/edit/angular-material-context-menu?file=app%2Fcontext-menu-example.ts
+  onContextMenu(event: MouseEvent, element: User) {
+    event.preventDefault()
+    this.contextMenuPosition.x = event.clientX + "px"
+    this.contextMenuPosition.y = event.clientY + "px"
+    this.contextMenu.menuData = element
+    this.contextMenu.menu.focusFirstItem("mouse")
+    this.contextMenu.openMenu()
+  }
+
+  onGroupsClicked() {
+    const dialogRef = this.dialog.open(EditGroupsFromUserComponent, {
+      disableClose: true,
+      data: this.contextMenu.menuData
+    })
+  }
+
+  onSingleUserDeleteClicked() {
+    this.onDeleteClicked(this.contextMenu.menuData)
+  }
 }
