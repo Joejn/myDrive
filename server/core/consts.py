@@ -17,3 +17,4 @@ administrators_groups = ["administrators"]
 DATA_PATH = config_parser.get("GENERAL", "HomeDir")
 HOME_DIR = "home"
 TRASH_DIR = "trash"
+USER_HISTORY_FILE = "user_history.json"

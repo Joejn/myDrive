@@ -1,10 +1,11 @@
 import base64
+from collections import namedtuple
 import io
 import os
 from os.path import join
 
 from core.utils import Database, Files, Path
-from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR
+from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR, USER_HISTORY_FILE
 from flask import json, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
@@ -39,30 +40,60 @@ class GetFile(Resource):
     @api.doc("get specific file")
     @jwt_required()
     def get(self):
-        user_id = get_jwt()["id"]
-
-        file_path = str(request.args.get("file"))
+        file_path = Path().to_relative(str(request.args.get("file")))
         identity = get_jwt_identity()
         user_storage_path = join(DATA_PATH, identity, HOME_DIR)
-        file = file_path.replace("\\", "/")
-        if file[0] == "/":
-            file = file[1:]
 
         current_file = user_storage_path
 
-        if not file == "/":
-            current_file = join(user_storage_path, file)
+        if not file_path == "/":
+            current_file = join(user_storage_path, file_path)
 
         current_file = current_file.replace("\\", "/")
 
         with open(current_file, "rb") as file:
             file_content = base64.b64encode(file.read()).decode("utf-8")
 
-        basename = current_file.split("/").pop()
-        statement = "INSERT INTO user_history (user_id, file_name, file_path) VALUES (" + str(
-            user_id) + ", '" + str(basename) + "', '" + str(current_file) + "');"
-        db = Database()
-        db.exec(statement)
+        file_name = current_file.split("/").pop()
+        user_history_path = os.path.join(
+            DATA_PATH, identity, USER_HISTORY_FILE)
+        user_history_content = {
+            file_name: {
+                "path": file_path,
+                "deleted": "false"
+            }
+        }
+
+        current_history_content = {}
+        history_file_content = {}
+
+        if os.path.isfile(user_history_path):
+            with open(user_history_path, "r") as f:
+                content = f.read()
+                if content != "":
+                    current_history_content = json.loads(content)
+
+        if file_name in current_history_content:
+            del current_history_content[file_name]
+
+        if len(current_history_content) >= 100:
+            counter = 0
+            keys_to_delete = []
+            for key in current_history_content:
+                if counter >= 100:
+                    keys_to_delete.append(key)
+                counter += 1
+
+            for key in keys_to_delete:
+                del current_history_content[key]
+
+        history_file_content = {
+            **user_history_content, **current_history_content}
+        my_namedtuple = namedtuple("content", "filename")
+        file_content_namedtuple = my_namedtuple(history_file_content)
+
+        with open(user_history_path, "w") as f:
+            f.write(str(file_content_namedtuple.filename).replace("'", '"'))
 
         return file_content
 
@@ -81,9 +112,7 @@ class SetFileContent(Resource):
 
         identity = get_jwt_identity()
         user_storage_path = join(DATA_PATH, identity, HOME_DIR)
-        file = file_path.replace("\\", "/")
-        if file[0] == "/":
-            file = file[1:]
+        file = Path().to_relative(file_path)
 
         current_file = user_storage_path
 
@@ -102,36 +131,33 @@ class GetRecentFiles(Resource):
     def get(self):
         db = Database()
         id = get_jwt()["id"]
-        statement = """
-            SELECT
-                subselect.file_name, subselect.file_path
-            FROM
-                (SELECT distinct on (file_path) id, file_name, file_path FROM public.user_history WHERE user_id = """ + str(id) + """ LIMIT 20) as subselect
-            ORDER BY subselect.id DESC
-        """
-        recent_files = db.select(statement)
-        # for item in recent_files:
-        #     data.append(
-        #         {"name": item[0], "path": item[1]}
-        #     )
+        identity = get_jwt_identity()
 
-        """
-        {"name": item, "path": fullName.replace(path, ""), "last_modified": getmtime(
-                        fullName), "file_size": getsize(fullName)}
-        """
+        user_history_path = os.path.join(
+            DATA_PATH, identity, USER_HISTORY_FILE)
+        recent_files = []
+        with open(user_history_path, "r") as f:
+            files = json.loads(f.read())
+            for file in files.values():
+                path = file["path"]
+                if len(path) > 0:
+                    if path[0] == "/" or path[0] == "\\":
+                        path = path[1:]
+                recent_files.append(path)
 
         body = {
             "directories": [],
             "files": []
         }
 
-        for name, path in recent_files:
-            if os.path.isfile(path):
+        for path in recent_files:
+            absolute_path = os.path.join(DATA_PATH, identity, HOME_DIR, path)
+            if os.path.isfile(absolute_path):
                 body["files"].append({
-                    "name": name,
-                    "path": path,
-                    "last_modified": os.path.getmtime(path),
-                    "file_size": os.path.getsize(path)
+                    "name": os.path.basename(absolute_path),
+                    "path": absolute_path,
+                    "last_modified": os.path.getmtime(absolute_path),
+                    "file_size": os.path.getsize(absolute_path)
                 })
 
         return json.jsonify(body)
@@ -182,6 +208,27 @@ class MoveToTrash(Resource):
         path = os.path.join(DATA_PATH, identity, HOME_DIR, relative_path)
         object_name = relative_path.split("/").pop()
         trash_path = os.path.join(DATA_PATH, identity, TRASH_DIR, object_name)
+        
+        isToDeleteFromUserHistory = False
+        if os.path.isfile(path):
+            recent_files = {}
+            user_history_path = os.path.join(
+                DATA_PATH, identity, USER_HISTORY_FILE)
+            with open(user_history_path, "r") as f:
+                recent_files = json.loads(f.read())
+                for file in recent_files:
+                    if recent_files[file].get("path") == relative_path:
+                        isToDeleteFromUserHistory = True
+            
+            if isToDeleteFromUserHistory:
+                del recent_files[relative_path]
+
+            my_namedtuple = namedtuple("content", "filename")
+            file_content_namedtuple = my_namedtuple(recent_files)
+
+            with open(user_history_path, "w") as f:
+                f.write(str(file_content_namedtuple.filename).replace("'", '"'))
+        
         os.rename(path, trash_path)
         return "ok", 200
 
@@ -206,10 +253,6 @@ class DeleteObjectFromTrash(Resource):
         relative_path = Path().to_relative(body.get("path"))
         path = os.path.join(DATA_PATH, identity, TRASH_DIR, relative_path)
         if os.path.isfile(path):
-            statement = """
-                DELETE FROM public.user_history
-                    WHERE file_path={};
-            """.format(path)
             os.remove(path)
         else:
             rmtree(path)
