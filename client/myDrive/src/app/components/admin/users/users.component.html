@@ -3,7 +3,7 @@
         <mat-label>Search</mat-label>
         <input matInput (keyup)="applyFilter($event)" #input>
     </mat-form-field>
-    <button mat-raised-button class="table__header-item" type="button" color="primary" (click)="openDialog()">
+    <button mat-raised-button class="table__header-item" type="button" color="primary" (click)="openAddUserDialog()">
         <mat-icon class="button__icon-left">add</mat-icon>
         <span>Add new user</span>
     </button>

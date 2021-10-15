@@ -49,8 +49,11 @@ export class AddToGroupComponent implements OnInit {
   }
 
   onApplyClicked() {
-    console.log(this.data)
     this.group.addToGroup(this.groups, this.data).subscribe()
-    // this.dialogRef.close()
+    this.dialogRef.close(true)
+  }
+
+  onCanceldClicked() {
+    this.dialogRef.close(false)
   }
 }

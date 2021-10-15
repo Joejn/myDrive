@@ -86,7 +86,7 @@ export class UsersComponent implements AfterViewInit {
     })
   }
 
-  openDialog() {
+  openAddUserDialog() {
     const dialogRef = this.dialog.open(NewUserDialogComponent, {
       disableClose: true
     })
@@ -94,6 +94,7 @@ export class UsersComponent implements AfterViewInit {
     dialogRef.afterClosed().subscribe((status) => {
       if (status) {
         this.setTableData()
+        this.openSnackBar("User added successfully", "Close")
       }
     })
   }
@@ -151,6 +152,12 @@ export class UsersComponent implements AfterViewInit {
     const dialogRef = this.dialog.open(EditGroupsFromUserComponent, {
       disableClose: true,
       data: this.contextMenu.menuData
+    })
+
+    dialogRef.afterClosed().subscribe((data: boolean) => {
+      if (data) {
+        this.openSnackBar("Groups updated successfully", "Close")
+      }
     })
   }
 

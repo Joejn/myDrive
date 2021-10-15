@@ -47,12 +47,13 @@
                 <mat-error *ngIf="this.addUserForm.controls['email'].hasError('required')">
                     {{ this.getErrorMessage("required", { "name": "Email" }) }}
                 </mat-error>
-                <mat-error *ngIf="this.addUserForm.controls['email'].hasError('email') && !this.addUserForm.controls['email'].hasError('required')">
+                <mat-error
+                    *ngIf="this.addUserForm.controls['email'].hasError('email') && !this.addUserForm.controls['email'].hasError('required')">
                     {{ this.getErrorMessage("email") }}
                 </mat-error>
             </mat-form-field>
         </div>
-    
+
         <div class="form-div">
             <mat-form-field appearance="outline">
                 <mat-label>Password</mat-label>
@@ -60,14 +61,15 @@
                 <mat-error *ngIf="this.addUserForm.controls['password'].hasError('required')">
                     {{ this.getErrorMessage("required", { "name": "Password" }) }}
                 </mat-error>
-                <mat-error *ngIf="this.addUserForm.controls['password'].hasError('minLength') || !this.addUserForm.controls['password'].hasError('required')">
+                <mat-error
+                    *ngIf="this.addUserForm.controls['password'].hasError('minLength') || !this.addUserForm.controls['password'].hasError('required')">
                     {{ this.getErrorMessage("minLength", { "name": "Password", "value": 8 }) }}
                 </mat-error>
             </mat-form-field>
         </div>
-    
+
         <div class="add-div">
-            <button mat-raised-button matDialogClose type="button" color="warn" class="button">Close</button>
+            <button mat-raised-button type="button" color="warn" class="button" (click)="onCanceldClicked()" >Cancel</button>
             <button mat-raised-button type="submit" color="primary" class="button">Add</button>
         </div>
     </form>

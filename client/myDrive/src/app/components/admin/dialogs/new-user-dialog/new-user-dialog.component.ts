@@ -51,4 +51,8 @@ export class NewUserDialogComponent implements OnInit {
     })
   }
 
+  onCanceldClicked() {
+    this.dialogRef.close(false)
+  }
+
 }

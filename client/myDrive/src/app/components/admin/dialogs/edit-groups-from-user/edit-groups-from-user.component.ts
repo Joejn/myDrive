@@ -32,7 +32,13 @@ export class EditGroupsFromUserComponent implements OnInit {
   ngOnInit(): void { }
 
   onApplyClicked() {
-    this.group.setGroupsOfUser(this.data.id, this.memberOfGroups).subscribe()
+    this.group.setGroupsOfUser(this.data.id, this.memberOfGroups).subscribe(() => {
+      this.dialogRef.close(true)
+    })
+  }
+
+  onCanceldClicked() {
+    this.dialogRef.close(false)
   }
 
   // Source: https://material.angular.io/cdk/drag-drop/overview

@@ -27,7 +27,7 @@
         </form>
     </div>
     <div mat-dialog-actions class="dialog-actions">
-        <button mat-raised-button color="warn" mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="warn" (click)="onCanceldClicked()">Cancel</button>
         <button mat-raised-button color="primary" (click)="onApplyClicked()" [disabled]="groups.length === 0">Apply</button>
     </div>
 </div>
