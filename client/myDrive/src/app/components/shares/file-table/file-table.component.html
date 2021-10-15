@@ -9,7 +9,7 @@
         <input type="file" multiple hidden #fileUpload (change)="onFileUploadChanged($event)">
         <button class="table__header-item" [hidden]="!this.headerElements.includes('upload')" mat-raised-button
             color="primary" (click)="fileUpload.click()">
-            <mat-icon class="button__icon-left">cloud_download</mat-icon>
+            <mat-icon class="button__icon-left">cloud_upload</mat-icon>
             <span>Upload file</span>
         </button>
         <button class="table__header-item" [hidden]="!this.headerElements.includes('createFolder')" mat-raised-button
