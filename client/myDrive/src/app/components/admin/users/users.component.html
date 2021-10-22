@@ -1,7 +1,8 @@
 <div class="table__header">
     <mat-form-field appearance="outline" class="no-wrapper table__header-item">
         <mat-label>Search</mat-label>
-        <input matInput (keyup)="applyFilter($event)" #input>
+        <input matInput type="search" (keyup)="applyFilter($event)" #input>
+        <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
     <button mat-raised-button class="table__header-item" type="button" color="primary" (click)="openAddUserDialog()">
         <mat-icon class="button__icon-left">add</mat-icon>
