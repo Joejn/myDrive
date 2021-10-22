@@ -34,6 +34,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .sidenav {
+    display: flex;
+    flex-direction: row;
     min-width: 200px;
 }
 
@@ -48,11 +50,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .sidenav-item {
-    height: 50px;
     display: flex;
+    height: 50px;
     align-items: center;
     margin: 0.4em;
     padding: 1em;
+}
+
+.sidenav__item--pointer {
     cursor: pointer;
 }
 
@@ -77,6 +82,18 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 @keyframes item {
     0% { transform: translateX(0px)}
     100% { transform: translateX(10px)}
+}
+
+.sidenav--collapsed {
+    min-width: 0 !important;
+}
+
+.sidenav__item--content-left {
+    flex-direction: row;
+}
+
+.sidenav__item--content-right {
+    flex-direction: row-reverse;
 }
 
 ////////////////////////////////////////////////////////

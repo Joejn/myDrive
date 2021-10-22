@@ -1,20 +1,29 @@
-<mat-sidenav-container class="sidenav-container">
-    <mat-sidenav class="sidenav" mode="side" opened>
-        <div class="sidenav-item"  [ngClass]="{'active-sidenav-item': currentTab == 'home'}" (click)="currentTab = 'home'">
-            <mat-icon>home</mat-icon>
-            <span>Home</span>
+<mat-sidenav-container class="sidenav-container" autosize>
+    <mat-sidenav class="sidenav" mode="side" opened id="sidenav">
+        <div class="sidenav-item sidenav__item--pointer" [ngClass]="{'active-sidenav-item': currentTab == 'home'}"
+            (click)="currentTab = 'home'">
+            <mat-icon mat-list-icon>home</mat-icon>
+            <span *ngIf="isSidenavExpanded">Home</span>
         </div>
-        <div class="sidenav-item" [ngClass]="{'active-sidenav-item': currentTab == 'recent'}" (click)="currentTab = 'recent'">
-            <mat-icon>history</mat-icon>
-            <span>Recent</span>
+        <div class="sidenav-item sidenav__item--pointer" [ngClass]="{'active-sidenav-item': currentTab == 'recent'}"
+            (click)="currentTab = 'recent'">
+            <mat-icon mat-list-icon>history</mat-icon>
+            <span *ngIf="isSidenavExpanded">Recent</span>
         </div>
-        <div class="sidenav-item" [ngClass]="{'active-sidenav-item': currentTab == 'trash'}" (click)="currentTab = 'trash'">
-            <mat-icon>delete</mat-icon>
-            <span>Trash</span>
+        <div class="sidenav-item sidenav__item--pointer" [ngClass]="{'active-sidenav-item': currentTab == 'trash'}"
+            (click)="currentTab = 'trash'">
+            <mat-icon mat-list-icon>delete</mat-icon>
+            <span *ngIf="isSidenavExpanded">Trash</span>
         </div>
-        <div class="sidenav-item" [ngClass]="{'active-sidenav-item': currentTab == 'shared-with-me'}" (click)="currentTab = 'shared-with-me'">
-            <mat-icon>folder_shared</mat-icon>
-            <span>Shared with me</span>
+        <div class="sidenav-item sidenav__item--pointer" [ngClass]="{'active-sidenav-item': currentTab == 'shared-with-me'}"
+            (click)="currentTab = 'shared-with-me'">
+            <mat-icon mat-list-icon>folder_shared</mat-icon>
+            <span *ngIf="isSidenavExpanded">Shared with me</span>
+        </div>
+        <div class="sidenav-item sidenav__item--content-right">
+            <button mat-icon-button (click)="onSidenavExpandClicked()">
+                <mat-icon mat-list-icon>{{expansionIcon}}</mat-icon>
+            </button>
         </div>
     </mat-sidenav>
     <mat-sidenav-content class="sidenav-content">
