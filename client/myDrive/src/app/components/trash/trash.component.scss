@@ -16,9 +16,9 @@ table {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 20px;
-    height: 500px;
-    width: 400px;
+    margin-top: 2rem;
+    height: 50rem;
+    width: 40rem;
 }
 
 .center-card {
@@ -28,14 +28,14 @@ table {
 }
 
 .search-icon {
-    font-size: 160px;
-    height: 160px;
-    width: 160px;
+    font-size: 16rem;
+    height: 16rem;
+    width: 16rem;
 }
 
 .site-content {
     width: 100%;
-    margin: 1em;
+    margin: 1rem;
 }
 
 .overlay {
@@ -51,7 +51,7 @@ table {
 }
 
 .overlay * {
-    margin: 1em;
+    margin: 1rem;
 }
 
 .loading-text::before {

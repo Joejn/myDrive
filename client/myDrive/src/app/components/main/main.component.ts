@@ -44,5 +44,4 @@ export class MainComponent implements OnInit {
       this.expansionIcon = "arrow_forward"
     }
   }
-
 }

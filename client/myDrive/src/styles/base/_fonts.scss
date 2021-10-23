@@ -1,0 +1,10 @@
+.warn_text *{
+    color: #f44336 !important
+}
+
+.text-overflow-ellipsis {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

@@ -1,44 +1,46 @@
-<div class="content-div">
+<div>
     <div class="row">
         <div class="col-sm-4">
             <mat-card>
-                <app-line-chart-cpu-freq #diskFreqChart label="cpu frequenz" [xAxie]="this.cpuFreq.x" [yAxie]="this.cpuFreq.y"></app-line-chart-cpu-freq>
+                <app-line-chart-cpu-freq #diskFreqChart label="cpu frequenz" [xAxie]="this.cpuFreq.x"
+                    [yAxie]="this.cpuFreq.y"></app-line-chart-cpu-freq>
             </mat-card>
         </div>
         <div class="col-sm-4">
             <mat-card>
-                <app-line-chart-cpu-used #cpuUsageChart label="cpu usage" [xAxie]="this.cpuUsage.x" [yAxie]="this.cpuUsage.y"></app-line-chart-cpu-used>
+                <app-line-chart-cpu-used #cpuUsageChart label="cpu usage" [xAxie]="this.cpuUsage.x"
+                    [yAxie]="this.cpuUsage.y"></app-line-chart-cpu-used>
             </mat-card>
         </div>
         <div class="col-sm-4">
             <mat-card>
-                <app-line-chart-memory-used #memoryUsageChart label="memory usage" [xAxie]="this.memoryUsage.x" [yAxie]="this.memoryUsage.y"></app-line-chart-memory-used>
+                <app-line-chart-memory-used #memoryUsageChart label="memory usage" [xAxie]="this.memoryUsage.x"
+                    [yAxie]="this.memoryUsage.y"></app-line-chart-memory-used>
             </mat-card>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-8">
             <mat-card>
-                <app-doughnut-chart-space-used #spaceUsageChart label="space usage" [freeSpace]="0" [usedSpace]="0"></app-doughnut-chart-space-used>
+                <app-doughnut-chart-space-used #spaceUsageChart label="space usage" [freeSpace]="0" [usedSpace]="0">
+                </app-doughnut-chart-space-used>
             </mat-card>
         </div>
         <div class="col-sm-4">
-            <mat-card style="height: 100%;">
-                <div style="height: 100%; width: 100%;">
-                    <div style="display: flex; justify-content: center;">
-                        <h1>Registered users</h1>
-                    </div>
-                    <div style="height: 60%; display: flex; justify-content: center; align-items: center;">
-                        <div style="height: 160px; width: 160px; border-radius: 100%; border: 2px solid; display: flex; justify-content: center; align-items: center;">
-                            <mat-icon style="height: 100px; width: 100px; font-size: 100px;">
-                                people
-                            </mat-icon>
-                        </div>
-                    </div>
-                    <h1 style="display: flex; justify-content: center;">
-                        {{this.userCount}}
-                    </h1>
+            <mat-card class="registered-users-card">
+                <div class="registered-users-card__heading">
+                    <h1>Registered users</h1>
                 </div>
+                <div class="registered-users-card__content">
+                    <div class="registered-users-card__content__border">
+                        <mat-icon class="registered-users-card__content__icon">
+                            people
+                        </mat-icon>
+                    </div>
+                </div>
+                <h1 style="display: flex; justify-content: center;">
+                    {{this.userCount}}
+                </h1>
             </mat-card>
         </div>
     </div>

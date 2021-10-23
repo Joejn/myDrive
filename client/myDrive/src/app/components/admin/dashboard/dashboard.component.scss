@@ -1,7 +1,36 @@
 div.row {
-    padding: 1em;
+    padding: 1rem;
 }
 
-.col-sm-4 > mat-card {
-    margin: 3px;
+.registered-users-card {
+    height: 100%;
+}
+
+.registered-users-card__heading {
+    display: flex;
+    justify-content: center;
+}
+
+.registered-users-card__content {
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.registered-users-card__content__icon {
+    height: 10rem;
+    width: 10rem;
+    font-size: 10rem;
+}
+
+.registered-users-card__content__border {
+    height: 16rem;
+    width: 16rem;
+    border-radius: 100%;
+    border: 0.25rem solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

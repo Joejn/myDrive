@@ -14,12 +14,12 @@
             </div>
             <div *ngIf="this.auth.memberOfGroup('administrators')">
               <div *ngFor="let item of administratorsLinks">
-                <hr style="margin: 0px 8px 0px 8px;">
+                <hr class="seperator">
                 <button mat-menu-item routerLink={{item.routerLink}}>{{item.name}}</button>
               </div>
             </div>
 
-            <hr style="margin: 0px 8px 0px 8px;">
+            <hr class="seperator">
             <div *ngFor="let item of logoutLinks">
               <button mat-menu-item routerLink={{item.routerLink}} (click)="auth.logout()">{{item.name}}</button>
             </div>

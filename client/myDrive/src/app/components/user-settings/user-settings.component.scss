@@ -1,15 +1,15 @@
 .setting_card {
     max-width: 60%;
     min-width: 40%;
-    margin-top: 1em;
+    margin-top: 1rem;
     margin-right: auto;
     margin-left: auto;
     display: flex;
 }
 
 .user_icon_button {
-    height: 100px;
-    width: 100px;
+    height: 10rem;
+    width: 10rem;
     border-radius: 100%;
     display: flex;
     justify-content: center;
@@ -37,7 +37,7 @@ div.row {
 }
 
 .row-line {
-    border-bottom: 1px solid lightgray;
+    border-bottom: 0.1rem solid lightgray;
 }
 
 div.col-sm-2{
@@ -55,5 +55,5 @@ mat-form-field {
 }
 
 button {
-    margin: 0.4em;
+    margin: 0.4rem;
 }
