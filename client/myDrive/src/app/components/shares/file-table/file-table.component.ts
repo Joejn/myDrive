@@ -102,20 +102,27 @@ export class FileTableComponent implements AfterViewInit {
   //////////////////////////////////////////////////////////////////////////////////////////////////////
 
   setTableData(directory: string = "/") {
-    console.log(this.dataApi)
     if (this.dataApi === "recent") {
       this.file.getRecentFiles().subscribe((data: Dir) => {
         this.appendRows(data)
       })
       return
     }
+
+    if (directory.includes("..")) {
+      const directory_splitted = directory.split("\\")
+      directory_splitted.pop()
+      directory_splitted.pop()
+      directory = directory_splitted.join("\\")
+    }
+    
     this.rows = []
-    if (directory !== "/" && directory !== "..") {
+    if (directory !== "/" && directory) {
       this.rows = [{
         "position": -1,
         "type": "directory",
         "name": "..",
-        "path": "..",
+        "path": directory + "\\..",
         "last_modified": "",
         "file_size": ""
       }]
@@ -183,7 +190,6 @@ export class FileTableComponent implements AfterViewInit {
 
     }
 
-    this.currentDir = row["path"]
     this.setFileAction(currentRow)
   }
 
@@ -202,6 +208,7 @@ export class FileTableComponent implements AfterViewInit {
 
   setFileAction(row: FileTableRow) {
     if (row["type"] === "directory") {
+      this.currentDir = row["path"]
       this.setTableData(row.path)
     } else {
       const file_extension: string = row.name.split(".").pop() + ""
