@@ -25,7 +25,7 @@
                 <th [hidden]="!displayedColumns.includes('select')" mat-header-cell *matHeaderCellDef>
                     <mat-checkbox (change)="$event ? masterToggle() : null"
                         [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected" [aria-label]="checkboxLabel()">
+                        [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
                     </mat-checkbox>
                 </th>
                 <td [hidden]="!displayedColumns.includes('select')" mat-cell *matCellDef="let row">

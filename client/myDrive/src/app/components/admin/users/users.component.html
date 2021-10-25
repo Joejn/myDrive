@@ -15,8 +15,8 @@
     </button>
 </div>
 
-<div class="mat-elevation-z8">
-    <table id="userTable" mat-table [dataSource]="dataSource" matSort>
+<div>
+    <table id="userTable" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
         <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
                 <mat-checkbox (change)="$event ? masterToggle() : null"
