@@ -2,7 +2,14 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from 'src/app/interfaces/user';
+import { AuthService } from 'src/app/services/auth.service';
 import { GroupsService } from 'src/app/services/groups.service';
+
+
+export interface DialogStatus {
+  state: boolean,
+  msg: string
+}
 
 @Component({
   selector: 'app-edit-groups-from-user',
@@ -16,6 +23,7 @@ export class EditGroupsFromUserComponent implements OnInit {
   memberOfGroups: string[] = []
 
   constructor(private group: GroupsService,
+    private auth: AuthService,
     public dialogRef: MatDialogRef<EditGroupsFromUserComponent>,
     @Inject(MAT_DIALOG_DATA) public data: User) {
     let allGroups: string[] = []
@@ -32,8 +40,19 @@ export class EditGroupsFromUserComponent implements OnInit {
   ngOnInit(): void { }
 
   onApplyClicked() {
+    let status: DialogStatus = {
+      state: true,
+      msg: "Groups updated successfully"
+    }
+    const id = this.auth.getUserId()
+    if (id === this.data.id) {
+      status.state = false
+      status.msg = "Can not update own user"
+      this.dialogRef.close(status)
+      return
+    }
     this.group.setGroupsOfUser(this.data.id, this.memberOfGroups).subscribe(() => {
-      this.dialogRef.close(true)
+      this.dialogRef.close(status)
     })
   }
 

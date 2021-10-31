@@ -154,9 +154,11 @@ export class UsersComponent implements AfterViewInit {
       data: this.contextMenu.menuData
     })
 
-    dialogRef.afterClosed().subscribe((data: boolean) => {
-      if (data) {
-        this.openSnackBar("Groups updated successfully", "Close")
+    dialogRef.afterClosed().subscribe(status => {
+      if (status.state) {
+        this.openSnackBar(status.msg, "Close")
+      } else {
+        this.openSnackBar(status.msg, "Close")
       }
     })
   }

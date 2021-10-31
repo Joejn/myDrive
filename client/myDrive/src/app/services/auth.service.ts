@@ -70,10 +70,7 @@ export class AuthService {
 
   getGroups() {
     const token = this.getAccessToken()
-    let base64Url = token.split(".")[1]
-    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
-    const groups = JSON.parse(atob(base64))["groups"]
-    return groups
+    return this.jwtToObject(token)["groups"]
   }
 
   memberOfGroup(group: string) {
@@ -81,4 +78,15 @@ export class AuthService {
     return userGroups.includes(group) ? true : false
   }
 
+  getUserId() {
+    const token = this.getAccessToken()
+    return this.jwtToObject(token)["id"]
+  }
+
+  jwtToObject(token: string) {
+    let base64Url = token.split(".")[1]
+    let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+    const jwt = JSON.parse(atob(base64))
+    return jwt
+  }
 }
