@@ -1,18 +1,18 @@
 <div>
-    <div [hidden]="this.headerElements.length === 0" class="table__header">
-        <button class="table__header-item" [hidden]="!this.headerElements.includes('download')" mat-raised-button
+    <div [hidden]="this.headerElements.length === 0" class="app-table__header">
+        <button class="app-table__header-item" [hidden]="!this.headerElements.includes('download')" mat-raised-button
             color="primary" (click)="onDownloadClicked(selection.selected)"
             [disabled]="selection.selected.length === 0">
             <mat-icon class="button__icon-left">cloud_download</mat-icon>
             <span>Download file</span>
         </button>
         <input type="file" multiple hidden #fileUpload (change)="onFileUploadChanged($event)">
-        <button class="table__header-item" [hidden]="!this.headerElements.includes('upload')" mat-raised-button
+        <button class="app-table__header-item" [hidden]="!this.headerElements.includes('upload')" mat-raised-button
             color="primary" (click)="fileUpload.click()">
             <mat-icon class="button__icon-left">cloud_upload</mat-icon>
             <span>Upload file</span>
         </button>
-        <button class="table__header-item" [hidden]="!this.headerElements.includes('createFolder')" mat-raised-button
+        <button class="app-table__header-item" [hidden]="!this.headerElements.includes('createFolder')" mat-raised-button
             color="primary" (click)="onCreateFolderClicked()">
             <mat-icon class="button__icon-left">add</mat-icon>
             <span>Create Folder</span>
@@ -73,8 +73,7 @@
             </ng-container>
             <ng-container matColumnDef="delete">
                 <th [hidden]="!displayedColumns.includes('delete')" mat-header-cell *matHeaderCellDef></th>
-                <td [hidden]="!displayedColumns.includes('delete')" mat-cell *matCellDef="let row"
-                    style="display: flex; justify-content: end;">
+                <td class="app-table__cell-content-right" [hidden]="!displayedColumns.includes('delete')" mat-cell *matCellDef="let row">
                     <button mat-icon-button color="warn" (click)="onDeleteClicked(row)">
                         <mat-icon>delete</mat-icon>
                     </button>

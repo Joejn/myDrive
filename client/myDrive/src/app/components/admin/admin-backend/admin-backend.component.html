@@ -17,11 +17,14 @@
         </div>
     </mat-sidenav>
     <mat-sidenav-content class="sidenav-content">
-        <div *ngIf="currentTab=='dashboard'">
+        <div class="sidenav-content" *ngIf="currentTab=='dashboard'">
             <app-dashboard></app-dashboard>
         </div>
-        <div *ngIf="currentTab=='users'">
+        <div class="sidenav-content" *ngIf="currentTab=='users'">
             <app-users></app-users>
+        </div>
+        <div class="sidenav-content" *ngIf="currentTab=='quotas'">
+            <app-quotas></app-quotas>
         </div>
     </mat-sidenav-content>
 </mat-sidenav-container>

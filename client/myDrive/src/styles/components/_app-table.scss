@@ -1,0 +1,17 @@
+.app-table {
+    width: 100%;
+}
+
+.app-table__header {
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+}
+
+.app-table__header-item {
+    margin-right: 1rem !important;
+}
+
+.app-table__cell-content-right {
+    display: flex;
+    justify-content: end;
+}

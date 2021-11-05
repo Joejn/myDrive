@@ -1,0 +1,10 @@
+.content-container {
+    padding: 1rem;
+
+    & {
+        height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

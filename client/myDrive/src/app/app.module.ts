@@ -64,6 +64,7 @@ import { FileTableComponent } from './components/shares/file-table/file-table.co
 import { SharedWithMeComponent } from './components/shared-with-me/shared-with-me.component';
 import { AddToGroupComponent } from './components/admin/dialogs/add-to-group/add-to-group.component';
 import { EditGroupsFromUserComponent } from './components/admin/dialogs/edit-groups-from-user/edit-groups-from-user.component';
+import { QuotasComponent } from './components/admin/quotas/quotas.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -125,6 +126,7 @@ const matCdk = [
     SharedWithMeComponent,
     AddToGroupComponent,
     EditGroupsFromUserComponent,
+    QuotasComponent,
   ],
   imports: [
     BrowserModule,
