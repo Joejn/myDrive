@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { FileService } from 'src/app/services/file.service';
+import { CreateQuotaComponent } from '../dialogs/create-quota/create-quota.component';
 
 export interface QuotaElement {
   name: string;
@@ -25,9 +27,13 @@ export class QuotasComponent implements OnInit {
   displayedColumns: string[] = ["name", "size", "delete"]
   dataSource = new MatTableDataSource(DATA)
 
-  constructor(public file: FileService) { }
+  constructor(public file: FileService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
+  }
+
+  onAddClicked() {
+    let dialog = this.dialog.open(CreateQuotaComponent)
   }
 
 }

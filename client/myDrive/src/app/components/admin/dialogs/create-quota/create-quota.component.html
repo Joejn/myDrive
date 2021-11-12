@@ -1,0 +1,18 @@
+<div>
+    <h1 mat-dialog-title>Create Quota</h1>
+    <div mat-dialog-content>
+        <form>
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput [formControl]="quotaFormControl" required>
+                <mat-error *ngIf="this.quotaFormControl.hasError('required')">
+                    {{ this.getErrorMessage("required", { "name": "Name" }) }}
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions class="dialog__actions">
+        <button mat-raised-button color="warn" (click)="onCanceldClicked()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="onCreateClicked()">Create</button>
+    </div>
+</div>
