@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { QuotaService } from 'src/app/services/quota.service';
 import { getErrorMessage } from 'src/app/shared/error-messages';
 
 @Component({
@@ -10,13 +11,18 @@ import { getErrorMessage } from 'src/app/shared/error-messages';
 })
 export class CreateQuotaComponent implements OnInit {
 
-  constructor(private dialogRef: MatDialogRef<CreateQuotaComponent>) { }
+  constructor(private dialogRef: MatDialogRef<CreateQuotaComponent>, private quota: QuotaService, private fb: FormBuilder) { }
 
   getErrorMessage = getErrorMessage
-  
-  quotaFormControl = new FormControl("", [
-    Validators.required
-  ])
+
+  quotaForm = this.fb.group ({
+    name: ["", [Validators.required]],
+    size: ["", [
+      Validators.required,
+      Validators.pattern("[0-9]+"),
+    ]],
+
+  })
 
   ngOnInit(): void {
   }
@@ -26,6 +32,11 @@ export class CreateQuotaComponent implements OnInit {
   }
 
   onCreateClicked() {
+    const name = this.quotaForm.controls["name"].value
+    const size = this.quotaForm.controls["size"].value
+    this.quota.createQuota(name, size).subscribe(() => {
+      
+    })
     this.dialogRef.close(true)
   }
 

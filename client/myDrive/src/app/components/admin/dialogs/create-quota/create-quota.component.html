@@ -1,18 +1,29 @@
 <div>
     <h1 mat-dialog-title>Create Quota</h1>
     <div mat-dialog-content>
-        <form>
+        <form [formGroup]="quotaForm">
             <mat-form-field appearance="outline">
                 <mat-label>Name</mat-label>
-                <input matInput [formControl]="quotaFormControl" required>
-                <mat-error *ngIf="this.quotaFormControl.hasError('required')">
+                <input matInput formControlName="name" required>
+                <mat-error *ngIf="this.quotaForm.controls['name'].hasError('required')">
                     {{ this.getErrorMessage("required", { "name": "Name" }) }}
+                </mat-error>
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>Size (in Bit)</mat-label>
+                <input matInput formControlName="size" required>
+                <mat-error *ngIf="this.quotaForm.controls['size'].hasError('required')">
+                    {{ this.getErrorMessage("required", { "name": "Size" }) }}
+                </mat-error>
+                <mat-error *ngIf="this.quotaForm.controls['size'].hasError('pattern')">
+                    {{ this.getErrorMessage("onlyNumber", { "name": "Size" }) }}
                 </mat-error>
             </mat-form-field>
         </form>
     </div>
     <div mat-dialog-actions class="dialog__actions">
         <button mat-raised-button color="warn" (click)="onCanceldClicked()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="onCreateClicked()">Create</button>
+        <button mat-raised-button color="primary" (click)="this.quotaForm.valid ? onCreateClicked() : 'return'">Create</button>
     </div>
 </div>

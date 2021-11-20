@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { FileService } from 'src/app/services/file.service';
 import { CreateQuotaComponent } from '../dialogs/create-quota/create-quota.component';
@@ -27,13 +28,26 @@ export class QuotasComponent implements OnInit {
   displayedColumns: string[] = ["name", "size", "delete"]
   dataSource = new MatTableDataSource(DATA)
 
-  constructor(public file: FileService, private dialog: MatDialog) { }
+  constructor(public file: FileService, private dialog: MatDialog, private _snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
   }
 
   onAddClicked() {
     let dialog = this.dialog.open(CreateQuotaComponent)
+
+    dialog.afterClosed().subscribe(result => {
+      if (result) {
+        this.openSnackBar("Quota created", "Close")
+      }
+    })
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      horizontalPosition: "right",
+      duration: 3000
+    })
   }
 
 }

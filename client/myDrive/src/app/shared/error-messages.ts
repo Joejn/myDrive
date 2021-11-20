@@ -21,6 +21,8 @@ export function getErrorMessage( error: string, params: any = {} ) {
         return `${msg} is wrong`
     } else if ( error === "invalidName") {
         return `${params["name"]} is invalid`
+    } else if ( error === "onlyNumber") {
+        return `${params["name"]} must be a number`
     }
 
     return ""
