@@ -1,0 +1,8 @@
+#groupTable {
+    width: 100%;
+}
+
+:host ::ng-deep .no-wrapper .mat-form-field-wrapper {
+    margin: 0 !important;
+    padding: 0;
+}

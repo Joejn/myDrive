@@ -28,7 +28,7 @@ export class EditGroupsFromUserComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: User) {
     let allGroups: string[] = []
     this.group.getAllGroups().subscribe(data => {
-      allGroups = data.map(x => x.name)
+      allGroups = data.map(x => x.name_group)
 
       this.group.getGroupsOfUser(this.data.id).subscribe(memberships => {
         this.memberOfGroups = memberships.filter(group => allGroups.includes(group))

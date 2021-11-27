@@ -1,5 +1,6 @@
 export interface Group {
-    id: number,
-    name: string,
-    privileges: number
+    id_group: number,
+    name_group: string,
+    id_privilege: number,
+    name_privilege: string
 }

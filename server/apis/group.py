@@ -22,22 +22,22 @@ class GetAll(Resource):
         if not isAdmin:
             return "Unauthorized", 401
 
+
         db = Database()
-        statement = "SELECT id, name, privileges FROM public.groups;"
+        statement = "SELECT groups.id, groups.name, privileges, privileges.name FROM public.groups, public.privileges WHERE groups.privileges = privileges.id"
         query = db.select(statement)
-        body = []
+
+        groups = []
         for item in query:
-            id, name, privileges = item
-
-            privileges = list(map(lambda x: int(x), privileges))
-
-            body.append({
-                "id": id,
-                "name": name,
-                "privileges": privileges
+            id_group, name_group, id_privilege, name_privilege = item
+            groups.append({
+                "id_group": int(id_group),
+                "name_group": name_group,
+                "id_privilege": int(id_privilege),
+                "name_privilege": name_privilege
             })
 
-        return json.jsonify(body)
+        return json.jsonify(groups)
 
 
 @api.route("/add_to_group")

@@ -39,6 +39,7 @@ class Database():
         ), password=conf.get_db_pass(), host=conf.get_db_host())
         self.cur = self.conn.cursor()
 
+    # @staticmethod
     def select(self, statement):
         self.cur.execute(statement)
         return self.cur.fetchall()

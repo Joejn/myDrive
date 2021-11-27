@@ -25,7 +25,7 @@ export class AddToGroupComponent implements OnInit {
 
   ngOnInit(): void {
     this.group.getAllGroups().subscribe(groups => {
-      this.options = groups.map(x => x.name)
+      this.options = groups.map(x => x.name_group)
     })
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(""),

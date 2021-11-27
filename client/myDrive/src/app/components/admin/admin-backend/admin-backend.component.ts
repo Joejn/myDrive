@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AdminBackendComponent implements OnInit {
 
-  public currentTab: string = "quotas"
+  public currentTab: string = "groups"
 
   constructor() { }
 
