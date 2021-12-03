@@ -1,10 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Group } from 'src/app/interfaces/group';
 import { GroupsService } from 'src/app/services/groups.service';
+import { AddGroupComponent } from '../dialogs/add-group/add-group.component';
 
 export interface GroupRow {
   id: number,
@@ -32,7 +34,7 @@ export class GroupsComponent implements OnInit {
   dataSource = new MatTableDataSource(this.allGroups)
   selection = new SelectionModel<GroupRow>(true, []);
 
-  constructor(private groups: GroupsService) { }
+  constructor(private groups: GroupsService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.groups.getAllGroups().subscribe((data: Group[]) => {
@@ -51,7 +53,9 @@ export class GroupsComponent implements OnInit {
   }
 
   onAddClicked() {
-
+    let dialog = this.dialog.open(AddGroupComponent, {
+      disableClose: true
+    })
   }
 
   onChangeNameClicked() {
