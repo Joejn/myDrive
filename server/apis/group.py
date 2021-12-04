@@ -111,3 +111,23 @@ class SetGroupsOfUser(Resource):
         
         db = Database()
         db.exec(statement)
+
+@api.route("/add_group")
+class AddGroup(Resource):
+    @api.doc("add a new group")
+    @jwt_required()
+    def post(self):
+        id = get_jwt()["id"]
+        isAdmin = Admin.checkIfAdmin(id)
+
+        if not isAdmin:
+            return "Unauthorized", 401
+
+        name, privileges = json.loads(request.data).values()
+
+        statement = ""
+        for privilege in privileges:
+            statement += "INSERT INTO public.groups (name, privileges) VALUES ('{name}', {privilege});".format(name=name, privilege=privilege["id"])
+        
+        db = Database()
+        db.exec(statement)

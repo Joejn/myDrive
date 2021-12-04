@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Group } from '../interfaces/group';
+import { Privilege } from '../interfaces/privilege';
 import { ConfigService } from './config.service';
 
 @Injectable({
@@ -43,5 +44,14 @@ export class GroupsService {
     }
 
     return this.http.post(`${this.apiUrl}/set_groups_of_user`, body)
+  }
+
+  addGroup(name: string, privileges: Privilege[]) {
+    const body = {
+      "name": name,
+      "privileges": privileges
+    }
+
+    return this.http.post(`${this.apiUrl}/add_group`, body)
   }
 }

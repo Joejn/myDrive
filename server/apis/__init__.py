@@ -7,6 +7,7 @@ from .server_info import api as server_info
 from .users import api as users
 from .group import api as group
 from .quota import api as quota
+from .privilege import api as privilege
 
 api = Api(
     title="myDrive",
@@ -21,3 +22,4 @@ api.add_namespace(server_info)
 api.add_namespace(users)
 api.add_namespace(group)
 api.add_namespace(quota)
+api.add_namespace(privilege)

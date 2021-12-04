@@ -1,14 +1,21 @@
 <h1 mat-dialog-title>Create group</h1>
 <div mat-dialog-content>
-    <form class="example-form">
-        <mat-form-field class="example-full-width" appearance="outline">
+    <form [formGroup]="groupForm">
+        <div>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" required>
+            </mat-form-field>
+          </div>          
+        <mat-form-field appearance="outline" class="w-100">
             <mat-label>Privilege</mat-label>
-            <input type="text" matInput [formControl]="mainControl" [matAutocomplete]="auto">
+            <input type="text" matInput formControlName="privilege" [matAutocomplete]="auto">
             <button matSuffix mat-icon-button aria-label="Add" (click)="onAddClicked()">
                 <mat-icon>add</mat-icon>
             </button>
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                <mat-option *ngFor="let option of filteredOptions | async" [attr.data-privilege-id]=option.id
+                    [value]="option.name" #myInput>
                     {{option.name}}
                 </mat-option>
             </mat-autocomplete>
@@ -19,12 +26,11 @@
                 <div mat-subheader>Privileges</div>
                 <ng-container *ngFor="let privilege of selectedPrivileges">
                     <mat-list-item role="listitem">
-                        <h3 mat-line>{{privilege}}</h3>
-                        <button mat-icon-button color="warn">
+                        <h3 mat-line>{{privilege.name}}</h3>
+                        <button mat-icon-button color="warn" (click)="onDeleteClicked(privilege.id)">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </mat-list-item>
-                    
                 </ng-container>
             </mat-list>
         </div>
@@ -35,6 +41,6 @@
 <div mat-dialog-actions class="dialog-actions">
     <div>
         <button mat-raised-button [mat-dialog-close]="false">Cancel</button>
-        <button mat-raised-button color="primary">Create</button>
+        <button mat-raised-button color="primary" (click)="onCreateClicked()" >Create</button>
     </div>
 </div>
