@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { Privilege } from 'src/app/interfaces/privilege';
@@ -26,7 +27,7 @@ export class AddGroupComponent implements OnInit {
   filteredOptions: Observable<Privilege[]> = new Observable
   selectedPrivileges: Privilege[] = []
 
-  constructor(private privilege: PrivilegeService, private group: GroupsService) { }
+  constructor(private privilege: PrivilegeService, private group: GroupsService, private dialogRef: MatDialogRef<AddGroupComponent>) { }
 
   ngOnInit(): void {
     this.privilege.getAllPrivileges().subscribe(privileges => {
@@ -109,6 +110,7 @@ export class AddGroupComponent implements OnInit {
       this.groupForm.controls.name.setValue("")
       this.groupForm.controls.privilege.setValue("")
       this.selectedPrivileges = []
+      this.dialogRef.close(true)
     })
   }
 

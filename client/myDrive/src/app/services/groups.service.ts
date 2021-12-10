@@ -54,4 +54,12 @@ export class GroupsService {
 
     return this.http.post(`${this.apiUrl}/add_group`, body)
   }
+
+  deleteGroup(id: number) {
+    const body = {
+      "id": id
+    }
+
+    return this.http.post(`${this.apiUrl}/delete_group`, body)
+  }
 }

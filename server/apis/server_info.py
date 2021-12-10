@@ -27,22 +27,6 @@ class Usage(Resource):
         memory_usage = psutil.virtual_memory().percent
 
         current_time = datetime.now().strftime("%H:%M")
-        
-        # cpu_usage_history.append({
-        #     "time": current_time,
-        #     "value": cpu_usage
-        # })
-
-        # cpu_freq_history.append({
-        #     "time": current_time,
-        #     "value": cpu_freq_current
-        # })
-
-        # memory_usage_history.append({
-        #     "time": current_time,
-        #     "value": memory_usage
-        # })
-
 
         data = {
             "cpu_usage": {
@@ -61,7 +45,4 @@ class Usage(Resource):
             "disk_space_used": disk_space_used
         }
         
-        # if len(cpu_usage_history) > 8:
-        #     cpu_usage_history.pop(0)
-            
         return data

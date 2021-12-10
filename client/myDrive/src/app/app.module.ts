@@ -68,6 +68,7 @@ import { QuotasComponent } from './components/admin/quotas/quotas.component';
 import { CreateQuotaComponent } from './components/admin/dialogs/create-quota/create-quota.component';
 import { GroupsComponent } from './components/admin/groups/groups.component';
 import { AddGroupComponent } from './components/admin/dialogs/add-group/add-group.component';
+import { DeleteGroupComponent } from './components/admin/dialogs/delete-group/delete-group.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -133,6 +134,7 @@ const matCdk = [
     CreateQuotaComponent,
     GroupsComponent,
     AddGroupComponent,
+    DeleteGroupComponent,
   ],
   imports: [
     BrowserModule,

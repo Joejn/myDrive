@@ -131,3 +131,23 @@ class AddGroup(Resource):
         
         db = Database()
         db.exec(statement)
+
+@api.route("/delete_group")
+class DeleteGroup(Resource):
+    @api.doc("delete a group")
+    @jwt_required()
+    def post(self):
+        id = get_jwt()["id"]
+        isAdmin = Admin.checkIfAdmin(id)
+
+        if not isAdmin:
+            return "Unauthorized", 401
+
+        group_id = json.loads(request.data)["id"]
+
+        statement = "DELETE FROM public.groups WHERE id={id}".format(id=group_id)
+
+        db = Database()
+        db.exec(statement)
+
+        return "success", 200

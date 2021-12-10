@@ -7,6 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Group } from 'src/app/interfaces/group';
 import { GroupsService } from 'src/app/services/groups.service';
 import { AddGroupComponent } from '../dialogs/add-group/add-group.component';
+import { DeleteGroupComponent } from '../dialogs/delete-group/delete-group.component';
 
 export interface GroupRow {
   id: number,
@@ -37,6 +38,10 @@ export class GroupsComponent implements OnInit {
   constructor(private groups: GroupsService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this.setTableData()
+  }
+
+  setTableData() {
     this.groups.getAllGroups().subscribe((data: Group[]) => {
       const tableData: GroupRow[] = []
       for (const item of data) {
@@ -56,13 +61,32 @@ export class GroupsComponent implements OnInit {
     let dialog = this.dialog.open(AddGroupComponent, {
       disableClose: true
     })
+
+    dialog.afterClosed().subscribe(state => {
+      if (state) {
+        this.setTableData()
+      }
+    })
   }
 
   onChangeNameClicked() {
 
   }
   onDeleteClicked(group: GroupRow) {
+    const dialogRef = this.dialog.open(DeleteGroupComponent, {
+      disableClose: true,
+      data: group
+    })
 
+    dialogRef.afterClosed().subscribe(state => {
+      if (state) {
+        this.groups.deleteGroup(group.id).subscribe((state) => {
+          if (state === "success") {
+            this.setTableData()
+          }
+        })
+      }
+    })
   }
 
   onContextMenuDeleteClicked() {
