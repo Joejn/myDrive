@@ -105,8 +105,6 @@ class DeleteUser(Resource):
         user_id = data.get("id")
         username = data.get("username")
         db = Database()
-        statement = "DELETE FROM public.user_history WHERE id={id};".format(id=user_id)
-        db.exec(statement)
         
         statement = "DELETE FROM public.users WHERE id={id};".format(id=user_id)
         db.exec(statement)
