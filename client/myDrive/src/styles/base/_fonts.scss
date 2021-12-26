@@ -1,3 +1,54 @@
+
+// Roboto normal
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url("../../fonts/Roboto/Roboto-Light.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../fonts/Roboto/Roboto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("../../fonts/Roboto/Roboto-Medium.ttf") format("truetype");
+}
+
+// Roboto italic
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 300;
+    font-display: swap;
+    src: url("../../fonts/Roboto/Roboto-LightItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../fonts/Roboto/Roboto-BlackItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url("../../fonts/Roboto/Roboto-MediumItalic.ttf") format("truetype");
+}
+
 .warn_text *{
     color: #f44336 !important
 }
