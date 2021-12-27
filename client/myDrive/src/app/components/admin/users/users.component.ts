@@ -157,8 +157,6 @@ export class UsersComponent implements AfterViewInit {
     dialogRef.afterClosed().subscribe(status => {
       if (status.state) {
         this.openSnackBar(status.msg, "Close")
-      } else {
-        this.openSnackBar(status.msg, "Close")
       }
     })
   }

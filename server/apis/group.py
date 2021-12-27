@@ -24,7 +24,7 @@ class GetAll(Resource):
 
 
         db = Database()
-        statement = "SELECT groups.id, groups.name, privileges, privileges.name FROM public.groups, public.privileges WHERE groups.privileges = privileges.id"
+        statement = "SELECT groups.id, groups.name, privileges.id, privileges.name FROM public.groups, public.privileges"
         query = db.select(statement)
 
         groups = []
