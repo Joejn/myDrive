@@ -150,3 +150,23 @@ class GetRegisterdUsersCount(Resource):
         }
 
         return json.jsonify(body)
+
+@api.route("/get_all_usernames_and_ids")
+class GetAllUsernamesAndIds(Resource):
+    @api.doc("return all usernames and there ids")
+    @jwt_required()
+    def get(self):
+        db = Database()
+
+        data = []
+        users = db.select(
+            "SELECT id, username FROM public.users ORDER BY id;")
+        for item in users:
+            user_id, username = item
+
+            data.append({
+                "id": user_id,
+                "name": username
+            })
+
+        return json.jsonify(data)

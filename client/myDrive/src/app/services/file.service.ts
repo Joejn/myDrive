@@ -1,11 +1,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Dir } from 'src/app/interfaces/dir';
+import { listItem } from '../dialogs/edit-share-access/edit-share-access.component';
+import { DefaultResponse } from '../interfaces/default-response';
 import { FileTableRow } from '../interfaces/file-table-row';
 import { RecentFiles } from '../interfaces/recent-files';
 import { ConfigService } from './config.service';
 
 export interface DownloadFilesStructureInformations {
+  "is_share": boolean,
+  "shared_folder": string,
   currentDir: string,
   data: 
     {
@@ -21,6 +26,23 @@ export interface DownloadFilesStructure {
     title: string,
     body: string
   }
+}
+
+export interface SharedFolders {
+    "state": string,
+    "data": [{
+      "shared_folder_id": number,
+      "name": string,
+      "is_owner": boolean
+    }]
+}
+
+export interface UsersWithAccessResponse {
+  "status": string,
+  "data": [{
+    "id": number,
+    "name": string
+  }]
 }
 
 @Injectable({
@@ -61,9 +83,7 @@ export class FileService {
   }
 
   getSpecificFile(filePath: string) {
-    console.log(filePath)
     filePath = filePath.replaceAll("\\", "/")
-    console.log(`http://127.0.0.1:5000/file/get_file?file=${filePath}`)
     return this.http.get<any>(`http://127.0.0.1:5000/file/get_file?file=${filePath}`)
   }
 
@@ -156,6 +176,78 @@ export class FileService {
     return rows
   }
 
+  getShareFolder() {
+    return this.http.get<SharedFolders>(`${this.apiUrl}/get_shared_folder`)
+  }
+
+  getShareFolderContent(shared_folder: string, sub_dir: string = "") {
+    // const httpOptions = {
+    //   headers: new HttpHeaders({
+    //     "shared_folder": shared_folder,
+    //     "sub_dir": sub_dir
+    //   })
+    // }
+
+    return this.http.get<Dir>(`${this.apiUrl}/get_shared_folder_content?shared_folder=${shared_folder}&sub_dir=${sub_dir}`)
+  }
+
+  createSharedFolder(name: string) {
+    const body = {
+      "name": name
+    }
+    return this.http.post<any>(`${this.apiUrl}/create_shared_folder`, body)
+  }
+
+  createSharedSubFolder(shared_folder: string, sub_dir: string = "") {
+    const body = {
+      "shared_folder": shared_folder,
+      "sub_dir": sub_dir
+    }
+    return this.http.post<any>(`${this.apiUrl}/create_shared_sub_folder`, body)
+  }
+
+  uploadFilesToSharedFolder(files: File[], shared_folder: string, sub_dir: string = "") {
+    const fd = new FormData()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        "shared_folder": shared_folder,
+        "sub_dir": sub_dir
+      })
+    }
+    for (const file of files) {
+      if (typeof(file) === "object") {
+        fd.append(file.name, file, file.name)
+      }
+    }
+    return this.http.post(`${this.apiUrl}/upload_files_to_shared_folder`, fd, httpOptions)
+  }
+
+  getSpecificFileFromShare(filePath: string, shared_folder="") {
+    filePath = filePath.replaceAll("\\", "/")
+    return this.http.get<any>(`http://127.0.0.1:5000/file/get_shared_file?file=${filePath}&shared_folder=${shared_folder}`)
+  }
+
+  getUsersWithAccessToSharedFolder(shared_folder: string) {
+    return this.http.get<UsersWithAccessResponse>(`http://127.0.0.1:5000/file/get_users_with_access_to_shared_folder?shared_folder=${shared_folder}`)
+  }
+
+  deleteSharedFolder(shared_folder: string, sub_dir: string) {
+    const body = {
+      "shared_folder": shared_folder,
+      "sub_dir": sub_dir
+    }
+    return this.http.post<any>(`${this.apiUrl}/delete_shared_folder`, body)
+  }
+
+  renameShareSubFolder(sharedFolder: string, oldPath: string, newPath: string) {
+    const body = {
+      "shared_folder": sharedFolder,
+      "old_path": oldPath,
+      "new_path": newPath
+    }
+    return this.http.post<any>(`${this.apiUrl}/rename_share_sub_folder`, body)
+  }
+
   // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
   formatBytes( bytes: number, decimals: number = 2 ): string {
     if (bytes === 0) {
@@ -193,11 +285,7 @@ export class FileService {
     return display_last_modified
   }
 
-  /**
-   * 
-   * @param files releative path to object
-   */
-  downloadFiles( rows: FileTableRow[], currentDir: string ) {
+  createBodyForDownload(rows: FileTableRow[], currentDir: string, isShare: boolean, sharedFolder: string = "") : DownloadFilesStructureInformations {
     const bodyData = []
     for (const row of rows) {
       const dataElement = {
@@ -209,13 +297,26 @@ export class FileService {
     }
 
     const body: DownloadFilesStructureInformations = {
+      "is_share": isShare,
+      "shared_folder": sharedFolder,
       "currentDir": currentDir,
       data: bodyData
     }
 
+    return body
+  }
 
+
+  downloadFiles( rows: FileTableRow[], currentDir: string ) {
+    const body = this.createBodyForDownload(rows, currentDir, false)
     return this.http.post<DownloadFilesStructure>(`${this.apiUrl}/download`, body)
   }
+
+  downloadSharedFiles( rows: FileTableRow[], currentDir: string, sharedFolder: string) {
+    const body = this.createBodyForDownload(rows, currentDir, true, sharedFolder)
+    return this.http.post<DownloadFilesStructure>(`${this.apiUrl}/download_shared_files`, body)
+  }
+
 
   rename( oldPath: string, newPath: string ) {
     const body = {
@@ -223,5 +324,22 @@ export class FileService {
       "newPath": newPath
     }
     return this.http.post(`${this.apiUrl}/rename`, body)
+  }
+
+  renameSharedFolder(oldName: string, newName: string): Observable<DefaultResponse> {
+    const body = {
+      "old_name": oldName,
+      "new_name": newName
+    }
+
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/rename_shared_folder`, body)
+  }
+
+  setUserAccess(folderName:string, users: listItem[]): Observable<DefaultResponse> {
+    const body = {
+      "folder_name": folderName,
+      "users": users
+    }
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/set_user_access`, body)
   }
 }

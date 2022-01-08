@@ -3,9 +3,10 @@ from collections import namedtuple
 import io
 import os
 from os.path import join
+from re import template
 
 from core.utils import Database, Files, Path
-from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR, USER_HISTORY_FILE
+from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR, USER_HISTORY_FILE, ROOT, SHARES_DIR
 from flask import json, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
@@ -272,82 +273,20 @@ class Download(Resource):
         home_path = os.path.join(DATA_PATH, identity, HOME_DIR)
         isOneFile = False
 
-        mime_type = "application/zip"
         data = {}
         if len(elements) == 1:
             if elements[0].get("type") == "file":
                 isOneFile = True
 
         if (isOneFile):
-            element = elements[0]
-            relative_path = Path().to_relative(element.get("path"))
-            if (relative_path == ".."):
-                return ""
-            absolute_path = os.path.join(
-                DATA_PATH, identity, HOME_DIR, relative_path)
-
-            with open(absolute_path, "rb") as f:
-                bin_data = f.read()
-                mime_type = magic.from_buffer(bin_data, mime=True)
-
-            base64_data = (base64.b64encode(bin_data)).decode("utf-8")
-            data = {
-                "title": os.path.basename(absolute_path),
-                "body": base64_data
-            }
+            data = Files.download_single_file(elements, home_path, elements[0].get("path"))
         else:
-            empty_dirs = []
-            buffer = io.BytesIO()
-            with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-                for element in elements:
-                    relative_path = Path().to_relative(element.get("path"))
-                    if (relative_path == ".."):
-                        continue
-                    absolute_path = os.path.join(
-                        DATA_PATH, identity, HOME_DIR, relative_path)
-                    if element.get("type") == "file":
-                        zip_file.write(
-                            absolute_path, os.path.basename(absolute_path))
-                    else:
-                        pass
-                        if len(os.listdir(absolute_path)) == 0:
-                            empty_dirs.append(absolute_path)
-
-                        for dirname, subdirs, files in os.walk(absolute_path):
-                            empty_dirs.extend([os.path.join(
-                                dirname, dir) for dir in subdirs if os.listdir(join(dirname, dir)) == []])
-
-                            for filename in files:
-                                absname = os.path.abspath(
-                                    os.path.join(dirname, filename))
-                                archname = absname[len(os.path.join(
-                                    home_path, current_dir)) + 1:]
-                                zip_file.write(absname, archname)
-
-                            for dir in empty_dirs:
-                                path = os.path.join(dir, "")[len(
-                                    os.path.join(home_path, current_dir)) + 1:]
-                                zif = zipfile.ZipInfo(path)
-                                zip_file.writestr(zif, "")
-
-            buffer.seek(0)
-
-            bin_data = ""
-            with buffer as f:
-                bin_data = f.read()
-
-            base64_data = (base64.b64encode(bin_data)).decode("utf-8")
-            data = {
-                "title": "myDrive.zip",
-                "body": base64_data
-            }
+            data = Files.download_multiple_files(elements, home_path, current_dir)
 
         body = {
-            "mimeType": mime_type,
             "data": data
         }
         return body
-
 
 @api.route("/rename")
 class Rename(Resource):
@@ -360,5 +299,350 @@ class Rename(Resource):
             DATA_PATH, identity, HOME_DIR, Path().to_relative(oldPath))
         new_path_abs = os.path.join(
             DATA_PATH, identity, HOME_DIR, Path().to_relative(newPath))
+        os.rename(old_path_abs, new_path_abs)
+        return True
+
+@api.route("/get_shared_folder")
+class GetSharedFolder(Resource):
+    @api.doc("get the shared folders")
+    @jwt_required()
+    def get(self):
+        id = get_jwt()["id"]
+
+        db = Database()
+        statement = """
+            SELECT
+                shared_folder_id, name, id_owner
+            FROM
+                public.shared_folders
+            WHERE
+                id_owner = {id}
+                OR shared_folders.shared_folder_id = ANY (SELECT id_shared_folder FROM public.shared_folder_users WHERE id_user = {id})""".format(id=id)
+        query = db.select(statement)
+        body = {"state": "success"}
+        body_entries = []
+        for row in query:
+            shared_folder_id, name, id_owner = row
+
+            is_owner = False
+            if id_owner == id:
+                is_owner = True
+
+            body_entry = {
+                "shared_folder_id": shared_folder_id,
+                "name": name,
+                "is_owner": is_owner
+            }
+            body_entries.append(body_entry)
+
+        body["data"] = body_entries
+        return body
+
+
+@api.route("/create_shared_folder")
+class CreateSharedFolder(Resource):
+    @api.doc("create a shared folder")
+    @jwt_required()
+    def post(self):
+        id = get_jwt()["id"]
+
+        data = json.loads(request.data)
+        dirname = data["name"]
+        dir = os.path.join(ROOT, SHARES_DIR, dirname)
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+
+            db = Database()
+
+            statement = "INSERT INTO public.shared_folders(name, id_owner) VALUES ('{name}', {id_owner});".format(name=dirname, id_owner=id)
+            db.exec(statement)
+
+            # statement = "SELECT shared_folder_id FROM public.shared_folders WHERE name = '{name}'".format(name=dirname)
+            # query = db.select(statement)
+            # shared_folder_id = query[0][0]
+
+            # statement = "SELECT id FROM public.users WHERE username = ANY ('{username}')".format(username="{jonas, hallo}")
+            # query = db.select(statement)
+            # user_ids = list(map(lambda item: item[0], query))
+
+            # statement_template = """    INSERT INTO public.shared_folder_users(
+            #                                 id_user, id_shared_folder)
+            #                             VALUES ({id_user}, {id_shared_folder});"""
+
+            # for user_id in user_ids:
+            #     statement = statement_template.format(id_user=user_id, id_shared_folder=shared_folder_id)
+            #     db.exec(statement)
+
+        answer = {"state": "success"}
+        return json.jsonify(answer)
+
+@api.route("/create_shared_sub_folder")
+class RemoveUserToSharedFolder(Resource):
+    @api.doc("create a sub folder in a share")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+
+        data = json.loads(request.data)
+        dirname = data.get("shared_folder")
+        sub_dir = Path.to_relative(data.get("sub_dir"))
+        shared_path = os.path.join(ROOT, SHARES_DIR, dirname)
+
+        absolute_folder_path = os.path.join(
+            shared_path, sub_dir)
+
+        if not os.path.exists(absolute_folder_path):
+            os.makedirs(absolute_folder_path)
+
+        return True
+
+@api.route("/upload_files_to_shared_folder")
+class UploadFilesToSharedFolder(Resource):
+    @api.doc("upload files to a shared folder")
+    @jwt_required()
+    def post(self):
+
+        identity = get_jwt_identity()
+        headers = request.headers
+
+        dirname = headers.get("shared_folder")
+        sub_dir = Path.to_relative(headers.get("sub_dir"))
+        shared_path = os.path.join(ROOT, SHARES_DIR, dirname)
+
+
+        if len(sub_dir) > 0:
+            current_dir = sub_dir[1:]
+        files = request.files
+        for file in files:
+            f = files.get(file)
+            file_path = os.path.join(shared_path, sub_dir, file)
+            f.save(file_path)
+
+@api.route("/get_shared_file")
+class GetSharedFile(Resource):
+    @api.doc("get a file from a shared folder")
+    @jwt_required()
+    def get(self):
+        file_path = Path().to_relative(str(request.args.get("file")))
+        identity = get_jwt_identity()
+
+        args = request.args
+        dirname = args.get("shared_folder")
+        file = args.get("file")
+        shared_path = os.path.join(ROOT, SHARES_DIR, dirname)
+
+        current_file = shared_path
+
+        if not file_path == "/":
+            current_file = join(shared_path, file_path)
+
+        current_file = current_file.replace("\\", "/")
+
+        with open(current_file, "rb") as file:
+            file_content = base64.b64encode(file.read()).decode("utf-8")
+
+        file_name = current_file.split("/").pop()
+        user_history_path = os.path.join(
+            DATA_PATH, identity, USER_HISTORY_FILE)
+        user_history_content = {
+            file_name: {
+                "path": file_path,
+                "deleted": "false"
+            }
+        }
+
+        current_history_content = {}
+        history_file_content = {}
+
+        if os.path.isfile(user_history_path):
+            with open(user_history_path, "r") as f:
+                content = f.read()
+                if content != "":
+                    current_history_content = json.loads(content)
+
+        if file_name in current_history_content:
+            del current_history_content[file_name]
+
+        if len(current_history_content) >= 100:
+            counter = 0
+            keys_to_delete = []
+            for key in current_history_content:
+                if counter >= 100:
+                    keys_to_delete.append(key)
+                counter += 1
+
+            for key in keys_to_delete:
+                del current_history_content[key]
+
+        history_file_content = {
+            **user_history_content, **current_history_content}
+        my_namedtuple = namedtuple("content", "filename")
+        file_content_namedtuple = my_namedtuple(history_file_content)
+
+        with open(user_history_path, "w") as f:
+            f.write(str(file_content_namedtuple.filename).replace("'", '"'))
+
+        return file_content
+
+@api.route("/download_shared_files")
+class RemoveUserToSharedFolder(Resource):
+    @api.doc("download files from share")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+        request_data = json.loads(request.data)
+        current_dir = Path().to_relative(request_data.get("currentDir"))
+        elements = request_data.get("data")
+        shared_folder = request_data.get("shared_folder")
+        shared_path = os.path.join(ROOT, SHARES_DIR, shared_folder)
+        isOneFile = False
+        data = {}
+
+        if len(elements) == 1:
+            if elements[0].get("type") == "file":
+                isOneFile = True
+
+        if (isOneFile):
+            data = Files.download_single_file(elements, shared_path, elements[0].get("path"))
+        else:
+            data = Files.download_multiple_files(elements, shared_path, current_dir)
+
+        body = {
+            "data": data
+        }
+        return body
+
+@api.route("/get_shared_folder_content")
+class GetSharedFolder(Resource):
+    @api.doc("get the shared folder content")
+    @jwt_required()
+    def get(self):
+        args = request.args
+
+        identity = get_jwt_identity()
+        dirname = args.get("shared_folder")
+        current_directory = args.get("sub_dir")
+        shared_path = os.path.join(ROOT, SHARES_DIR, dirname)
+
+        if len(current_directory) > 0:
+            if current_directory[0] == "/" or current_directory[0] == "\\":
+                current_directory = current_directory[1:]
+
+        return Files().get_dir_content(shared_path, current_directory)
+
+@api.route("/rename_shared_folder")
+class RenameSharedFolder(Resource):
+    @api.doc("rename a shared folder")
+    @jwt_required()
+    def post(self):
+        id = get_jwt()["id"]
+        data = json.loads(request.data)
+        old_folder_name, new_folder_name = data.values()
+
+        db = Database()
+        statement = "SELECT name FROM shared_folders WHERE id_owner = {id_owner}".format(id_owner=id)
+        query = db.select(statement)
+        result_check_user_is_owner = []
+        if len(query) > 0:
+            result_check_user_is_owner = query[0]
+
+        if old_folder_name in result_check_user_is_owner:
+            statement = "SELECT name FROM shared_folders WHERE name = '{name}'".format(name=new_folder_name)
+
+            query = db.select(statement)
+
+            result_check_if_folder_exists = []
+            if len(query) > 0:
+                return { "status": "faild", "description": "folder already exists"}
+
+            statement = "UPDATE public.shared_folders SET name='{new_folder_name}' WHERE name='{old_folder_name}';".format(new_folder_name=new_folder_name, old_folder_name=old_folder_name)
+            db.exec(statement)
+
+            old_path_abs = os.path.join(ROOT, SHARES_DIR, old_folder_name)
+            new_path_abs = os.path.join(ROOT, SHARES_DIR, new_folder_name)
+            os.rename(old_path_abs, new_path_abs)
+
+            return { "status": "success" }
+        return { "status": "faild", "description": "user is not owner of the share"}
+        
+@api.route("/set_user_access")
+class SetUserAccess(Resource):
+    @api.doc("set the users, which have access to the shared folder")
+    @jwt_required()
+    def post(self):
+        identity = get_jwt_identity()
+        folder_name, users = json.loads(request.data).values()
+
+        db = Database()
+        statement = "SELECT shared_folder_id FROM shared_folders WHERE name = '{folder_name}'".format(folder_name=folder_name)
+        query = db.select(statement)
+        shared_folder_id = ""
+        if len(query) > 0:
+            shared_folder_id = query[0][0]
+        else: 
+            return { "status": "faild", "description": "folder does not exist"}
+
+        statement = "DELETE FROM public.shared_folder_users WHERE id_shared_folder = {shared_folder_id}".format(shared_folder_id = shared_folder_id)
+        db.exec(statement)
+
+        for user in users:
+            id, name = user.values()
+            statement = "INSERT INTO public.shared_folder_users( id_user, id_shared_folder ) VALUES ({id_user}, {shared_folder_id});".format(id_user = id, shared_folder_id = shared_folder_id)
+            db.exec(statement)
+
+        return { "status": "success" }
+
+@api.route("/get_users_with_access_to_shared_folder")
+class GetUsersWithAccessToSharedFolder(Resource):
+    @api.doc("get the users with access to the shared folder")
+    @jwt_required()
+    def get(self):
+        identity = get_jwt_identity()
+        args = request.args
+        shared_folder = args.get("shared_folder")
+        db = Database()
+        statement = "SELECT id_user, username FROM public.v_shared_folders_with_users WHERE name = '{shared_folder}'".format(shared_folder = shared_folder)
+        query = db.select(statement)
+        users = []
+        if len(query) > 0:
+            users = query
+
+        data = []
+        for user in users:
+            id, name = user
+            data.append({
+                "id": id,
+                "name": name
+            })
+        return { "status": "success", "data": data}
+
+@api.route("/delete_shared_folder")
+class RenameSharedFolder(Resource):
+    @api.doc("rename a shared folder")
+    @jwt_required()
+    def post(self):
+        data = json.loads(request.data)
+        shared_folder = Path().to_relative(data.get("shared_folder"))
+
+        sub_folder = Path().to_relative(data.get("sub_dir"))
+        path = os.path.join(ROOT, SHARES_DIR, shared_folder, sub_folder)
+
+        if os.path.isfile(path):
+            os.remove(path)
+        else:
+            rmtree(path)
+
+        return { "status": "success" }
+
+@api.route("/rename_share_sub_folder")
+class RenameShareSubFolder(Resource):
+    @api.doc("rename a object from a shared folder")
+    @jwt_required()
+    def post(self):
+        shared_folder, oldPath, newPath = json.loads(request.data).values()
+        old_path_abs = os.path.join(
+            ROOT, SHARES_DIR, shared_folder, Path().to_relative(oldPath))
+        new_path_abs = os.path.join(
+            ROOT, SHARES_DIR, shared_folder, Path().to_relative(newPath))
         os.rename(old_path_abs, new_path_abs)
         return True

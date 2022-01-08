@@ -1,1 +1,60 @@
-<p>shared-with-me works!</p>
+<mat-toolbar class="bg-transparent">
+    <button mat-raised-button color="primary" (click)="openCreateSharedFolderDialog()" >Create shared folder</button >
+</mat-toolbar>
+
+<mat-divider></mat-divider>
+
+<div class="mt-3 mb-3">
+    <mat-grid-list cols="8" rowHeight="5:1">
+        <mat-grid-tile>
+            <div class="w-75">
+                <span class="h2">My Shares</span>
+            </div>
+        </mat-grid-tile>
+        <ng-container *ngFor="let share of myShares">
+            <mat-grid-tile>
+                <mat-card class="h-75 w-75" style="overflow: hidden;">
+                    <div class="h-100 w-100 d-flex flex-row align-items-center">
+                        <button type="button" class="h-100 w-100 card__button d-flex flex-row align-items-center justify-content-start" (click)="onShareButtonClicked(share.name)" >
+                            <div class="w-100 d-flex justify-content-start"><span>{{share.name}}</span></div>
+                        </button>
+                        <button mat-icon-button (click)="onEditClicked(share.shared_folder_id, share.name)"><mat-icon style="font-size: 1.4em;">edit</mat-icon></button>
+                    </div>
+                </mat-card>
+            </mat-grid-tile>
+        </ng-container>
+    </mat-grid-list>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="mt-3 mb-3">
+    <mat-grid-list cols="8" rowHeight="5:1">
+        <mat-grid-tile>
+            <div class="w-75">
+                <span class="h2">Shared with me</span>
+            </div>
+        </mat-grid-tile>
+        <ng-container *ngFor="let share of sharedWithMe">
+            <mat-grid-tile>
+                <mat-card class="h-75 w-75" style="overflow: hidden;">
+                    <div class="h-100 w-100 d-flex flex-row align-items-center">
+                        <button type="button" class="h-100 w-100 card__button d-flex flex-row align-items-center justify-content-start" (click)="onShareButtonClicked(share.name)" >
+                            <div class="w-100 d-flex justify-content-start"><span>{{share.name}}</span></div>
+                        </button>
+                    </div>
+                </mat-card>
+            </mat-grid-tile>
+        </ng-container>
+    </mat-grid-list>
+</div>
+<mat-divider></mat-divider>
+<div class="mt-3 mb-3">
+    <ng-container *ngIf="this.selectedSharedFolder !== ''">
+        <h1>Share {{selectedSharedFolder}}</h1>
+        <app-file-table #table [dataApi]="'shared_folder'" [shared_folder_name]="this.selectedSharedFolder"></app-file-table>
+    </ng-container>
+</div>
+
+
+  

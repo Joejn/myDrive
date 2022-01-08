@@ -1,0 +1,47 @@
+<div class="dialog">
+    <h1 mat-dialog-title>Edit share</h1>
+    <form [formGroup]="editGroup" (ngSubmit)="onSubmit()">
+        <div mat-dialog-content class="d-flex flex-column">
+            <mat-form-field appearance="outline">
+                <mat-label>Folder name</mat-label>
+                <input matInput formControlName="folderName">
+                <mat-error *ngIf="editGroup.controls['folderName'].hasError('required')">
+                    {{ this.getErrorMessage("required", { "name": "Folder name" }) }}
+                </mat-error>
+            </mat-form-field>
+            <h2>Users with access</h2>
+            <mat-form-field appearance="outline">
+                <mat-label>Username</mat-label>
+                <input type="text" placeholder="Pick one" aria-label="Number" matInput formControlName="userName"
+                    [matAutocomplete]="auto">
+                <button type="button" matSuffix mat-icon-button aria-label="Add" (click)="onAddClicked()">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    <mat-option *ngFor="let option of this.filteredOptions| async" [value]="option.name">
+                        {{option.name}}
+                    </mat-option>
+                </mat-autocomplete>
+
+
+
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-list class="dialog__list" role="list">
+                <ng-container *ngFor="let listItem of selectedItems">
+                    <mat-list-item role="listitem">
+                        <span mat-line>{{listItem.name}}</span>
+                        <button type="button" mat-icon-button (click)="onItemRemoveClicked(listItem.id)">
+                            <mat-icon mat-list-icon color="warn">delete</mat-icon>
+                        </button>
+                    </mat-list-item>
+                </ng-container>
+            </mat-list>
+        </div>
+        <div mat-dialog-actions class="d-flex justify-content-end">
+            <button type="button" mat-raised-button color="warn"
+                [matDialogClose]="{'status': 'canceld', 'folderName': '', 'usersWithAccess': []}">Cancel</button>
+            <button type="submit" mat-raised-button color="primary">Save</button>
+        </div>
+    </form>
+</div>

@@ -55,6 +55,7 @@ export class FileTableComponent implements AfterViewInit {
    */
   @Input() headerElements: string[] = ["download", "upload", "createFolder"]
   @Input() dataApi: string = "home"
+  @Input() shared_folder_name: string = ""
 
   rows: FileTableRow[] = []
   dataSource = new MatTableDataSource(this.rows)
@@ -126,6 +127,14 @@ export class FileTableComponent implements AfterViewInit {
         "last_modified": "",
         "file_size": ""
       }]
+    }
+
+    if (this.dataApi === "shared_folder") {
+      this.file.getShareFolderContent(this.shared_folder_name ,directory).subscribe((data: Dir) => {
+        this.appendRows(data)
+      })
+
+      return
     }
 
     this.file.getDir(directory).subscribe((data: Dir) => {
@@ -206,34 +215,46 @@ export class FileTableComponent implements AfterViewInit {
     dialog.componentInstance.content = content
   }
 
+  fileAction(data : any, file_extension: string, row: FileTableRow) {
+    let blob = new Blob([atob(data)], { type: "octet/stream" })
+    const imgFormats = ["png", "jpg"]
+
+    if (file_extension === "txt") {
+      this.openTextDialog(row.name, atob(data), row.path)
+    } else if (file_extension === "pdf") {
+      this.onDownloadClicked([row])
+    } else if (imgFormats.includes(file_extension)) {
+      this.openImageDialog(row.name, data)
+    } else {
+      // https://stackoverflow.com/questions/52182851/how-to-download-file-with-blob-function-using-angular-5
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      document.body.appendChild(a)
+      a.setAttribute("style", "display: none")
+      a.href = url
+      a.download = row.name
+      a.click()
+      window.URL.revokeObjectURL(url)
+      a.remove()
+    }
+  }
+
   setFileAction(row: FileTableRow) {
     if (row["type"] === "directory") {
       this.currentDir = row["path"]
       this.setTableData(row.path)
     } else {
       const file_extension: string = row.name.split(".").pop() + ""
+
+      if (this.dataApi === "shared_folder") {
+        this.file.getSpecificFileFromShare(row.path, this.shared_folder_name).subscribe(data => {
+          this.fileAction(data, file_extension, row)
+        })
+
+        return
+      }
       this.file.getSpecificFile(row.path).subscribe(data => {
-        let blob = new Blob([atob(data)], { type: "octet/stream" })
-        const imgFormats = ["png", "jpg"]
-
-        if (file_extension === "txt") {
-          this.openTextDialog(row.name, atob(data), row.path)
-        } else if (file_extension === "pdf") {
-
-        } else if (imgFormats.includes(file_extension)) {
-          this.openImageDialog(row.name, data)
-        } else {
-          // https://stackoverflow.com/questions/52182851/how-to-download-file-with-blob-function-using-angular-5
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement("a")
-          document.body.appendChild(a)
-          a.setAttribute("style", "display: none")
-          a.href = url
-          a.download = row.name
-          a.click()
-          window.URL.revokeObjectURL(url)
-          a.remove()
-        }
+        this.fileAction(data, file_extension, row)
       })
     }
   }
@@ -242,20 +263,45 @@ export class FileTableComponent implements AfterViewInit {
     if (selectedItems.length === 0) {
       return
     }
-    this.file.downloadFiles(selectedItems, this.currentDir).subscribe(file => {
-      var element = document.createElement("a")
-      element.setAttribute("href", "data:" + file.mimeType + ";base64," + file.data.body)
 
-      element.setAttribute("download", file.data.title)
-
-      element.style.display = "none"
-      document.body.appendChild(element)
-      element.click()
-      document.body.removeChild(element)
-    })
+    
+    if (this.dataApi === "shared_folder") {
+      this.file.downloadSharedFiles(selectedItems, this.currentDir, this.shared_folder_name).subscribe(file => {
+        var element = document.createElement("a")
+        element.setAttribute("href", "data:" + file.mimeType + ";base64," + file.data.body)
+  
+        element.setAttribute("download", file.data.title)
+  
+        element.style.display = "none"
+        document.body.appendChild(element)
+        element.click()
+        document.body.removeChild(element)
+      })
+    } else {
+      this.file.downloadFiles(selectedItems, this.currentDir).subscribe(file => {
+        var element = document.createElement("a")
+        element.setAttribute("href", "data:" + file.mimeType + ";base64," + file.data.body)
+  
+        element.setAttribute("download", file.data.title)
+  
+        element.style.display = "none"
+        document.body.appendChild(element)
+        element.click()
+        document.body.removeChild(element)
+      })
+    }
+    
   }
 
   onFileUploadChanged(event: any) {
+    if (this.dataApi === "shared_folder") {
+
+      this.file.uploadFilesToSharedFolder(event.target.files, this.shared_folder_name, this.currentDir).subscribe((data) => {
+        this.setTableData(this.currentDir)
+      })
+      
+      return
+    }
     this.file.uploadFiles(event.target.files, this.currentDir).subscribe((data) => {
       this.setTableData(this.currentDir)
     })
@@ -267,6 +313,13 @@ export class FileTableComponent implements AfterViewInit {
       if (result === "") {
         return
       }
+
+      if (this.dataApi === "shared_folder") {
+        this.file.createSharedSubFolder(this.shared_folder_name, this.currentDir + "/" + result).subscribe(data => {
+          this.setTableData(this.currentDir)
+        })
+        return
+      }
       this.file.createFolder(this.currentDir, result).subscribe(data => {
         this.setTableData(this.currentDir)
       })
@@ -274,6 +327,14 @@ export class FileTableComponent implements AfterViewInit {
   }
 
   onDeleteClicked(row: FileTableRow) {
+    if (this.dataApi === "shared_folder") {
+      this.file.deleteSharedFolder(this.shared_folder_name, row.path).subscribe(() => {
+        this.setTableData(this.currentDir)
+      })
+      
+      return
+    }
+
     this.file.moveObjectToTrash(row.path).subscribe(data => {
       if (data === "ok") {
         this.setTableData(this.currentDir)
@@ -321,6 +382,16 @@ export class FileTableComponent implements AfterViewInit {
         path.push(data)
         const oldPath = this.contextMenu.menuData["path"]
         const newPath = path.join("\\")
+
+        if (this.dataApi === "shared_folder") {
+          this.file.renameShareSubFolder(this.shared_folder_name, oldPath, newPath).subscribe(() => {
+            this.setTableData()
+            this.openSnackBar("Successfully renamed", "Close")
+          })
+          
+          return
+        }
+
         this.file.rename(oldPath, newPath).subscribe(status => {
           if (status) {
             this.setTableData()

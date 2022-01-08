@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { listItem } from '../dialogs/edit-share-access/edit-share-access.component';
 import { User } from '../interfaces/user';
 import { ConfigService } from './config.service';
 
@@ -40,5 +41,9 @@ export class UsersService {
 
   getUserCount() {
     return this.http.get(`${this.apiUrl}/get_registerd_users_count`)
+  }
+
+  getAllUsernamesAndIds() {
+    return this.http.get<listItem[]>(`${this.apiUrl}/get_all_usernames_and_ids`)
   }
 }

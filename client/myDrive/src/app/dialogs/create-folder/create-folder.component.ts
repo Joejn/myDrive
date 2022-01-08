@@ -24,7 +24,7 @@ export class CreateFolderComponent implements OnInit {
   constructor( public dialogRef: MatDialogRef<CreateFolderComponent>) { }
 
   ngOnInit(): void {
-    console.log(this.createFolder)
+    
   }
 
   onCreateClicked() {

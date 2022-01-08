@@ -14,7 +14,7 @@ import { DialogData } from '../confirm-user-delete/confirm-user-delete.component
 export class AddToGroupComponent implements OnInit {
 
   options: string[] = []
-  myControl = new FormControl
+  myControl = new FormControl()
   filteredOptions: Observable<string[]> = new Observable
   groups: string[] = []
 

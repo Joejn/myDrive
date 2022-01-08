@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Create shared folder</h1>
+<form [formGroup]="sharedFolderForm" (ngSubmit)="onCreateClicked()">
+    <div mat-dialog-content class="d-flex flex-column">
+        <mat-form-field appearance="outline">
+            <mat-label>Folder name</mat-label>
+            <input matInput formControlName="name">
+            <mat-error *ngIf="this.sharedFolderForm.controls['name'].hasError('required')">
+                {{ this.getErrorMessage("required", { "name": "Folder name" }) }}
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions class="button_container d-flex flex-row-reverse">
+        <div class="d-flex justify-content-between">
+            <button mat-raised-button mat-dialog-close>Cancel</button>
+            <button type="submit" mat-raised-button color="primary">Create</button>
+        </div>
+    </div>
+</form>

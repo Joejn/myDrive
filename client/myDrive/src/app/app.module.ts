@@ -40,6 +40,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatListModule } from '@angular/material/list';
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { DateAdapter, MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { CustomDateAdapter } from './adapters/custom-date-adapter';
@@ -69,6 +70,8 @@ import { CreateQuotaComponent } from './components/admin/dialogs/create-quota/cr
 import { GroupsComponent } from './components/admin/groups/groups.component';
 import { AddGroupComponent } from './components/admin/dialogs/add-group/add-group.component';
 import { DeleteGroupComponent } from './components/admin/dialogs/delete-group/delete-group.component';
+import { CreateSharedFolderComponent } from './dialogs/create-shared-folder/create-shared-folder.component';
+import { EditShareAccessComponent } from './dialogs/edit-share-access/edit-share-access.component';
 
 const materialModules = [
   MatToolbarModule,
@@ -99,7 +102,8 @@ const materialModules = [
 ]
 
 const matCdk = [
-  DragDropModule
+  DragDropModule,
+  ScrollingModule
 ]
 
 @NgModule({
@@ -135,6 +139,8 @@ const matCdk = [
     GroupsComponent,
     AddGroupComponent,
     DeleteGroupComponent,
+    CreateSharedFolderComponent,
+    EditShareAccessComponent,
   ],
   imports: [
     BrowserModule,

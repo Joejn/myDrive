@@ -127,7 +127,7 @@ class AddGroup(Resource):
 
         statement = ""
         for privilege in privileges:
-            statement += "INSERT INTO public.groups (name, privileges) VALUES ('{name}', {privilege});".format(name=name, privilege=privilege["id"])
+            statement += "INSERT INTO public.groups (name, privilege) VALUES ('{name}', {privilege});".format(name=name, privilege=privilege["id"])
         
         db = Database()
         db.exec(statement)

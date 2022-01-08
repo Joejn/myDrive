@@ -1,0 +1,9 @@
+.dialog {
+    max-height: 60vh;
+    min-width: 25vw;
+}
+
+.dialog__list {
+    max-height: 20rem;
+    overflow: auto;
+}

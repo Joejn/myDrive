@@ -8,7 +8,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 })
 export class MainComponent implements OnInit {
 
-  public currentTab: string = "home"
+  public currentTab: string = "shared-with-me"
   public isSidenavExpanded = true
   public isManuelSidenavExpanded = false
   public expansionIcon = "arrow_back"
