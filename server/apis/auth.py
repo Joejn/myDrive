@@ -1,6 +1,6 @@
 import bcrypt
 from flask_jwt_extended.utils import get_jwt
-from core.utils import Database
+from core.utils import Database, Auth
 from flask import request, json
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
@@ -15,69 +15,38 @@ user = api.model("User", {
     "groups": fields.String(required=False, description="group where the user is a member of"),
 })
 
+
 @api.route("/login")
 class Login(Resource):
     @api.doc("sign in")
     @api.param("password")
     @api.param("username")
     def post(self):
-       
-        
         user_credential = json.loads(request.data)
         if not (user_credential["username"] and user_credential["password"]):
-            return {
-                "login": False,
-                "access_token": "",
-                "refresh_token": ""
-            }
+            return Auth.generate_login_faild_response()
 
+        username = user_credential["username"]
         password = user_credential["password"]
 
         db = Database()
-        statement = "SELECT id, username, password, groups FROM users WHERE username = '" + user_credential["username"] + "';"
-        selectResult = db.select(statement)
-        
-        is_user_existing = False
-        if not selectResult:
-            return {
-                "login": False,
-                "access_token": "",
-                "refresh_token": ""
-            }
+        statement = "SELECT id, username, password, groups FROM users WHERE username = '{username}';".format(
+            username=username)
+        query = db.select(statement)
 
-        if not bcrypt.checkpw(str(password).encode("utf-8"), str(selectResult[0][2]).encode("utf-8")):
-            return {
-                "login": False,
-                "access_token": "",
-                "refresh_token": ""
-            }
+        if not query:
+            return Auth.generate_login_faild_response()
 
-        if selectResult[0][1] == user_credential["username"]:
-            is_user_existing = True
-        
-        if not is_user_existing:
-            return {
-                "login": False,
-                "access_token": "",
-                "refresh_token": ""
-            }
-
-        groups = selectResult[0][3]
-        if groups == None:
-            groups = []
+        if not bcrypt.checkpw(str(password).encode("utf-8"), str(query[0][2]).encode("utf-8")):
+            return Auth.generate_login_faild_response()
 
         additional_claims = {
-            "id": selectResult[0][0],
-            "groups": groups
-            }
-        access_token = create_access_token(identity=user_credential["username"], additional_claims=additional_claims)
-        refresh_token = create_refresh_token(identity=user_credential["username"], additional_claims=additional_claims)
-
-        return {
-            "login": True,
-            "access_token": access_token,
-            "refresh_token": refresh_token
+            "id": query[0][0],
+            "groups": query[0][3]
         }
+
+        return Auth.generate_login_success_response(username, additional_claims)
+
 
 @api.route("/refresh")
 class Refresh(Resource):
@@ -91,13 +60,10 @@ class Refresh(Resource):
         additional_claims = {
             "id": id,
             "groups": groups
-            }
-        access_token = create_access_token(identity=user, additional_claims=additional_claims)
+        }
+        access_token = create_access_token(
+            identity=user, additional_claims=additional_claims)
         return {
             "refresh": True,
             "access_token": access_token
         }
-
-        
-
-        

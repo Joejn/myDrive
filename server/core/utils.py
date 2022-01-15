@@ -8,6 +8,7 @@ import psycopg2
 import bcrypt
 from core.consts import administrators_groups
 from configparser import ConfigParser
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 from core.consts import DATA_PATH, HOME_DIR
 import magic
@@ -15,7 +16,7 @@ import base64
 
 
 class Files():
-    def get_dir_content(self, path, current_directory = ""):
+    def get_dir_content(self, path, current_directory=""):
         current_directory_absolute = join(path, current_directory)
         dirContent = listdir(current_directory_absolute)
         dirElements = {
@@ -71,7 +72,7 @@ class Files():
                     continue
                 absolute_path = os.path.join(
                     basepath, relative_path)
-                
+
                 if element.get("type") == "file":
                     zip_file.write(
                         absolute_path, os.path.basename(absolute_path))
@@ -110,6 +111,7 @@ class Files():
         }
 
         return data
+
 
 class Database():
     def __init__(self):
@@ -177,3 +179,27 @@ class Path():
                 path = path[1:]
 
         return path
+
+
+class Auth():
+    @staticmethod
+    def generate_login_success_response(
+            username: str, additional_claims: dict) -> dict:
+        access_token = create_access_token(
+            identity=username, additional_claims=additional_claims)
+        refresh_token = create_refresh_token(
+            identity=username, additional_claims=additional_claims)
+
+        return {
+            "login": True,
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }
+
+    @staticmethod
+    def generate_login_faild_response() -> dict:
+        return {
+            "login": False,
+            "access_token": "",
+            "refresh_token": ""
+        }
