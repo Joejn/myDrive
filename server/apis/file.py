@@ -13,10 +13,19 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource
 
+import psycopg2
+
 from shutil import rmtree
 
 api = Namespace("file", description="Files related operations")
 
+connection = psycopg2.connect(
+    host="127.0.0.1",
+    database="myDrive",
+    user="admin",
+    password="passme",
+)
+connection.set_session(autocommit=True)
 
 @api.route("/myFiles")
 class MyFiles(Resource):
@@ -562,19 +571,27 @@ class GetUsersWithAccessToSharedFolder(Resource):
         args = request.args
         shared_folder = args.get("shared_folder")
         db = Database()
-        statement = "SELECT id_user, username FROM public.v_shared_folders_with_users WHERE name = '{shared_folder}'".format(shared_folder = shared_folder)
-        query = db.select(statement)
+
+        query = []
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id_user, username FROM public.v_shared_folders_with_users WHERE name = %(shared_folder)s', {"shared_folder": shared_folder})
+            result = cursor.fetchone()
+            query = result
+
         users = []
         if len(query) > 0:
-            users = query
+            users.append(query)
 
         data = []
+        counter = 0
         for user in users:
             id, name = user
             data.append({
                 "id": id,
                 "name": name
             })
+
+            counter += 1
         return { "status": "success", "data": data}
 
 @api.route("/delete_shared_folder")
