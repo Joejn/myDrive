@@ -21,11 +21,10 @@ export class UserProfileService {
     return this.http.post(`${this.apiUrl}/upload_profile_picture`, fd)
   }
 
-  updateGeneralData(firstname: string, lastname: string, birthday: Date, email: string) {
-    const date = birthday.getDate() < 10 ? `0${birthday.getDate()}` : birthday.getDate()
-    const month = (birthday.getMonth() + 1) < 10 ? `0${birthday.getMonth() + 1}` : birthday.getMonth() + 1
-    const year = birthday.getFullYear()
-    const birthdayStr = `${month}/${date}/${year}`
+  updateGeneralData(firstname: string, lastname: string,
+    birthday: Date, email: string) {
+
+    const birthdayStr = birthday.toLocaleDateString("en-US");
 
     const data: Object = {
       "firstname": firstname,
@@ -33,6 +32,7 @@ export class UserProfileService {
       "birthday": birthdayStr,
       "email": email
     }
+    
     return this.http.post(`${this.apiUrl}/update_general_data`, data)
   }
 

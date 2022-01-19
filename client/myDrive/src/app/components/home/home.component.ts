@@ -189,17 +189,16 @@ export class HomeComponent implements AfterViewInit {
       this.setTableData(row.path)
     } else {
       const file_extension: string = row.name.split(".").pop() + ""
-      this.file.getSpecificFile(row.path).subscribe(data => {
-        let blob = new Blob([atob(data)], { type: "octet/stream" })
+      this.file.getSpecificFile(row.path).subscribe(blob => {
         const imgFormats = ["png", "jpg"]
 
-        if (file_extension === "txt") {
-          this.openTextDialog(row.name, atob(data), row.path)
-        } else if (file_extension === "pdf") {
+        // if (file_extension === "txt") {
+        //   this.openTextDialog(row.name, atob(data), row.path)
+        // } else if (file_extension === "pdf") {
 
-        } else if (imgFormats.includes(file_extension)) {
-          this.openImageDialog(row.name, data)
-        } else {
+        // } else if (imgFormats.includes(file_extension)) {
+        //   this.openImageDialog(row.name, data)
+        // } else {
           // https://stackoverflow.com/questions/52182851/how-to-download-file-with-blob-function-using-angular-5
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement("a")
@@ -210,7 +209,7 @@ export class HomeComponent implements AfterViewInit {
           a.click()
           window.URL.revokeObjectURL(url)
           a.remove()
-        }
+        // }
       })
     }
   }

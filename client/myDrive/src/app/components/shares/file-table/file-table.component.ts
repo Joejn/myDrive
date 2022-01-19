@@ -215,16 +215,22 @@ export class FileTableComponent implements AfterViewInit {
     dialog.componentInstance.content = content
   }
 
-  fileAction(data : any, file_extension: string, row: FileTableRow) {
-    let blob = new Blob([atob(data)], { type: "octet/stream" })
+  fileAction(blob : Blob, file_extension: string, row: FileTableRow) {
+    // let blob = new Blob([atob(data)], { type: "octet/stream" })
     const imgFormats = ["png", "jpg"]
+    let reader = new FileReader()
+
+    reader.readAsText(blob)
+    const _this = this
 
     if (file_extension === "txt") {
-      this.openTextDialog(row.name, atob(data), row.path)
-    } else if (file_extension === "pdf") {
-      this.onDownloadClicked([row])
+      reader.onload =  function() {
+        _this.openTextDialog(row.name, String(reader.result), row.path)
+      }
     } else if (imgFormats.includes(file_extension)) {
-      this.openImageDialog(row.name, data)
+      reader.onload =  function() {
+        _this.openImageDialog(row.name, String(reader.result))
+      }
     } else {
       // https://stackoverflow.com/questions/52182851/how-to-download-file-with-blob-function-using-angular-5
       const url = window.URL.createObjectURL(blob)

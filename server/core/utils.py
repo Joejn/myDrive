@@ -1,8 +1,12 @@
 import base64
+from collections import namedtuple
 import io
+import json
 from os import listdir
 from os.path import isfile, join, getsize, getmtime
 import os
+from traceback import print_tb
+from xmlrpc.client import boolean
 import zipfile
 import psycopg2
 import bcrypt
@@ -10,7 +14,7 @@ from core.consts import administrators_groups
 from configparser import ConfigParser
 from flask_jwt_extended import create_access_token, create_refresh_token
 
-from core.consts import DATA_PATH, HOME_DIR
+from core.consts import DATA_PATH, USER_HISTORY_FILE
 import magic
 import base64
 
@@ -112,6 +116,65 @@ class Files():
 
         return data
 
+    @staticmethod
+    def get_user_history(username: str) -> dict:
+        history = {}
+        user_history_path = os.path.join(
+            DATA_PATH, username, USER_HISTORY_FILE)
+
+        if os.path.isfile(user_history_path):
+            with open(user_history_path, "r") as f:
+                content = f.read()
+                if content != "":
+                    history = json.loads(content)
+
+        return history
+
+    @staticmethod
+    def delete_enties_from_user_history(file_name: str, user_history: dict):
+        current_user_history = user_history.copy()
+
+        if file_name in current_user_history:
+            del current_user_history[file_name]
+
+        if len(current_user_history) >= 100:
+            counter = 0
+            keys_to_delete = []
+            for key in current_user_history:
+                if counter >= 100:
+                    keys_to_delete.append(key)
+                counter += 1
+
+            for key in keys_to_delete:
+                del current_user_history[key]
+
+        return current_user_history
+
+    @staticmethod
+    def add_entry_to_user_history(username: str, filename: str, path: str):
+        current_history_content = Files.get_user_history(username)
+
+        current_history_content = Files.delete_enties_from_user_history(
+            filename, current_history_content)
+
+        user_history_path = os.path.join(
+            DATA_PATH, username, USER_HISTORY_FILE)
+        
+        user_history_content = {
+            filename: {
+                "path": path,
+                "deleted": "false"
+            }
+        }
+
+        history_file_content = {
+            **user_history_content, **current_history_content}
+        my_namedtuple = namedtuple("content", "filename")
+        file_content_namedtuple = my_namedtuple(history_file_content)
+
+        with open(user_history_path, "w") as f:
+            f.write(str(file_content_namedtuple.filename).replace("'", '"'))
+
 
 class Database():
     def __init__(self):
@@ -168,6 +231,9 @@ class Config():
 
     def get_db_host(self):
         return self.config_parser.get("DATABASE", "Host")
+
+    def get_user_history_max_entries_count(self):
+        return self.config_parser.get("GENERAL", "MaxUserHistoryEntriesCount")
 
 
 class Path():

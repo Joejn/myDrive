@@ -1,20 +1,19 @@
 import base64
 from collections import namedtuple
-import io
+from msilib.schema import File
 import os
 from os.path import join
-from re import template
+from posixpath import basename
+from traceback import print_tb
 
 from core.utils import Database, Files, Path
 from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR, USER_HISTORY_FILE, ROOT, SHARES_DIR
-from flask import json, request
+from flask import json, request, send_file, send_from_directory
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource
 
 from shutil import rmtree
-import zipfile
-import magic
 
 api = Namespace("file", description="Files related operations")
 
@@ -45,58 +44,14 @@ class GetFile(Resource):
         identity = get_jwt_identity()
         user_storage_path = join(DATA_PATH, identity, HOME_DIR)
 
-        current_file = user_storage_path
+        file_path = join(user_storage_path, file_path)
+        splitted_file_path = list(os.path.split(file_path))
+        filename = splitted_file_path.pop()
+        parent_dir = splitted_file_path[0]
 
-        if not file_path == "/":
-            current_file = join(user_storage_path, file_path)
+        Files.add_entry_to_user_history(identity, filename, file_path)
 
-        current_file = current_file.replace("\\", "/")
-
-        with open(current_file, "rb") as file:
-            file_content = base64.b64encode(file.read()).decode("utf-8")
-
-        file_name = current_file.split("/").pop()
-        user_history_path = os.path.join(
-            DATA_PATH, identity, USER_HISTORY_FILE)
-        user_history_content = {
-            file_name: {
-                "path": file_path,
-                "deleted": "false"
-            }
-        }
-
-        current_history_content = {}
-        history_file_content = {}
-
-        if os.path.isfile(user_history_path):
-            with open(user_history_path, "r") as f:
-                content = f.read()
-                if content != "":
-                    current_history_content = json.loads(content)
-
-        if file_name in current_history_content:
-            del current_history_content[file_name]
-
-        if len(current_history_content) >= 100:
-            counter = 0
-            keys_to_delete = []
-            for key in current_history_content:
-                if counter >= 100:
-                    keys_to_delete.append(key)
-                counter += 1
-
-            for key in keys_to_delete:
-                del current_history_content[key]
-
-        history_file_content = {
-            **user_history_content, **current_history_content}
-        my_namedtuple = namedtuple("content", "filename")
-        file_content_namedtuple = my_namedtuple(history_file_content)
-
-        with open(user_history_path, "w") as f:
-            f.write(str(file_content_namedtuple.filename).replace("'", '"'))
-
-        return file_content
+        return send_from_directory(parent_dir, filename)
 
 
 @api.route("/set_file_content")
@@ -172,13 +127,18 @@ class UploadFiles(Resource):
         identity = get_jwt_identity()
         user_storage_path = join(DATA_PATH, identity, HOME_DIR)
         current_dir = request.headers.get("current_dir")
-        if len(current_dir) > 0:
-            current_dir = current_dir[1:]
+        current_dir = Path.to_relative(current_dir)
+
         files = request.files
+
         for file in files:
             f = files.get(file)
             file_path = os.path.join(user_storage_path, current_dir, file)
             f.save(file_path)
+
+        return {
+            "success": True
+        }
 
 
 @api.route("/create_folder")
@@ -207,6 +167,7 @@ class MoveToTrash(Resource):
         identity = get_jwt_identity()
         relative_path = Path().to_relative(body.get("path"))
         path = os.path.join(DATA_PATH, identity, HOME_DIR, relative_path)
+
         object_name = relative_path.split("/").pop()
         trash_path = os.path.join(DATA_PATH, identity, TRASH_DIR, object_name)
         

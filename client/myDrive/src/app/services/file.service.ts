@@ -12,12 +12,12 @@ export interface DownloadFilesStructureInformations {
   "is_share": boolean,
   "shared_folder": string,
   currentDir: string,
-  data: 
-    {
-      type: string,
-      path: string
-    }[]
-  
+  data:
+  {
+    type: string,
+    path: string
+  }[]
+
 }
 
 export interface DownloadFilesStructure {
@@ -29,12 +29,12 @@ export interface DownloadFilesStructure {
 }
 
 export interface SharedFolders {
-    "state": string,
-    "data": [{
-      "shared_folder_id": number,
-      "name": string,
-      "is_owner": boolean
-    }]
+  "state": string,
+  "data": [{
+    "shared_folder_id": number,
+    "name": string,
+    "is_owner": boolean
+  }]
 }
 
 export interface UsersWithAccessResponse {
@@ -53,24 +53,13 @@ export class FileService {
   currentDirectory: string = "root"
   apiUrl = `http://${this.conf.getAPIAdress()}:${this.conf.getAPIPort()}/file`
 
-  constructor( private http: HttpClient, private conf: ConfigService ) { }
+  constructor(private http: HttpClient, private conf: ConfigService) { }
 
-  getDir(directory: string = "/") {
-
+  getDir(directory: string = "/"): Observable<Dir> {
     directory = directory.replaceAll("\\", "/")
-    
-    if (this.currentDirectory[0] === "\\" || this.currentDirectory[0] === "/") {
-      this.currentDirectory = this.currentDirectory.substring(1)
-    }
-    
+
     if (directory === "..") {
-      let splitted_path = this.currentDirectory.split("/")
-      splitted_path.pop()
-      if (splitted_path.length !== 0) {
-        this.currentDirectory = splitted_path.join("/")
-      } else {
-        this.currentDirectory = "/"
-      }
+      this.currentDirectory = this.getParentDir(this.currentDirectory)
     } else {
       this.currentDirectory = directory
     }
@@ -78,13 +67,13 @@ export class FileService {
     return this.http.get<Dir>(`${this.apiUrl}/myFiles?directory=${this.currentDirectory}`)
   }
 
-  getCurrentDir () {
+  getCurrentDir() {
     return this.currentDirectory
   }
 
-  getSpecificFile(filePath: string) {
-    filePath = filePath.replaceAll("\\", "/")
-    return this.http.get<any>(`http://127.0.0.1:5000/file/get_file?file=${filePath}`)
+  getSpecificFile(filePath: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/get_file?file=${filePath}`,
+      { responseType: 'blob' })
   }
 
   setFileContent(filePath: string, content: string) {
@@ -99,18 +88,18 @@ export class FileService {
     return this.http.get<Dir>(`${this.apiUrl}/get_recent_files`)
   }
 
-  uploadFiles( files: File[], currentDir: string) {
+  uploadFiles(files: File[], currentDir: string): Observable<any> {
     const fd = new FormData()
     const httpOptions = {
       headers: new HttpHeaders({
         "current_dir": currentDir
       })
     }
+
     for (const file of files) {
-      if (typeof(file) === "object") {
-        fd.append(file.name, file, file.name)
-      }
+      fd.append(file.name, file, file.name)
     }
+
     return this.http.post(`${this.apiUrl}/upload_files`, fd, httpOptions)
   }
 
@@ -123,7 +112,7 @@ export class FileService {
     return this.http.post(`${this.apiUrl}/create_folder`, body)
   }
 
-  moveObjectToTrash( path : string ) {
+  moveObjectToTrash(path: string) {
     const body = {
       "path": path
     }
@@ -134,15 +123,15 @@ export class FileService {
     return this.http.get<Dir>(`${this.apiUrl}/get_objects_from_trash`)
   }
 
-  deleteObjectFromTrash( path : string ) {
+  deleteObjectFromTrash(path: string) {
     const body = {
       "path": path
     }
     return this.http.post(`${this.apiUrl}/delete_object_from_trash`, body)
   }
 
-  formatFileRowContent( data : Dir ) : FileTableRow[] {
-    const rows : FileTableRow[] = []
+  formatFileRowContent(data: Dir): FileTableRow[] {
+    const rows: FileTableRow[] = []
     let pos = 0
     for (const item of data.directories) {
       const last_modified = new Date(item.last_modified * 1000)
@@ -160,7 +149,7 @@ export class FileService {
 
     for (const item of data.files) {
       const last_modified = new Date(item.last_modified * 1000)
-      
+
       rows.push(
         {
           "position": pos++,
@@ -215,14 +204,14 @@ export class FileService {
       })
     }
     for (const file of files) {
-      if (typeof(file) === "object") {
+      if (typeof (file) === "object") {
         fd.append(file.name, file, file.name)
       }
     }
     return this.http.post(`${this.apiUrl}/upload_files_to_shared_folder`, fd, httpOptions)
   }
 
-  getSpecificFileFromShare(filePath: string, shared_folder="") {
+  getSpecificFileFromShare(filePath: string, shared_folder = "") {
     filePath = filePath.replaceAll("\\", "/")
     return this.http.get<any>(`http://127.0.0.1:5000/file/get_shared_file?file=${filePath}&shared_folder=${shared_folder}`)
   }
@@ -249,7 +238,7 @@ export class FileService {
   }
 
   // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
-  formatBytes( bytes: number, decimals: number = 2 ): string {
+  formatBytes(bytes: number, decimals: number = 2): string {
     if (bytes === 0) {
       return "0 Bytes"
     }
@@ -263,9 +252,19 @@ export class FileService {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
   }
 
+  getParentDir(path: string): string {
+    let splitted_path = path.split("/")
+    splitted_path.pop()
+    if (splitted_path.length !== 0) {
+      return splitted_path.join("/")
+    } else {
+      return "/"
+    }
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  getModifiedStr( last_modified: Date): string {
+  getModifiedStr(last_modified: Date): string {
     const last_modified_date = new Date(last_modified).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0)
     let display_last_modified = ""
@@ -285,7 +284,7 @@ export class FileService {
     return display_last_modified
   }
 
-  createBodyForDownload(rows: FileTableRow[], currentDir: string, isShare: boolean, sharedFolder: string = "") : DownloadFilesStructureInformations {
+  createBodyForDownload(rows: FileTableRow[], currentDir: string, isShare: boolean, sharedFolder: string = ""): DownloadFilesStructureInformations {
     const bodyData = []
     for (const row of rows) {
       const dataElement = {
@@ -307,18 +306,18 @@ export class FileService {
   }
 
 
-  downloadFiles( rows: FileTableRow[], currentDir: string ) {
+  downloadFiles(rows: FileTableRow[], currentDir: string) {
     const body = this.createBodyForDownload(rows, currentDir, false)
     return this.http.post<DownloadFilesStructure>(`${this.apiUrl}/download`, body)
   }
 
-  downloadSharedFiles( rows: FileTableRow[], currentDir: string, sharedFolder: string) {
+  downloadSharedFiles(rows: FileTableRow[], currentDir: string, sharedFolder: string) {
     const body = this.createBodyForDownload(rows, currentDir, true, sharedFolder)
     return this.http.post<DownloadFilesStructure>(`${this.apiUrl}/download_shared_files`, body)
   }
 
 
-  rename( oldPath: string, newPath: string ) {
+  rename(oldPath: string, newPath: string) {
     const body = {
       "oldPath": oldPath,
       "newPath": newPath
@@ -335,7 +334,7 @@ export class FileService {
     return this.http.post<DefaultResponse>(`${this.apiUrl}/rename_shared_folder`, body)
   }
 
-  setUserAccess(folderName:string, users: listItem[]): Observable<DefaultResponse> {
+  setUserAccess(folderName: string, users: listItem[]): Observable<DefaultResponse> {
     const body = {
       "folder_name": folderName,
       "users": users
