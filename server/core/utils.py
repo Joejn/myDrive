@@ -13,6 +13,7 @@ import bcrypt
 from core.consts import administrators_groups
 from configparser import ConfigParser
 from flask_jwt_extended import create_access_token, create_refresh_token
+import psycopg2
 
 from core.consts import DATA_PATH, USER_HISTORY_FILE
 import magic
@@ -159,7 +160,7 @@ class Files():
 
         user_history_path = os.path.join(
             DATA_PATH, username, USER_HISTORY_FILE)
-        
+
         user_history_content = {
             filename: {
                 "path": path,
@@ -181,15 +182,18 @@ class Database():
         conf = Config()
         self.conn = psycopg2.connect(dbname=conf.get_db_name(), user=conf.get_db_user(
         ), password=conf.get_db_pass(), host=conf.get_db_host())
+
+        self.conn.set_session(autocommit=True)
         self.cur = self.conn.cursor()
 
+
     # @staticmethod
-    def select(self, statement):
-        self.cur.execute(statement)
+    def select(self, statement, vars={}):
+        self.cur.execute(statement, vars)
         return self.cur.fetchall()
 
-    def exec(self, statement):
-        self.cur.execute(statement)
+    def exec(self, statement, vars={}):
+        self.cur.execute(statement, vars)
         self.conn.commit()
 
     def __exit__(self):

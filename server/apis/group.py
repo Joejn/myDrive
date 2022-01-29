@@ -52,14 +52,13 @@ class AddToGroup(Resource):
             return "Unauthorized", 401
 
         groups, users = json.loads(request.data).values()
-        statement = "SELECT update_groups_from_users('{groups}', '{users}');"
+        statement = "SELECT update_groups_from_users(%(groups)s, %(users)s);"
 
         groupsStr = "{" + ",".join(groups) + "}"
         usersStr = "{" + ",".join(users) + "}"
 
-        statement = statement.format(groups=groupsStr, users=usersStr)
         db = Database()
-        db.exec(statement)
+        db.exec(statement, {"groups": groupsStr, "users": usersStr})
 
 
 @api.route("/get_groups_of_user")
@@ -77,9 +76,9 @@ class GetGroupsOfUser(Resource):
         if user_id is None:
             return "Bad request", 400
         
-        statement = "SELECT groups FROM public.users WHERE id={user_id};".format(user_id=user_id)
+        statement = "SELECT groups FROM public.users WHERE id=%(user_id)s;"
         db = Database()
-        query = db.select(statement)
+        query = db.select(statement, {"user_id": user_id})
         groups = query[0][0]
         if groups is None:
             groups = []
@@ -107,10 +106,10 @@ class SetGroupsOfUser(Resource):
             return "Bad request", 400
 
         groupsStr = "{" + ", ".join(groups) + "}"
-        statement = "UPDATE public.users SET groups='{groupsStr}' WHERE id={user_id};".format(groupsStr=groupsStr, user_id=user_id)
+        statement = "UPDATE public.users SET groups=%(groupsStr)s WHERE id=%(user_id)s;"
         
         db = Database()
-        db.exec(statement)
+        db.exec(statement, {"groupsStr": groupsStr, "user_id": user_id})
 
 @api.route("/add_group")
 class AddGroup(Resource):
@@ -125,13 +124,12 @@ class AddGroup(Resource):
 
         name, privileges = json.loads(request.data).values()
 
-        statement = ""
-        for privilege in privileges:
-            statement += "INSERT INTO public.groups (name, privilege) VALUES ('{name}', {privilege});".format(name=name, privilege=privilege["id"])
-        
         db = Database()
-        db.exec(statement)
+        for privilege in privileges:
+            statement = "INSERT INTO public.groups (name, privilege) VALUES (%(name)s, %(privilege)s);"
+            db.exec(statement, {"name": name, "privilege": privilege["id"]})
 
+        
 @api.route("/delete_group")
 class DeleteGroup(Resource):
     @api.doc("delete a group")
@@ -145,9 +143,9 @@ class DeleteGroup(Resource):
 
         group_id = json.loads(request.data)["id"]
 
-        statement = "DELETE FROM public.groups WHERE id={id}".format(id=group_id)
+        statement = "DELETE FROM public.groups WHERE id=%(id)s"
 
         db = Database()
-        db.exec(statement)
+        db.exec(statement, {"id": group_id})
 
         return "success", 200

@@ -29,7 +29,7 @@ class Privileges(Resource):
 
         statement = "SELECT id, name FROM public.privileges"
         db = Database()
-        query = Database.select(db, statement)
+        query = db.select(statement)
 
         body = []
         for id, name in query:

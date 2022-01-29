@@ -42,6 +42,7 @@ class GetAllUsers(Resource):
 
         return json.jsonify(data)
 
+
 @api.route("/add_user")
 class AddUser(Resource):
     @api.doc("Add a user")
@@ -61,9 +62,18 @@ class AddUser(Resource):
             INSERT INTO public.users(
                 username, firstname, lastname, birthday, email, password)
             VALUES
-                ('{username}' , '{firstname}', '{lastname}', to_date('{birthday}', 'mm/dd/yyyy'), '{email}', '{password}');
-        """.format(username=username, firstname=firstname, lastname=lastname, birthday=datetime.utcfromtimestamp(birthday).strftime("%m/%d/%y"), email=email, password=hashed_password)
-        db.exec(statement.strip())
+                (%(username)s , %(firstname)s, %(lastname)s, to_date(%(birthday)s, 'mm/dd/yyyy'), %(email)s, %(password)s);
+        """
+        
+        vars = {
+            "username": username,
+            "firstname": firstname,
+            "lastname": lastname,
+            "birthday": datetime.utcfromtimestamp(birthday).strftime("%m/%d/%y"),
+            "email": email,
+            "password": hashed_password
+        }
+        db.exec(statement, vars)
 
         # Create home directory for new User ##################
 
@@ -90,6 +100,7 @@ class AddUser(Resource):
 
         return json.jsonify(data)
 
+
 @api.route("/delete_user")
 class DeleteUser(Resource):
     @api.doc("Delete a user")
@@ -105,9 +116,9 @@ class DeleteUser(Resource):
         user_id = data.get("id")
         username = data.get("username")
         db = Database()
-        
-        statement = "DELETE FROM public.users WHERE id={id};".format(id=user_id)
-        db.exec(statement)
+
+        statement = "DELETE FROM public.users WHERE id=%(id)s;"
+        db.exec(statement, {"id": user_id})
 
         # Delete home directory from User ##################
 
@@ -115,7 +126,7 @@ class DeleteUser(Resource):
         shutil.rmtree(data_dir_of_user)
 
         #######################################################
-        
+
         data = []
         users = db.select(
             "SELECT id, username, firstname, lastname, birthday, email FROM public.users ORDER BY id;")
@@ -131,6 +142,7 @@ class DeleteUser(Resource):
             })
 
         return json.jsonify(data)
+
 
 @api.route("/get_registerd_users_count")
 class GetRegisterdUsersCount(Resource):
@@ -150,6 +162,7 @@ class GetRegisterdUsersCount(Resource):
         }
 
         return json.jsonify(body)
+
 
 @api.route("/get_all_usernames_and_ids")
 class GetAllUsernamesAndIds(Resource):

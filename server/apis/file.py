@@ -13,19 +13,10 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource
 
-import psycopg2
-
 from shutil import rmtree
 
 api = Namespace("file", description="Files related operations")
 
-connection = psycopg2.connect(
-    host="127.0.0.1",
-    database="myDrive",
-    user="admin",
-    password="passme",
-)
-connection.set_session(autocommit=True)
 
 @api.route("/myFiles")
 class MyFiles(Resource):
@@ -179,7 +170,7 @@ class MoveToTrash(Resource):
 
         object_name = relative_path.split("/").pop()
         trash_path = os.path.join(DATA_PATH, identity, TRASH_DIR, object_name)
-        
+
         isToDeleteFromUserHistory = False
         if os.path.isfile(path):
             recent_files = {}
@@ -190,7 +181,7 @@ class MoveToTrash(Resource):
                 for file in recent_files:
                     if recent_files[file].get("path") == relative_path:
                         isToDeleteFromUserHistory = True
-            
+
             if isToDeleteFromUserHistory:
                 del recent_files[relative_path]
 
@@ -199,7 +190,7 @@ class MoveToTrash(Resource):
 
             with open(user_history_path, "w") as f:
                 f.write(str(file_content_namedtuple.filename).replace("'", '"'))
-        
+
         os.rename(path, trash_path)
         return "ok", 200
 
@@ -249,14 +240,17 @@ class Download(Resource):
                 isOneFile = True
 
         if (isOneFile):
-            data = Files.download_single_file(elements, home_path, elements[0].get("path"))
+            data = Files.download_single_file(
+                elements, home_path, elements[0].get("path"))
         else:
-            data = Files.download_multiple_files(elements, home_path, current_dir)
+            data = Files.download_multiple_files(
+                elements, home_path, current_dir)
 
         body = {
             "data": data
         }
         return body
+
 
 @api.route("/rename")
 class Rename(Resource):
@@ -272,6 +266,7 @@ class Rename(Resource):
         os.rename(old_path_abs, new_path_abs)
         return True
 
+
 @api.route("/get_shared_folder")
 class GetSharedFolder(Resource):
     @api.doc("get the shared folders")
@@ -286,9 +281,10 @@ class GetSharedFolder(Resource):
             FROM
                 public.shared_folders
             WHERE
-                id_owner = {id}
-                OR shared_folders.shared_folder_id = ANY (SELECT id_shared_folder FROM public.shared_folder_users WHERE id_user = {id})""".format(id=id)
-        query = db.select(statement)
+                id_owner = %(id)s
+                OR shared_folders.shared_folder_id = ANY (SELECT id_shared_folder FROM public.shared_folder_users WHERE id_user = %(id)s)"""
+        query = db.select(statement, {"id": id})
+
         body = {"state": "success"}
         body_entries = []
         for row in query:
@@ -324,27 +320,12 @@ class CreateSharedFolder(Resource):
 
             db = Database()
 
-            statement = "INSERT INTO public.shared_folders(name, id_owner) VALUES ('{name}', {id_owner});".format(name=dirname, id_owner=id)
-            db.exec(statement)
-
-            # statement = "SELECT shared_folder_id FROM public.shared_folders WHERE name = '{name}'".format(name=dirname)
-            # query = db.select(statement)
-            # shared_folder_id = query[0][0]
-
-            # statement = "SELECT id FROM public.users WHERE username = ANY ('{username}')".format(username="{jonas, hallo}")
-            # query = db.select(statement)
-            # user_ids = list(map(lambda item: item[0], query))
-
-            # statement_template = """    INSERT INTO public.shared_folder_users(
-            #                                 id_user, id_shared_folder)
-            #                             VALUES ({id_user}, {id_shared_folder});"""
-
-            # for user_id in user_ids:
-            #     statement = statement_template.format(id_user=user_id, id_shared_folder=shared_folder_id)
-            #     db.exec(statement)
+            statement = "INSERT INTO public.shared_folders(name, id_owner) VALUES (%(name)s, %(id_owner)s);"
+            db.exec(statement, {"name": dirname, "id_owner": id})
 
         answer = {"state": "success"}
         return json.jsonify(answer)
+
 
 @api.route("/create_shared_sub_folder")
 class RemoveUserToSharedFolder(Resource):
@@ -366,6 +347,7 @@ class RemoveUserToSharedFolder(Resource):
 
         return True
 
+
 @api.route("/upload_files_to_shared_folder")
 class UploadFilesToSharedFolder(Resource):
     @api.doc("upload files to a shared folder")
@@ -379,7 +361,6 @@ class UploadFilesToSharedFolder(Resource):
         sub_dir = Path.to_relative(headers.get("sub_dir"))
         shared_path = os.path.join(ROOT, SHARES_DIR, dirname)
 
-
         if len(sub_dir) > 0:
             current_dir = sub_dir[1:]
         files = request.files
@@ -387,6 +368,7 @@ class UploadFilesToSharedFolder(Resource):
             f = files.get(file)
             file_path = os.path.join(shared_path, sub_dir, file)
             f.save(file_path)
+
 
 @api.route("/get_shared_file")
 class GetSharedFile(Resource):
@@ -454,6 +436,7 @@ class GetSharedFile(Resource):
 
         return file_content
 
+
 @api.route("/download_shared_files")
 class RemoveUserToSharedFolder(Resource):
     @api.doc("download files from share")
@@ -473,14 +456,17 @@ class RemoveUserToSharedFolder(Resource):
                 isOneFile = True
 
         if (isOneFile):
-            data = Files.download_single_file(elements, shared_path, elements[0].get("path"))
+            data = Files.download_single_file(
+                elements, shared_path, elements[0].get("path"))
         else:
-            data = Files.download_multiple_files(elements, shared_path, current_dir)
+            data = Files.download_multiple_files(
+                elements, shared_path, current_dir)
 
         body = {
             "data": data
         }
         return body
+
 
 @api.route("/get_shared_folder_content")
 class GetSharedFolder(Resource):
@@ -500,6 +486,7 @@ class GetSharedFolder(Resource):
 
         return Files().get_dir_content(shared_path, current_directory)
 
+
 @api.route("/rename_shared_folder")
 class RenameSharedFolder(Resource):
     @api.doc("rename a shared folder")
@@ -510,31 +497,32 @@ class RenameSharedFolder(Resource):
         old_folder_name, new_folder_name = data.values()
 
         db = Database()
-        statement = "SELECT name FROM shared_folders WHERE id_owner = {id_owner}".format(id_owner=id)
-        query = db.select(statement)
+        statement = "SELECT name FROM shared_folders WHERE id_owner = %(id_owner)s;"
+        query = db.select(statement, {"id_owner":id})
+
         result_check_user_is_owner = []
         if len(query) > 0:
             result_check_user_is_owner = query[0]
 
         if old_folder_name in result_check_user_is_owner:
-            statement = "SELECT name FROM shared_folders WHERE name = '{name}'".format(name=new_folder_name)
+            statement = "SELECT name FROM shared_folders WHERE name = %(name)s;"
+            query = db.select(statement, {"name": new_folder_name})
 
-            query = db.select(statement)
-
-            result_check_if_folder_exists = []
             if len(query) > 0:
-                return { "status": "faild", "description": "folder already exists"}
+                return {"status": "faild", "description": "folder already exists"}
 
-            statement = "UPDATE public.shared_folders SET name='{new_folder_name}' WHERE name='{old_folder_name}';".format(new_folder_name=new_folder_name, old_folder_name=old_folder_name)
-            db.exec(statement)
+            statement = "UPDATE public.shared_folders SET name=%(new_folder_name)s WHERE name=%(old_folder_name)s;"
+
+            db.exec(statement, {"new_folder_name": new_folder_name, "old_folder_name": old_folder_name})
 
             old_path_abs = os.path.join(ROOT, SHARES_DIR, old_folder_name)
             new_path_abs = os.path.join(ROOT, SHARES_DIR, new_folder_name)
             os.rename(old_path_abs, new_path_abs)
 
-            return { "status": "success" }
-        return { "status": "faild", "description": "user is not owner of the share"}
-        
+            return {"status": "success"}
+        return {"status": "faild", "description": "user is not owner of the share"}
+
+
 @api.route("/set_user_access")
 class SetUserAccess(Resource):
     @api.doc("set the users, which have access to the shared folder")
@@ -544,23 +532,24 @@ class SetUserAccess(Resource):
         folder_name, users = json.loads(request.data).values()
 
         db = Database()
-        statement = "SELECT shared_folder_id FROM shared_folders WHERE name = '{folder_name}'".format(folder_name=folder_name)
-        query = db.select(statement)
+        statement = "SELECT shared_folder_id FROM shared_folders WHERE name = %(folder_name)s"
+        query = db.select(statement, {"folder_name": folder_name})
         shared_folder_id = ""
         if len(query) > 0:
             shared_folder_id = query[0][0]
-        else: 
-            return { "status": "faild", "description": "folder does not exist"}
+        else:
+            return {"status": "faild", "description": "folder does not exist"}
 
-        statement = "DELETE FROM public.shared_folder_users WHERE id_shared_folder = {shared_folder_id}".format(shared_folder_id = shared_folder_id)
-        db.exec(statement)
+        statement = "DELETE FROM public.shared_folder_users WHERE id_shared_folder = %(shared_folder_id)s;"
+        db.exec(statement, {"shared_folder_id": shared_folder_id})
 
         for user in users:
             id, name = user.values()
-            statement = "INSERT INTO public.shared_folder_users( id_user, id_shared_folder ) VALUES ({id_user}, {shared_folder_id});".format(id_user = id, shared_folder_id = shared_folder_id)
-            db.exec(statement)
+            statement = "INSERT INTO public.shared_folder_users( id_user, id_shared_folder ) VALUES (%(id_user)s, %(shared_folder_id)s);"
+            db.exec(statement, {"id_user": id, "shared_folder_id": shared_folder_id})
 
-        return { "status": "success" }
+        return {"status": "success"}
+
 
 @api.route("/get_users_with_access_to_shared_folder")
 class GetUsersWithAccessToSharedFolder(Resource):
@@ -573,14 +562,10 @@ class GetUsersWithAccessToSharedFolder(Resource):
         db = Database()
 
         query = []
-        with connection.cursor() as cursor:
-            cursor.execute('SELECT id_user, username FROM public.v_shared_folders_with_users WHERE name = %(shared_folder)s', {"shared_folder": shared_folder})
-            result = cursor.fetchone()
-            query = result
+        statement = "SELECT id_user, username FROM public.v_shared_folders_with_users WHERE name = %(shared_folder)s"
+        query = db.select(statement, {"shared_folder": shared_folder})
 
-        users = []
-        if len(query) > 0:
-            users.append(query)
+        users = query
 
         data = []
         counter = 0
@@ -592,7 +577,8 @@ class GetUsersWithAccessToSharedFolder(Resource):
             })
 
             counter += 1
-        return { "status": "success", "data": data}
+        return {"status": "success", "data": data}
+
 
 @api.route("/delete_shared_folder")
 class RenameSharedFolder(Resource):
@@ -610,7 +596,8 @@ class RenameSharedFolder(Resource):
         else:
             rmtree(path)
 
-        return { "status": "success" }
+        return {"status": "success"}
+
 
 @api.route("/rename_share_sub_folder")
 class RenameShareSubFolder(Resource):

@@ -30,9 +30,8 @@ class Login(Resource):
         password = user_credential["password"]
 
         db = Database()
-        statement = "SELECT id, username, password, groups FROM users WHERE username = '{username}';".format(
-            username=username)
-        query = db.select(statement)
+        statement = "SELECT id, username, password, groups FROM users WHERE username = %(username)s;"
+        query = db.select(statement, {"username": username})
 
         if not query:
             return Auth.generate_login_faild_response()

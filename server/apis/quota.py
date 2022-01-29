@@ -24,9 +24,9 @@ class Usage(Resource):
 
         name, size = json.loads(request.data).values()
         db = Database()
-
-        statement = "INSERT INTO public.quotas(name, size) VALUES ('{name}', {size});".format(name=name, size=size)
-        db.exec(statement)
+ 
+        statement = "INSERT INTO public.quotas(name, size) VALUES (%(name)s, %(size)s);"
+        db.exec(statement, {"name": name, "size": size})
 
         return "", 200
 
