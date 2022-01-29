@@ -5,7 +5,6 @@ import { Dir } from 'src/app/interfaces/dir';
 import { listItem } from '../dialogs/edit-share-access/edit-share-access.component';
 import { DefaultResponse } from '../interfaces/default-response';
 import { FileTableRow } from '../interfaces/file-table-row';
-import { RecentFiles } from '../interfaces/recent-files';
 import { ConfigService } from './config.service';
 
 export interface DownloadFilesStructureInformations {
@@ -100,7 +99,7 @@ export class FileService {
       fd.append(file.name, file, file.name)
     }
 
-    return this.http.post(`${this.apiUrl}/upload_files`, fd, httpOptions)
+    return this.http.post<any>(`${this.apiUrl}/upload_files`, fd, httpOptions)
   }
 
   createFolder(currentDir: string, folderName: string) {
@@ -180,14 +179,14 @@ export class FileService {
     return this.http.get<Dir>(`${this.apiUrl}/get_shared_folder_content?shared_folder=${shared_folder}&sub_dir=${sub_dir}`)
   }
 
-  createSharedFolder(name: string) {
+  createSharedFolder(name: string): Observable<any> {
     const body = {
       "name": name
     }
     return this.http.post<any>(`${this.apiUrl}/create_shared_folder`, body)
   }
 
-  createSharedSubFolder(shared_folder: string, sub_dir: string = "") {
+  createSharedSubFolder(shared_folder: string, sub_dir: string = ""): Observable<any> {
     const body = {
       "shared_folder": shared_folder,
       "sub_dir": sub_dir
@@ -211,7 +210,7 @@ export class FileService {
     return this.http.post(`${this.apiUrl}/upload_files_to_shared_folder`, fd, httpOptions)
   }
 
-  getSpecificFileFromShare(filePath: string, shared_folder = "") {
+  getSpecificFileFromShare(filePath: string, shared_folder = ""): Observable<any> {
     filePath = filePath.replaceAll("\\", "/")
     return this.http.get<any>(`http://127.0.0.1:5000/file/get_shared_file?file=${filePath}&shared_folder=${shared_folder}`)
   }
@@ -220,7 +219,7 @@ export class FileService {
     return this.http.get<UsersWithAccessResponse>(`http://127.0.0.1:5000/file/get_users_with_access_to_shared_folder?shared_folder=${shared_folder}`)
   }
 
-  deleteSharedFolder(shared_folder: string, sub_dir: string) {
+  deleteSharedFolder(shared_folder: string, sub_dir: string): Observable<any> {
     const body = {
       "shared_folder": shared_folder,
       "sub_dir": sub_dir
@@ -228,7 +227,7 @@ export class FileService {
     return this.http.post<any>(`${this.apiUrl}/delete_shared_folder`, body)
   }
 
-  renameShareSubFolder(sharedFolder: string, oldPath: string, newPath: string) {
+  renameShareSubFolder(sharedFolder: string, oldPath: string, newPath: string): Observable<any> {
     const body = {
       "shared_folder": sharedFolder,
       "old_path": oldPath,
