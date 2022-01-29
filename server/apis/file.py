@@ -358,13 +358,15 @@ class UploadFilesToSharedFolder(Resource):
         sub_dir = Path.to_relative(headers.get("sub_dir"))
         shared_path = os.path.join(ROOT, SHARES_DIR, dirname)
 
-        if len(sub_dir) > 0:
-            current_dir = sub_dir[1:]
         files = request.files
         for file in files:
             f = files.get(file)
             file_path = os.path.join(shared_path, sub_dir, file)
             f.save(file_path)
+
+        return {"state": "success"}
+
+        
 
 
 @api.route("/get_shared_file")
@@ -506,7 +508,7 @@ class RenameSharedFolder(Resource):
             query = db.select(statement, {"name": new_folder_name})
 
             if len(query) > 0:
-                return {"status": "faild", "description": "folder already exists"}
+                return {"state": "faild", "description": "folder already exists"}
 
             statement = "UPDATE public.shared_folders SET name=%(new_folder_name)s WHERE name=%(old_folder_name)s;"
 
@@ -516,8 +518,8 @@ class RenameSharedFolder(Resource):
             new_path_abs = os.path.join(ROOT, SHARES_DIR, new_folder_name)
             os.rename(old_path_abs, new_path_abs)
 
-            return {"status": "success"}
-        return {"status": "faild", "description": "user is not owner of the share"}
+            return {"state": "success"}
+        return {"state": "faild", "description": "user is not owner of the share"}
 
 
 @api.route("/set_user_access")
@@ -535,7 +537,7 @@ class SetUserAccess(Resource):
         if len(query) > 0:
             shared_folder_id = query[0][0]
         else:
-            return {"status": "faild", "description": "folder does not exist"}
+            return {"state": "faild", "description": "folder does not exist"}
 
         statement = "DELETE FROM public.shared_folder_users WHERE id_shared_folder = %(shared_folder_id)s;"
         db.exec(statement, {"shared_folder_id": shared_folder_id})
@@ -545,7 +547,7 @@ class SetUserAccess(Resource):
             statement = "INSERT INTO public.shared_folder_users( id_user, id_shared_folder ) VALUES (%(id_user)s, %(shared_folder_id)s);"
             db.exec(statement, {"id_user": id, "shared_folder_id": shared_folder_id})
 
-        return {"status": "success"}
+        return {"state": "success"}
 
 
 @api.route("/get_users_with_access_to_shared_folder")
@@ -574,7 +576,7 @@ class GetUsersWithAccessToSharedFolder(Resource):
             })
 
             counter += 1
-        return {"status": "success", "data": data}
+        return {"state": "success", "data": data}
 
 
 @api.route("/delete_shared_folder")
@@ -593,7 +595,7 @@ class RenameSharedFolder(Resource):
         else:
             rmtree(path)
 
-        return {"status": "success"}
+        return {"state": "success"}
 
 
 @api.route("/rename_share_sub_folder")
@@ -607,4 +609,4 @@ class RenameShareSubFolder(Resource):
         new_path_abs = os.path.join(
             ROOT, SHARES_DIR, shared_folder, Path().to_relative(newPath))
         os.rename(old_path_abs, new_path_abs)
-        return True
+        return {"state": "success"}

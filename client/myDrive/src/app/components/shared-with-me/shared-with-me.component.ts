@@ -92,7 +92,7 @@ export class SharedWithMeComponent implements OnInit {
       
       if (oldName !== data.folderName) {
         this.fileService.renameSharedFolder(oldName, data.folderName).subscribe((result) => {
-          if (result.status === "faild") {
+          if (result.state === "faild") {
             this._openSnackbar("update faild")
             return
           }
@@ -100,7 +100,7 @@ export class SharedWithMeComponent implements OnInit {
           this.setSharedFolders()
 
           this.fileService.setUserAccess(data.folderName, data.usersWithAccess).subscribe(result => {
-            if (result.status === "success") {
+            if (result.state === "success") {
               this._openSnackbar("updated successfully")
             } else {
               this._openSnackbar("update faild")
@@ -111,7 +111,7 @@ export class SharedWithMeComponent implements OnInit {
         })
       } else {
         this.fileService.setUserAccess(data.folderName, data.usersWithAccess).subscribe(result => {
-          if (result.status === "success") {
+          if (result.state === "success") {
             this._openSnackbar("updated successfully")
           } else {
             this._openSnackbar("update faild")

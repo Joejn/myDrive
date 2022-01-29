@@ -186,8 +186,8 @@ class Database():
         self.conn.set_session(autocommit=True)
         self.cur = self.conn.cursor()
 
-
     # @staticmethod
+
     def select(self, statement, vars={}):
         self.cur.execute(statement, vars)
         return self.cur.fetchall()
@@ -209,8 +209,8 @@ class Password():
 class Admin():
     def checkIfAdmin(id):
         db = Database()
-        groups = db.select(
-            "SELECT groups FROM public.users WHERE id=" + str(id))[0][0]
+        statement = "SELECT groups FROM public.users WHERE id=%(id)s;"
+        groups = db.select(statement, {"id": id})[0][0]
         return any(x in groups for x in administrators_groups)
 
 

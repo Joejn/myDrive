@@ -1,4 +1,4 @@
 export interface DefaultResponse {
-    status: string,
+    state: string,
     description?: string
 }

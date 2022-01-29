@@ -16,7 +16,6 @@ export interface DownloadFilesStructureInformations {
     type: string,
     path: string
   }[]
-
 }
 
 export interface DownloadFilesStructure {
@@ -87,7 +86,7 @@ export class FileService {
     return this.http.get<Dir>(`${this.apiUrl}/get_recent_files`)
   }
 
-  uploadFiles(files: File[], currentDir: string) {
+  uploadFiles(files: File[], currentDir: string): Observable<DefaultResponse> {
     const fd = new FormData()
     const httpOptions = {
       headers: new HttpHeaders({
@@ -99,7 +98,7 @@ export class FileService {
       fd.append(file.name, file, file.name)
     }
 
-    return this.http.post(`${this.apiUrl}/upload_files`, fd, httpOptions)
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/upload_files`, fd, httpOptions)
   }
 
   createFolder(currentDir: string, folderName: string) {
@@ -169,32 +168,25 @@ export class FileService {
   }
 
   getShareFolderContent(shared_folder: string, sub_dir: string = "") {
-    // const httpOptions = {
-    //   headers: new HttpHeaders({
-    //     "shared_folder": shared_folder,
-    //     "sub_dir": sub_dir
-    //   })
-    // }
-
     return this.http.get<Dir>(`${this.apiUrl}/get_shared_folder_content?shared_folder=${shared_folder}&sub_dir=${sub_dir}`)
   }
 
-  createSharedFolder(name: string) {
+  createSharedFolder(name: string): Observable<DefaultResponse> {
     const body = {
       "name": name
     }
-    return this.http.post(`${this.apiUrl}/create_shared_folder`, body)
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/create_shared_folder`, body)
   }
 
-  createSharedSubFolder(shared_folder: string, sub_dir: string = "") {
+  createSharedSubFolder(shared_folder: string, sub_dir: string = ""): Observable<DefaultResponse> {
     const body = {
       "shared_folder": shared_folder,
       "sub_dir": sub_dir
     }
-    return this.http.post(`${this.apiUrl}/create_shared_sub_folder`, body)
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/create_shared_sub_folder`, body)
   }
 
-  uploadFilesToSharedFolder(files: File[], shared_folder: string, sub_dir: string = "") {
+  uploadFilesToSharedFolder(files: File[], shared_folder: string, sub_dir: string = ""): Observable<DefaultResponse> {
     const fd = new FormData()
     const httpOptions = {
       headers: new HttpHeaders({
@@ -207,33 +199,33 @@ export class FileService {
         fd.append(file.name, file, file.name)
       }
     }
-    return this.http.post(`${this.apiUrl}/upload_files_to_shared_folder`, fd, httpOptions)
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/upload_files_to_shared_folder`, fd, httpOptions)
   }
 
-  getSpecificFileFromShare(filePath: string, shared_folder = "") {
+  getSpecificFileFromShare(filePath: string, shared_folder = ""): Observable<Blob> {
     filePath = filePath.replaceAll("\\", "/")
-    return this.http.get(`http://127.0.0.1:5000/file/get_shared_file?file=${filePath}&shared_folder=${shared_folder}`)
+    return this.http.get<Blob>(`${this.apiUrl}/get_shared_file?file=${filePath}&shared_folder=${shared_folder}`)
   }
 
   getUsersWithAccessToSharedFolder(shared_folder: string) {
-    return this.http.get<UsersWithAccessResponse>(`http://127.0.0.1:5000/file/get_users_with_access_to_shared_folder?shared_folder=${shared_folder}`)
+    return this.http.get<UsersWithAccessResponse>(`${this.apiUrl}/get_users_with_access_to_shared_folder?shared_folder=${shared_folder}`)
   }
 
-  deleteSharedFolder(shared_folder: string, sub_dir: string) {
+  deleteSharedFolder(shared_folder: string, sub_dir: string): Observable<DefaultResponse> {
     const body = {
       "shared_folder": shared_folder,
       "sub_dir": sub_dir
     }
-    return this.http.post(`${this.apiUrl}/delete_shared_folder`, body)
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/delete_shared_folder`, body)
   }
 
-  renameShareSubFolder(sharedFolder: string, oldPath: string, newPath: string) {
+  renameShareSubFolder(sharedFolder: string, oldPath: string, newPath: string): Observable<DefaultResponse> {
     const body = {
       "shared_folder": sharedFolder,
       "old_path": oldPath,
       "new_path": newPath
     }
-    return this.http.post(`${this.apiUrl}/rename_share_sub_folder`, body)
+    return this.http.post<DefaultResponse>(`${this.apiUrl}/rename_share_sub_folder`, body)
   }
 
   // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript

@@ -12,8 +12,8 @@
             <mat-icon class="button__icon-left">cloud_upload</mat-icon>
             <span>Upload file</span>
         </button>
-        <button class="app-table__header-item" [hidden]="!this.headerElements.includes('createFolder')" mat-raised-button
-            color="primary" (click)="onCreateFolderClicked()">
+        <button class="app-table__header-item" [hidden]="!this.headerElements.includes('createFolder')"
+            mat-raised-button color="primary" (click)="onCreateFolderClicked()">
             <mat-icon class="button__icon-left">add</mat-icon>
             <span>Create Folder</span>
         </button>
@@ -41,11 +41,9 @@
                 <td [hidden]="!displayedColumns.includes('name')" mat-cell *matCellDef="let element"
                     (click)="onClick(element)" (contextmenu)="onContextMenu($event, element)">
                     <!-- https://stackoverflow.com/questions/3779534/how-do-i-disable-text-selection-with-css-or-javascript -->
-                    <div style="display: flex; align-items: center; -moz-user-select: none;
-                                        -webkit-user-select: none; -ms-user-select: none; user-select: none;
-                                        -moz-user-select: none;" unselectable="on" onselectstart="return false"
+                    <div class="disable-text-select d-flex align-items-center" unselectable="on" onselectstart="return false"
                         onmousedown="return false">
-                        <mat-icon style="vertical-align: center; margin-right: 1em;">{{element.type == "file" ?
+                        <mat-icon class="mr-4">{{element.type == "file" ?
                             "description" : "folder"}} </mat-icon>
                         <span>{{element.name}}</span>
                     </div>
@@ -56,9 +54,7 @@
                 <th [hidden]="!displayedColumns.includes('last_modified')" mat-header-cell *matHeaderCellDef
                     mat-sort-header>last modified</th>
                 <td [hidden]="!displayedColumns.includes('last_modified')" mat-cell *matCellDef="let element"
-                    (click)="onClick(element)" style="-moz-user-select: none;
-                                    -webkit-user-select: none; -ms-user-select: none; user-select: none;
-                                    -moz-user-select: none;" unselectable="on" onselectstart="return false"
+                    (click)="onClick(element)" unselectable="on" onselectstart="return false"
                     onmousedown="return false">{{element.last_modified}}</td>
             </ng-container>
 
@@ -66,14 +62,13 @@
                 <th [hidden]="!displayedColumns.includes('file_size')" mat-header-cell *matHeaderCellDef
                     mat-sort-header>file size</th>
                 <td [hidden]="!displayedColumns.includes('file_size')" mat-cell *matCellDef="let element"
-                    (click)="onClick(element)" style="-moz-user-select: none;
-                                    -webkit-user-select: none; -ms-user-select: none; user-select: none;
-                                    -moz-user-select: none;" unselectable="on" onselectstart="return false"
+                    (click)="onClick(element)" unselectable="on" onselectstart="return false"
                     onmousedown="return false">{{element.file_size}}</td>
             </ng-container>
             <ng-container matColumnDef="delete">
                 <th [hidden]="!displayedColumns.includes('delete')" mat-header-cell *matHeaderCellDef></th>
-                <td class="app-table__cell-content-right" [hidden]="!displayedColumns.includes('delete')" mat-cell *matCellDef="let row">
+                <td class="app-table__cell-content-right" [hidden]="!displayedColumns.includes('delete')" mat-cell
+                    *matCellDef="let row">
                     <button mat-icon-button color="warn" (click)="onDeleteClicked(row)">
                         <mat-icon>delete</mat-icon>
                     </button>
