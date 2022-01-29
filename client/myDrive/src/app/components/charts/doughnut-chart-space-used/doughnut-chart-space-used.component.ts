@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { FileService } from 'src/app/services/file.service';
-import { HighlightSpanKind } from 'typescript';
 
 @Component({
   selector: 'app-doughnut-chart-space-used',

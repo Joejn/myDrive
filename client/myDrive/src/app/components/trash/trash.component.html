@@ -22,9 +22,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
                 <td mat-cell *matCellDef="let element" (contextmenu)="onContextMenu($event, element)">
                     <!-- https://stackoverflow.com/questions/3779534/how-do-i-disable-text-selection-with-css-or-javascript -->
-                    <div style="display: flex; align-items: center; -moz-user-select: none;
-                                    -webkit-user-select: none; -ms-user-select: none; user-select: none;
-                                    -moz-user-select: none;" unselectable="on" onselectstart="return false"
+                    <div class="disable-text-select d-flex align-items-center" unselectable="on" onselectstart="return false"
                         onmousedown="return false">
                         <mat-icon style="vertical-align: center; margin-right: 1em;">{{element.type == "file" ?
                             "description" : "folder"}} </mat-icon>
@@ -35,17 +33,13 @@
 
             <ng-container matColumnDef="last_modified">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>last modified</th>
-                <td mat-cell *matCellDef="let element" style="-moz-user-select: none;
-                                -webkit-user-select: none; -ms-user-select: none; user-select: none;
-                                -moz-user-select: none;" unselectable="on" onselectstart="return false"
+                <td mat-cell *matCellDef="let element" unselectable="on" onselectstart="return false"
                     onmousedown="return false">{{element.last_modified}}</td>
             </ng-container>
 
             <ng-container matColumnDef="file_size">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>file size</th>
-                <td mat-cell *matCellDef="let element" style="-moz-user-select: none;
-                                -webkit-user-select: none; -ms-user-select: none; user-select: none;
-                                -moz-user-select: none;" unselectable="on" onselectstart="return false"
+                <td mat-cell *matCellDef="let element" unselectable="on" onselectstart="return false"
                     onmousedown="return false">{{element.file_size}}</td>
             </ng-container>
             <ng-container matColumnDef="delete">
