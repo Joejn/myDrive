@@ -1,12 +1,9 @@
 from datetime import datetime
-from os import cpu_count
-from time import time
-from flask import request, json
+
+import psutil
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended.utils import get_jwt, get_jwt_identity
 from flask_restx import Namespace
 from flask_restx.resource import Resource
-import psutil
 
 api = Namespace("server_info", description="server related operations")
 

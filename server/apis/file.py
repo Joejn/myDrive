@@ -1,19 +1,16 @@
 import base64
-from collections import namedtuple
-from msilib.schema import File
 import os
+from collections import namedtuple
 from os.path import join
-from posixpath import basename
-from traceback import print_tb
+from shutil import rmtree
 
+from core.consts import (DATA_PATH, HOME_DIR, ROOT, SHARES_DIR, TRASH_DIR,
+                         USER_HISTORY_FILE)
 from core.utils import Database, Files, Path
-from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR, USER_HISTORY_FILE, ROOT, SHARES_DIR
 from flask import json, request, send_file, send_from_directory
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource
-
-from shutil import rmtree
 
 api = Namespace("file", description="Files related operations")
 

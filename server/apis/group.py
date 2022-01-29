@@ -1,12 +1,10 @@
+from core.utils import Admin, Database
 from flask import json
 from flask.globals import request
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace
 from flask_restx.resource import Resource
-
-from core.utils import Database
-from core.utils import Admin
 
 api = Namespace("group", description="group related operations")
 

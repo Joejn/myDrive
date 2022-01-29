@@ -1,13 +1,13 @@
-from datetime import datetime
 import os
 import shutil
+from datetime import datetime
+
 from core.consts import DATA_PATH, HOME_DIR, TRASH_DIR
-from flask import request, json
+from core.utils import Admin, Database, Password
+from flask import json, request
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended.utils import get_jwt, get_jwt_identity
+from flask_jwt_extended.utils import get_jwt
 from flask_restx import Namespace, Resource
-from core.utils import Database
-from core.utils import Password, Admin
 
 api = Namespace("users", description="user related operations")
 

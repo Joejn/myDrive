@@ -1,11 +1,10 @@
 import bcrypt
+from core.utils import Auth, Database
+from flask import json, request
+from flask_jwt_extended import (create_access_token,
+                                get_jwt_identity, jwt_required)
 from flask_jwt_extended.utils import get_jwt
-from core.utils import Database, Auth
-from flask import request, json
-from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
-
-from flask_jwt_extended import create_access_token, create_refresh_token
 
 api = Namespace("auth", description="Authentication related operations")
 

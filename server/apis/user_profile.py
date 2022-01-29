@@ -1,13 +1,12 @@
-from datetime import datetime
-from flask import request, json
+import base64
+
+import bcrypt
+from core.utils import Database, Password
+from flask import json, request
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended.utils import get_jwt, get_jwt_identity
 from flask_restx import Namespace, Resource
 from werkzeug.utils import secure_filename
-from core.utils import Database
-import base64
-import bcrypt
-from core.utils import Password
 
 DEFAULT_THEME = "my-theme-light"
 
