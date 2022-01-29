@@ -25,7 +25,7 @@ export class SharedWithMeComponent implements OnInit {
   selectedSharedFolder = ""
   @ViewChild("table") table!: FileTableComponent
 
-  constructor(public dialog: MatDialog, private _snackbar: MatSnackBar, private fileService: FileService) { 
+  constructor(public dialog: MatDialog, private _snackbar: MatSnackBar, private fileService: FileService) {
 
   }
 
@@ -54,7 +54,7 @@ export class SharedWithMeComponent implements OnInit {
 
         resolve(sharedFolders)
       })
-    }) 
+    })
   }
   
   openCreateSharedFolderDialog() {
